@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+}
+
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  email      String   @unique
+  avatar     String?
+  created_at DateTime @default(now())
+
+  articles  Article[]
+  reactions Reaction[]
+  comments  Comment[]
+}
+
+model Article {
+  id         String   @id @default(uuid())
+  title      String
+  content    String
+  thumbnail  String?
+  created_at DateTime @default(now())
+
+  author_id String
+  author    User   @relation(fields: [author_id], references: [id])
+
+  reactions Reaction[]
+  comments  Comment[]
+}
+
+model Reaction {
+  id         String       @id @default(uuid())
+  user_id    String
+  article_id String
+  type       ReactionType
+  created_at DateTime     @default(now())
+
+  user    User    @relation(fields: [user_id], references: [id])
+  article Article @relation(fields: [article_id], references: [id])
+
+  @@unique([user_id, article_id])
+}
+
+enum ReactionType {
+  LIKE
+  DISLIKE
+}
+
+model Comment {
+  id         String   @id @default(uuid())
+  user_id    String
+  article_id String
+  content    String
+  created_at DateTime @default(now())
+
+  user    User    @relation(fields: [user_id], references: [id])
+  article Article @relation(fields: [article_id], references: [id])
+}
