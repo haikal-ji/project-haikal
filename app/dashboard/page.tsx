@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import DeleteArticleButton from './DeleteArticleButton'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const articles = await prisma.article.findMany({
     orderBy: { created_at: 'desc' },

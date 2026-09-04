@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import ArticleForm from '@/components/ArticleForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function EditArtikelPage({
   params,
 }: {
