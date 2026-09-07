@@ -2,8 +2,14 @@ import ArticleForm from '@/components/ArticleForm'
 
 export default function TambahArtikelPage() {
   return (
-    <div className="mx-auto max-w-2xl p-8">
-      <h1 className="mb-6 text-2xl font-semibold">Tambah Artikel</h1>
+    <div className="editor-page-shell">
+      <div className="editor-page-topbar">
+        <div>
+          <p className="dashboard-kicker">Library / New entry</p>
+          <h1>Tulis artikel</h1>
+        </div>
+        <span className="editor-draft-state"><i /> Draft baru</span>
+      </div>
       <ArticleForm mode="create" />
     </div>
   )

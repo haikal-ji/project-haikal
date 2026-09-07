@@ -24,9 +24,9 @@ export default function RichTextEditor({
       onChange(editor.getHTML())
     },
     editorProps: {
-      attributes: {
-        class:
-          'min-h-[220px] w-full rounded-md border border-gray-300 p-3 focus:outline-none [&_img]:max-w-full [&_img]:rounded-md',
+        attributes: {
+          class:
+          'editor-prose [&_img]:max-w-full [&_img]:rounded-md',
       },
     },
   })
@@ -67,45 +67,50 @@ export default function RichTextEditor({
   if (!editor) return null
 
   return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
+    <div className="rich-editor">
+      <div className="rich-editor-toolbar" aria-label="Toolbar editor">
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`rounded border px-2 py-1 text-sm font-bold ${editor.isActive('bold') ? 'bg-black text-white' : ''}`}
+          title="Tebal"
+          className={`rich-tool rich-tool-bold ${editor.isActive('bold') ? 'is-active' : ''}`}
         >
           B
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`rounded border px-2 py-1 text-sm italic ${editor.isActive('italic') ? 'bg-black text-white' : ''}`}
+          title="Miring"
+          className={`rich-tool rich-tool-italic ${editor.isActive('italic') ? 'is-active' : ''}`}
         >
           I
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          className={`rounded border px-2 py-1 text-sm ${editor.isActive('heading', { level: 2 }) ? 'bg-black text-white' : ''}`}
+          title="Subjudul"
+          className={`rich-tool ${editor.isActive('heading', { level: 2 }) ? 'is-active' : ''}`}
         >
           H2
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`rounded border px-2 py-1 text-sm ${editor.isActive('bulletList') ? 'bg-black text-white' : ''}`}
+          title="Daftar"
+          className={`rich-tool ${editor.isActive('bulletList') ? 'is-active' : ''}`}
         >
-          List
+          •••
         </button>
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="rounded border px-2 py-1 text-sm"
+          title="Upload gambar"
+          className="rich-tool rich-tool-wide"
         >
-          Upload Gambar
+          + Gambar
         </button>
-        <button type="button" onClick={insertImageFromUrl} className="rounded border px-2 py-1 text-sm">
-          Gambar dari URL
+      <button type="button" onClick={insertImageFromUrl} title="Tambah gambar dari URL" className="rich-tool rich-tool-wide">
+          URL gambar
         </button>
         <input
           ref={fileInputRef}

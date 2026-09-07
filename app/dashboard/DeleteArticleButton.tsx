@@ -26,7 +26,7 @@ export default function DeleteArticleButton({ id }: { id: string }) {
     <button
       onClick={handleDelete}
       disabled={loading}
-      className="text-sm text-red-600 underline disabled:opacity-50"
+      className="dashboard-delete-action disabled:opacity-50"
     >
       {loading ? 'Menghapus...' : 'Hapus'}
     </button>

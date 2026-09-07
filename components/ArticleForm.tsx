@@ -25,7 +25,7 @@ export default function ArticleForm({
 
   const [title, setTitle] = useState(initialTitle)
   const [content, setContent] = useState(initialContent)
-  const [thumbnail, setThumbnail] = useState<string | null>(initialThumbnail)
+  const [thumbnail] = useState<string | null>(initialThumbnail)
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(initialThumbnail)
   const [loading, setLoading] = useState(false)
@@ -82,41 +82,59 @@ export default function ArticleForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div>
-        <label className="mb-1 block text-sm font-medium">Judul</label>
+    <form onSubmit={handleSubmit} className="editor-form">
+      <div className="editor-main-column">
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           required
-          className="w-full rounded-md border border-gray-300 px-3 py-2"
+          placeholder="Judul artikel..."
+          aria-label="Judul artikel"
+          className="editor-title-input"
         />
+        <p className="editor-helper">Tulis dengan suara kamu sendiri. Tidak perlu semuanya sempurna di awal.</p>
+        <div className="editor-canvas">
+          <RichTextEditor content={content} onChange={setContent} />
+        </div>
       </div>
 
-      <div>
-        <label className="mb-1 block text-sm font-medium">Thumbnail</label>
-        {preview && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={preview} alt="Preview thumbnail" className="mb-2 h-32 rounded-md object-cover" />
-        )}
-        <input type="file" accept="image/*" onChange={handleThumbnailChange} />
-      </div>
+      <aside className="editor-sidebar">
+        <div className="editor-panel">
+          <div className="editor-panel-heading">
+            <span>01</span>
+            <h2>Cover image</h2>
+          </div>
+          <label className={`editor-cover-picker ${preview ? 'has-preview' : ''}`}>
+            {preview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={preview} alt="Preview cover artikel" />
+            ) : (
+              <span className="editor-cover-empty"><b>＋</b><span>Tambahkan gambar utama</span><small>JPG, PNG sampai 5MB</small></span>
+            )}
+            <input type="file" accept="image/*" onChange={handleThumbnailChange} />
+          </label>
+          <p className="editor-panel-note">Cover akan muncul di halaman jurnal dan kartu artikel.</p>
+        </div>
 
-      <div>
-        <label className="mb-1 block text-sm font-medium">Konten</label>
-        <RichTextEditor content={content} onChange={setContent} />
-      </div>
+        <div className="editor-panel editor-publish-panel">
+          <div className="editor-panel-heading">
+            <span>02</span>
+            <h2>Publishing</h2>
+          </div>
+          <div className="editor-meta-row"><span>Status</span><strong><i /> Live saat disimpan</strong></div>
+          <div className="editor-meta-row"><span>Format</span><strong>Article / Journal</strong></div>
+          <div className="editor-action-row">
+            <button type="submit" disabled={loading} className="editor-save-button">
+              {loading ? 'Menyimpan...' : mode === 'create' ? 'Publikasikan artikel' : 'Simpan perubahan'}
+              <span aria-hidden="true">↗</span>
+            </button>
+            <button type="button" className="editor-cancel-button" onClick={() => window.history.back()}>Batal</button>
+          </div>
+        </div>
 
-      {error && <p className="text-sm text-red-500">{error}</p>}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="rounded-md bg-black px-6 py-2 text-white disabled:opacity-50"
-      >
-        {loading ? 'Menyimpan...' : mode === 'create' ? 'Simpan Artikel' : 'Update Artikel'}
-      </button>
+        {error && <p className="editor-error">{error}</p>}
+      </aside>
     </form>
   )
 }

@@ -10,50 +10,100 @@ export default async function DashboardPage() {
   })
 
   return (
-    <div className="mx-auto max-w-5xl p-8">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Dashboard Artikel</h1>
-        <Link href="/dashboard/artikel/tambah" className="rounded-md bg-black px-4 py-2 text-white">
-          + Tambah Artikel
-        </Link>
-      </div>
+    <div className="dashboard-shell">
+      <aside className="dashboard-sidebar">
+        <Link href="/" className="dashboard-brand">HAiKAL<span>.</span></Link>
+        <p className="dashboard-label">Workspace</p>
+        <nav className="dashboard-nav" aria-label="Navigasi dashboard">
+          <Link href="/dashboard" className="dashboard-nav-active"><span>◌</span> Overview</Link>
+          <Link href="/dashboard/artikel/tambah"><span>＋</span> Tulis artikel</Link>
+          <Link href="/artikel"><span>↗</span> Lihat website</Link>
+        </nav>
+        <div className="dashboard-sidebar-note">
+          <span className="dashboard-status-dot" />
+          <p>Ruang kerja pribadi<br /><span>Semua perubahan tersimpan di project.</span></p>
+        </div>
+      </aside>
 
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="border-b text-left text-sm text-gray-500">
-            <th className="py-2">Judul</th>
-            <th className="py-2">Tanggal Dibuat</th>
-            <th className="py-2">Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          {articles.map((article) => (
-            <tr key={article.id} className="border-b">
-              <td className="py-3">{article.title}</td>
-              <td className="py-3 text-sm text-gray-500">
-                {new Date(article.created_at).toLocaleDateString('id-ID', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
-              </td>
-              <td className="space-x-3 py-3">
-                <Link href={`/dashboard/artikel/edit/${article.id}`} className="text-sm text-blue-600 underline">
-                  Edit
-                </Link>
-                <DeleteArticleButton id={article.id} />
-              </td>
-            </tr>
-          ))}
-          {articles.length === 0 && (
-            <tr>
-              <td colSpan={3} className="py-8 text-center text-gray-400">
-                Belum ada artikel.
-              </td>
-            </tr>
+      <main className="dashboard-main">
+        <header className="dashboard-topbar">
+          <div>
+            <p className="dashboard-kicker">Senin, 7 September 2026</p>
+            <h1>Selamat datang kembali.</h1>
+          </div>
+          <Link href="/dashboard/artikel/tambah" className="dashboard-primary-action">
+            <span aria-hidden="true">＋</span> Artikel baru
+          </Link>
+        </header>
+
+        <section className="dashboard-intro">
+          <div>
+            <p className="dashboard-kicker">Content desk</p>
+            <h2>Ide yang sudah menemukan bentuk.</h2>
+          </div>
+          <p>{articles.length === 0 ? 'Mulai dengan menulis catatan pertamamu.' : 'Kelola catatan, proses, dan cerita yang ingin kamu bagikan.'}</p>
+        </section>
+
+        <section className="dashboard-stats" aria-label="Ringkasan artikel">
+          <div className="dashboard-stat dashboard-stat-featured">
+            <span className="dashboard-stat-label">Total artikel</span>
+            <strong>{String(articles.length).padStart(2, '0')}</strong>
+            <span className="dashboard-stat-meta">Catatan yang tersimpan</span>
+          </div>
+          <div className="dashboard-stat">
+            <span className="dashboard-stat-label">Terakhir ditulis</span>
+            <strong>{articles[0] ? new Date(articles[0].created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) : '—'}</strong>
+            <span className="dashboard-stat-meta">Update terbaru</span>
+          </div>
+          <div className="dashboard-stat">
+            <span className="dashboard-stat-label">Dengan cover</span>
+            <strong>{String(articles.filter((article) => article.thumbnail).length).padStart(2, '0')}</strong>
+            <span className="dashboard-stat-meta">Artikel punya thumbnail</span>
+          </div>
+        </section>
+
+        <section className="dashboard-articles">
+          <div className="dashboard-section-heading">
+            <div>
+              <p className="dashboard-kicker">Library</p>
+              <h2>Artikel kamu</h2>
+            </div>
+            <span>{articles.length} item</span>
+          </div>
+
+          {articles.length > 0 ? (
+            <div className="dashboard-article-list">
+              {articles.map((article, index) => (
+                <article key={article.id} className="dashboard-article-row">
+                  <span className="dashboard-row-number">{String(index + 1).padStart(2, '0')}</span>
+                  {article.thumbnail ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={article.thumbnail} alt="" className="dashboard-article-thumb" />
+                  ) : (
+                    <div className="dashboard-article-thumb dashboard-article-thumb-empty" aria-hidden="true"><span>Haikal</span></div>
+                  )}
+                  <div className="dashboard-article-copy">
+                    <h3>{article.title}</h3>
+                    <p>Dipublikasikan · {new Date(article.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                  </div>
+                  <span className="dashboard-article-status"><i /> Live</span>
+                  <div className="dashboard-article-actions">
+                    <Link href={`/dashboard/artikel/edit/${article.id}`} aria-label={`Edit ${article.title}`}>Edit</Link>
+                    <DeleteArticleButton id={article.id} />
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="dashboard-empty-state">
+              <span className="dashboard-empty-mark">✦</span>
+              <h3>Belum ada artikel.</h3>
+              <p>Ruang ini siap diisi dengan catatan pertamamu.</p>
+              <Link href="/dashboard/artikel/tambah" className="editorial-link">Mulai menulis ↗</Link>
+            </div>
           )}
-        </tbody>
-      </table>
+        </section>
+      </main>
     </div>
   )
 }

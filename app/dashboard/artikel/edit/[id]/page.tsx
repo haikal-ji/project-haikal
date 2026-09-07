@@ -15,15 +15,21 @@ export default async function EditArtikelPage({
   if (!article) notFound()
 
   return (
-    <div className="mx-auto max-w-2xl p-8">
-      <h1 className="mb-6 text-2xl font-semibold">Edit Artikel</h1>
+    <div className="editor-page-shell">
+      <div className="editor-page-topbar">
+        <div>
+          <p className="dashboard-kicker">Library / Edit entry</p>
+          <h1>Edit artikel</h1>
+        </div>
+        <span className="editor-draft-state"><i /> Perubahan tersimpan manual</span>
+      </div>
       <ArticleForm
-        mode="edit"
-        articleId={article.id}
-        initialTitle={article.title}
-        initialContent={article.content}
-        initialThumbnail={article.thumbnail}
-      />
+          mode="edit"
+          articleId={article.id}
+          initialTitle={article.title}
+          initialContent={article.content}
+          initialThumbnail={article.thumbnail}
+        />
     </div>
   )
 }

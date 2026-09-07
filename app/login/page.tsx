@@ -70,11 +70,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100">
-      <div className="w-full max-w-sm space-y-6 bg-white dark:bg-zinc-900 p-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
-        <div className="text-center space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">Selamat Datang</h1>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Masuk ke akun Project Haikal Anda</p>
+    <div className="flex min-h-[calc(100vh-73px)] items-center justify-center px-4">
+      <div className="w-full max-w-sm space-y-6">
+        <div className="space-y-1 text-center">
+          <h1 className="font-serif text-3xl">Selamat Datang</h1>
+          <p className="text-sm text-foreground/60">Masuk ke akun kamu</p>
         </div>
 
         <div className="space-y-2.5">
@@ -83,9 +83,9 @@ export default function LoginPage() {
             type="button"
             disabled={oauthLoading !== null}
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white hover:bg-zinc-50 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700/80 py-2.5 px-4 font-medium text-sm transition shadow-sm disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-3 rounded-sm border border-line bg-background px-4 py-2.5 text-sm font-medium transition hover:bg-line/40 disabled:opacity-50"
           >
-            <svg className="w-4 h-4" viewBox="0 0 24 24">
+            <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path
                 fill="#4285F4"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -111,9 +111,9 @@ export default function LoginPage() {
             type="button"
             disabled={oauthLoading !== null}
             onClick={handleGithubLogin}
-            className="w-full flex items-center justify-center gap-3 rounded-xl border border-zinc-300 dark:border-zinc-700 bg-zinc-900 hover:bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200 py-2.5 px-4 font-medium text-sm transition disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-3 rounded-sm bg-foreground px-4 py-2.5 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-50"
           >
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+            <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
@@ -125,49 +125,49 @@ export default function LoginPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-          <span className="text-xs text-zinc-400">atau email</span>
-          <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+          <div className="h-px flex-1 bg-line" />
+          <span className="text-xs text-foreground/50">atau email</span>
+          <div className="h-px flex-1 bg-line" />
         </div>
 
         <form onSubmit={handleManualLogin} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Email</label>
+            <label className="mb-1 block text-xs font-medium text-foreground/60">Email</label>
             <input
               type="email"
               placeholder="nama@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50 py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+              className="w-full rounded-sm border border-line bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-clay"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-zinc-600 dark:text-zinc-400 mb-1">Password</label>
+            <label className="mb-1 block text-xs font-medium text-foreground/60">Password</label>
             <input
               type="password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950/50 py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-400"
+              className="w-full rounded-sm border border-line bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-clay"
             />
           </div>
 
-          {error && <p className="text-xs text-red-500 bg-red-50 dark:bg-red-950/40 p-2.5 rounded-lg">{error}</p>}
+          {error && <p className="rounded-sm bg-clay/10 p-2.5 text-xs text-clay">{error}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white py-2.5 px-4 text-sm font-semibold transition disabled:opacity-50"
+            className="w-full rounded-sm bg-clay px-4 py-2.5 text-sm font-semibold text-background transition hover:opacity-90 disabled:opacity-50"
           >
             {loading ? 'Memproses...' : 'Login'}
           </button>
         </form>
 
-        <p className="text-xs text-center text-zinc-500 dark:text-zinc-400">
+        <p className="text-center text-xs text-foreground/60">
           Belum punya akun?{' '}
-          <Link href="/register" className="font-semibold text-zinc-900 dark:text-zinc-100 hover:underline">
+          <Link href="/register" className="font-semibold text-clay hover:underline">
             Daftar
           </Link>
         </p>
