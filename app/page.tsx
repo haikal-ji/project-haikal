@@ -11,21 +11,28 @@ const projects = [
     name: 'Raw Anatomy',
     description: 'Entitas tanpa suara yang mendiami batas antara intuisi dan realita. Dibuat sebagai jurnal visual untuk menampung ekspresi mentah, narasi tersembunyi, dan eksplorasi bentuk.',
     tech: 'DESIGN / DIRECTION',
-    link: '',
+    link: '/collection',
   },
   {
     number: '02',
     name: 'Ephemera',
     description: 'Metamorfosis bentuk dan ide dalam garis-garis sederhana. Menangkap momen presisi di mana keindahan alam bertemu dengan ketenangan garis lukis',
     tech: 'DESIGN / DIRECTION',
-    link: '',
+    link: '/collection',
   },
   {
     number: '03',
     name: 'Celestial Gaze',
     description: 'Entitas surgawi dalam wujud garis monokrom. Menghadirkan kembali estetika ukiran klasik ke dalam konteks desain modern.',
     tech: 'DESIGN / DIRECTION',
-    link: '',
+    link: '/collection',
+  },
+  {
+    number: '04',
+    name: 'Material Study',
+    description: 'Eksplorasi visual terbaru tentang tekstur, bentuk, dan hubungan antara ruang dengan objek.',
+    tech: 'DESIGN / DIRECTION',
+    link: '/collection',
   },
 ]
 
@@ -54,23 +61,38 @@ export default async function HomePage() {
           <div className="hero-image hero-image-one" />
           <div className="hero-image hero-image-two" />
           <div className="hero-image hero-image-three" />
-          <span className="hero-stamp">Selected<br />works</span>
+          <span className="hero-stamp">Karya<br />terpilih</span>
         </div>
       </section>
 
       <ScrollReveal>
-        <section className="intro-section">
-          <p className="section-index">tentang</p>
-          <div>
-            <h2 className="max-w-3xl font-serif text-4xl leading-tight md:text-6xl">
-              Masih belajar, tapi senang membuat sesuatu dari nol.
-            </h2>
-            <p className="mt-8 max-w-xl text-base leading-7 text-foreground/65">
-              Website ini sendiri adalah bagian dari proses belajar saya — mulai dari database, autentikasi, sampai desain tampilan. Ada cerita lebih lengkap di halaman Tentang.
+        <section className="materials-section" aria-labelledby="materials-title">
+          <div className="materials-image materials-image-one" />
+          <div className="materials-image materials-image-two" />
+          <div className="materials-image materials-image-three" />
+          <div className="materials-image materials-image-four" />
+          <div className="materials-copy">
+            <p className="section-index">01 / proses visual</p>
+            <h2 id="materials-title" className="font-serif">Bentuk dari rasa ingin tahu</h2>
+            <p>
+              Setiap project dimulai dari potongan ide, gambar, dan percobaan kecil yang perlahan menemukan bentuknya.
             </p>
-            <Link href="/about" className="editorial-link mt-8 inline-flex items-center gap-3">
-              Kenali saya <span aria-hidden="true">↗</span>
-            </Link>
+          </div>
+        </section>
+      </ScrollReveal>
+
+      <ScrollReveal>
+        <section className="craft-section" aria-labelledby="craft-title">
+          <div className="craft-media">
+            <div className="craft-background" />
+            <div className="craft-art" />
+          </div>
+          <div className="craft-copy">
+            <p className="section-index">02 / studi bentuk</p>
+            <h2 id="craft-title" className="font-serif">Pelan-pelan, jadi bentuk.</h2>
+            <p>
+              Saya menikmati proses di balik sebuah karya: mengumpulkan referensi, mencoba kemungkinan, lalu menyederhanakan sampai yang tersisa terasa tepat.
+            </p>
           </div>
         </section>
       </ScrollReveal>
@@ -78,7 +100,7 @@ export default async function HomePage() {
       <section id="portofolio" className="portfolio-section">
         <div className="mb-10 flex items-end justify-between gap-6">
           <div>
-            <p className="section-index">karya yang saya buat</p>
+            <p className="section-index">03 / karya terpilih</p>
             <h2 className="mt-4 font-serif text-4xl md:text-5xl">Beberapa hal yang pernah saya buat</h2>
           </div>
           <span className="hidden text-xs uppercase tracking-[0.18em] text-foreground/50 md:block">2026 — sekarang</span>
@@ -97,14 +119,12 @@ export default async function HomePage() {
                   <p className="shrink-0 text-right text-[10px] uppercase tracking-[0.16em] text-foreground/45">{project.tech}</p>
                 </div>
                 {project.link && (
-                  <a
+                  <Link
                     href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="editorial-link mt-5 inline-flex"
                   >
                     Buka project ↗
-                  </a>
+                  </Link>
                 )}
               </article>
             </ScrollReveal>
@@ -116,10 +136,10 @@ export default async function HomePage() {
         <section className="journal-section">
           <div className="mb-8 flex items-end justify-between gap-6">
             <div>
-              <p className="section-index">03 / jurnal</p>
-              <h2 className="mt-4 font-serif text-4xl md:text-5xl">Catatan terbaru</h2>
+              <p className="section-index">04 / catatan & jurnal</p>
+              <h2 className="mt-4 max-w-2xl font-serif text-4xl md:text-5xl">Catatan dari proses berkarya</h2>
             </div>
-            <Link href="/artikel" className="editorial-link hidden md:inline-flex">Semua catatan ↗</Link>
+            <Link href="/artikel" className="editorial-link hidden md:inline-flex">Semua artikel ↗</Link>
           </div>
           <div className="journal-list">
             {latestArticles.map((article) => (
@@ -154,12 +174,12 @@ export default async function HomePage() {
               <p className="py-6 text-foreground/50">Belum ada catatan.</p>
             )}
           </div>
-          <Link href="/artikel" className="editorial-link mt-7 inline-flex md:hidden">Semua catatan ↗</Link>
+          <Link href="/artikel" className="editorial-link mt-7 inline-flex md:hidden">Semua artikel ↗</Link>
         </section>
       </ScrollReveal>
 
       <ScrollReveal>
-        <section className="contact-section">
+        <section id="contact" className="contact-section">
           <p className="section-index">04 / mari ngobrol</p>
           <h2 className="mt-6 max-w-3xl font-serif text-5xl leading-[0.95] tracking-[-0.03em] md:text-7xl">
             Punya ide yang ingin diberi bentuk?

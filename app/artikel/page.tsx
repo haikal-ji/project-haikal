@@ -1,5 +1,11 @@
-import Link from 'next/link'
+import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
+import ArticleSearch from '@/components/ArticleSearch'
+
+export const metadata: Metadata = {
+  title: 'Artikel | Haikal',
+  description: 'Catatan tentang proses, hal-hal yang sedang dipelajari, dan beberapa ide yang ingin disimpan.',
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -8,37 +14,22 @@ export default async function ArtikelListPage() {
     orderBy: { created_at: 'desc' },
   })
 
-  return (
-    <div className="mx-auto max-w-5xl px-6 py-16">
-      <h1 className="mb-8 text-3xl font-semibold">Artikel</h1>
+  const searchableArticles = articles.map((article) => ({
+    id: article.id,
+    title: article.title,
+    thumbnail: article.thumbnail,
+    created_at: article.created_at.toISOString(),
+  }))
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {articles.map((article) => (
-          <Link
-            key={article.id}
-            href={`/artikel/${article.id}`}
-            className="block overflow-hidden rounded-lg border border-gray-200"
-          >
-            {article.thumbnail ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={article.thumbnail} alt={article.title} className="h-40 w-full object-cover" />
-            ) : (
-              <div className="h-40 w-full bg-gray-100" />
-            )}
-            <div className="p-4">
-              <h2 className="mb-1 font-medium">{article.title}</h2>
-              <p className="text-xs text-gray-400">
-                {new Date(article.created_at).toLocaleDateString('id-ID', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
-              </p>
-            </div>
-          </Link>
-        ))}
-        {articles.length === 0 && <p className="text-gray-400">Belum ada artikel.</p>}
-      </div>
-    </div>
+  return (
+    <main className="articles-page">
+      <header className="articles-heading">
+        <p className="section-index">Journal / Notes</p>
+        <h1 className="font-serif">Artikel</h1>
+        <p>Catatan tentang proses, hal-hal yang sedang dipelajari, dan beberapa ide yang ingin disimpan.</p>
+      </header>
+
+      <ArticleSearch articles={searchableArticles} />
+    </main>
   )
 }

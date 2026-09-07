@@ -1,19 +1,26 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'About | Haikal',
+  description: 'Tentang Haikal dan proses belajar yang sedang dijalani',
+}
+
 export default function AboutPage() {
   return (
     <div className="mx-auto max-w-6xl px-6 py-16">
       <div className="grid gap-10 md:grid-cols-[1fr_1.1fr] md:items-start">
         {/* Kolom kiri: headline besar + cerita */}
         <div>
-          {/* TODO: ganti dengan headline besar tentang dirimu, 3-4 baris seperti judul artikel */}
           <h1 className="font-serif text-5xl leading-[1.1] md:text-6xl">
-            Cerita di Balik Setiap Baris Kode
+            About saya dan proses yang sedang saya jalani
           </h1>
 
-          {/* TODO: ganti dengan cerita 3-5 kalimat: latar belakang, kenapa tertarik web dev, apa yang lagi dipelajari */}
           <p className="mt-10 max-w-[50ch] leading-relaxed text-foreground/80">
-            Tulis cerita singkat di sini — latar belakang kamu, kenapa tertarik dengan web
-            development, dan apa yang sedang kamu pelajari sekarang. Bisa juga cerita soal
-            perjalanan PKL ini dan apa yang paling berkesan.
+            Saya adalah Muh. Haikal, seorang pelajar yang tertarik pada desain visual dan pengembangan website.
+            Saat ini saya sedang menjalani PKL dan mempelajari pengembangan web, desain UI/UX, serta cara mengelola database.
+            Saya menikmati proses membuat sesuatu dari nol, mulai dari menemukan ide, merancang tampilan, sampai mengembangkan fitur.
+            Website ini dibuat sebagai personal project sekaligus project akhir PKL. Di dalamnya terdapat beberapa karya
+            dan proses belajar yang sedang saya dokumentasikan.
           </p>
         </div>
 
@@ -28,23 +35,34 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* Fokus / values, 2 blok singkat */}
-      <div className="mt-20 grid gap-10 border-t border-line pt-16 md:grid-cols-2">
+      {/* Fokus / values, 3 blok */}
+      <div className="mt-20 grid gap-10 border-t border-line pt-16 md:grid-cols-3">
         <div>
           <h3 className="mb-3 font-serif text-xl">Cara kerja</h3>
-          {/* TODO: ganti dengan cara/prinsip kamu ngoding, misal soal detail, testing, dsb */}
           <p className="leading-relaxed text-foreground/70">
-            Tulis singkat tentang bagaimana kamu biasa mengerjakan sebuah project — misalnya mulai
-            dari riset kebutuhan, susun struktur dulu, baru masuk ke detail.
+            Saya mengerjakan project secara bertahap, mulai dari memahami kebutuhan, menyusun struktur,
+            merancang tampilan, lalu mengembangkan dan menguji setiap fitur.
           </p>
         </div>
         <div>
           <h3 className="mb-3 font-serif text-xl">Yang sedang dipelajari</h3>
-          {/* TODO: ganti dengan skill/teknologi yang lagi kamu dalami */}
           <p className="leading-relaxed text-foreground/70">
-            Tulis singkat tentang teknologi atau skill yang sedang kamu pelajari sekarang, misalnya
-            Next.js, database, atau desain UI/UX.
+            Saat ini saya sedang fokus mengembangkan kemampuan dalam pengembangan website, desain UI/UX,
+            serta database dan autentikasi.
           </p>
+        </div>
+        <div>
+          <h3 className="mb-3 font-serif text-xl">Teknologi & Tools</h3>
+          <div className="flex flex-wrap gap-2 pt-1 text-xs">
+            {['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Prisma ORM', 'Supabase', 'PostgreSQL', 'Figma', 'Git'].map((tool) => (
+              <span
+                key={tool}
+                className="rounded-sm border border-line bg-background/60 px-2.5 py-1 font-medium text-foreground/80"
+              >
+                {tool}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </div>

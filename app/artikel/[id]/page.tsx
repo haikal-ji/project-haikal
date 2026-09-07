@@ -1,7 +1,40 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import Link from 'next/link'
+import CopyUrlButton from '@/components/CopyUrlButton'
+import type { Metadata } from 'next'
+import ArticleViewTracker from '@/components/ArticleViewTracker'
 
 export const dynamic = 'force-dynamic'
+
+function estimateReadingTime(html: string): number {
+  // Strip HTML tags and count words
+  const text = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+  const wordCount = text.split(' ').filter(Boolean).length
+  const wordsPerMinute = 200
+  return Math.max(1, Math.ceil(wordCount / wordsPerMinute))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> {
+  const { id } = await params
+  const article = await prisma.article.findUnique({ where: { id } })
+  if (!article) return {}
+  return {
+    title: article.title,
+    description: article.content.replace(/<[^>]*>/g, '').slice(0, 155) + '...',
+    openGraph: {
+      title: article.title,
+      description: article.content.replace(/<[^>]*>/g, '').slice(0, 155) + '...',
+      type: 'article',
+      publishedTime: new Date(article.created_at).toISOString(),
+      images: article.thumbnail ? [article.thumbnail] : ['/og-image.png'],
+    },
+  }
+}
 
 export default async function ArtikelDetailPage({
   params,
@@ -25,51 +58,63 @@ export default async function ArtikelDetailPage({
 
   const likeCount = article.reactions.filter((r) => r.type === 'LIKE').length
   const dislikeCount = article.reactions.filter((r) => r.type === 'DISLIKE').length
+  const readingTime = estimateReadingTime(article.content)
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-16">
-      <h1 className="mb-2 text-3xl font-semibold">{article.title}</h1>
-      <p className="mb-6 text-sm text-gray-400">
-        {new Date(article.created_at).toLocaleDateString('id-ID', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
-        })}
-      </p>
+    <main className="article-detail-page">
+      <Link href="/artikel" className="editorial-link article-back">← Kembali ke artikel</Link>
+      <header className="article-detail-heading">
+        <p className="section-index">Journal / Article</p>
+        <h1 className="font-serif">{article.title}</h1>
+      <p className="article-detail-date">
+          {new Date(article.created_at).toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          })}
+          <span className="mx-2 opacity-40">·</span>
+          Baca ~{readingTime} menit
+          <span className="mx-2 opacity-40">·</span>
+          <ArticleViewTracker articleId={article.id} initialViewCount={article.view_count} />
+        </p>
+        <div className="mt-4 flex justify-center">
+          <CopyUrlButton />
+        </div>
+      </header>
 
       {article.thumbnail && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={article.thumbnail}
           alt={article.title}
-          className="mb-8 w-full rounded-lg object-cover"
+          className="article-detail-cover"
         />
       )}
 
       <div
-        className="mb-8 leading-relaxed [&_img]:max-w-full [&_img]:rounded-md"
+        className="article-detail-content"
         dangerouslySetInnerHTML={{ __html: article.content }}
       />
 
-      <div className="mb-10 flex gap-4 text-sm text-gray-500">
+      <div className="article-reactions">
         <span>👍 {likeCount} Suka</span>
         <span>👎 {dislikeCount} Tidak Suka</span>
       </div>
 
-      <section>
-        <h2 className="mb-4 text-xl font-semibold">Komentar ({article.comments.length})</h2>
-        <div className="space-y-4">
+      <section className="article-comments">
+        <h2 className="font-serif">Komentar <span>({article.comments.length})</span></h2>
+        <div>
           {article.comments.map((comment) => (
-            <div key={comment.id} className="rounded-md border border-gray-200 p-3">
-              <p className="mb-1 text-sm font-medium">{comment.user.name}</p>
-              <p className="text-sm text-gray-600">{comment.content}</p>
+            <div key={comment.id} className="article-comment">
+              <p>{comment.user.name}</p>
+              <span>{comment.content}</span>
             </div>
           ))}
           {article.comments.length === 0 && (
-            <p className="text-sm text-gray-400">Belum ada komentar.</p>
+            <p className="article-no-comments">Belum ada komentar. Jadilah yang pertama!</p>
           )}
         </div>
       </section>
-    </div>
+    </main>
   )
 }
