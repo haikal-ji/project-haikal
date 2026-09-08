@@ -27,8 +27,8 @@ const projects = [
   },
   {
     number: '04',
-    name: 'Material Study',
-    description: 'Eksplorasi visual terbaru tentang tekstur, bentuk, dan hubungan antara ruang dengan objek.',
+    name: 'Nocturnal Visage',
+    description: 'Potret teaterikal yang mengaburkan batas antara komedi dan tragedi. Menangkap keheningan seorang pelakon melalui kontras hitam-putih yang dramatis..',
     image: 'collection-image-four',
   },
 ]

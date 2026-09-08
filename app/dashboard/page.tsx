@@ -28,7 +28,7 @@ export default async function DashboardPage() {
       <main className="dashboard-main">
         <header className="dashboard-topbar">
           <div>
-            <p className="dashboard-kicker">Senin, 7 September 2026</p>
+            <p className="dashboard-kicker">Selasa, 8 September 2026</p>
             <h1>Selamat datang kembali.</h1>
           </div>
           <Link href="/dashboard/artikel/tambah" className="dashboard-primary-action">
@@ -47,7 +47,7 @@ export default async function DashboardPage() {
         <section className="dashboard-stats" aria-label="Ringkasan artikel">
           <div className="dashboard-stat dashboard-stat-featured">
             <span className="dashboard-stat-label">Total artikel</span>
-            <strong>{String(articles.length).padStart(2, '0')}</strong>
+            <strong>{String(articles.length).padStart(2, '')}</strong>
             <span className="dashboard-stat-meta">Catatan yang tersimpan</span>
           </div>
           <div className="dashboard-stat">
@@ -57,7 +57,7 @@ export default async function DashboardPage() {
           </div>
           <div className="dashboard-stat">
             <span className="dashboard-stat-label">Dengan cover</span>
-            <strong>{String(articles.filter((article) => article.thumbnail).length).padStart(2, '0')}</strong>
+            <strong>{String(articles.filter((article) => article.thumbnail).length).padStart(2, '')}</strong>
             <span className="dashboard-stat-meta">Artikel punya thumbnail</span>
           </div>
         </section>

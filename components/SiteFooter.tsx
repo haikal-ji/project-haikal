@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import Link from 'next/link'
 
 export default function SiteFooter() {
   const pathname = usePathname()
@@ -34,6 +35,8 @@ export default function SiteFooter() {
           >
             Instagram
           </a>
+          <Link href="/uses" className="footer-link">Uses / Stack</Link>
+          <Link href="/changelog" className="footer-link">Changelog</Link>
         </div>
 
         <div className="text-sm text-background/60 sm:text-right">

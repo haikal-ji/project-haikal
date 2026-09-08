@@ -10,28 +10,28 @@ const projects = [
     number: '01',
     name: 'Raw Anatomy',
     description: 'Entitas tanpa suara yang mendiami batas antara intuisi dan realita. Dibuat sebagai jurnal visual untuk menampung ekspresi mentah, narasi tersembunyi, dan eksplorasi bentuk.',
-    tech: 'DESIGN / DIRECTION',
+    tech: '',
     link: '/collection',
   },
   {
     number: '02',
     name: 'Ephemera',
     description: 'Metamorfosis bentuk dan ide dalam garis-garis sederhana. Menangkap momen presisi di mana keindahan alam bertemu dengan ketenangan garis lukis',
-    tech: 'DESIGN / DIRECTION',
+    tech: '',
     link: '/collection',
   },
   {
     number: '03',
     name: 'Celestial Gaze',
     description: 'Entitas surgawi dalam wujud garis monokrom. Menghadirkan kembali estetika ukiran klasik ke dalam konteks desain modern.',
-    tech: 'DESIGN / DIRECTION',
+    tech: '',
     link: '/collection',
   },
   {
     number: '04',
-    name: 'Material Study',
-    description: 'Eksplorasi visual terbaru tentang tekstur, bentuk, dan hubungan antara ruang dengan objek.',
-    tech: 'DESIGN / DIRECTION',
+    name: 'Nocturnal Visage',
+    description: 'Potret teaterikal yang mengaburkan batas antara komedi dan tragedi. Menangkap keheningan seorang pelakon melalui kontras hitam-putih yang dramatis..',
+    tech: '',
     link: '/collection',
   },
 ]
@@ -44,24 +44,23 @@ export default async function HomePage() {
 
   return (
     <div className="overflow-hidden">
-      <section className="hero-section border-b border-line">
+      <section className="hero-section hero-text-only border-b border-line">
         <div className="hero-copy">
           <p className="eyebrow">Web developer / creative technologist</p>
           <h1 className="font-serif text-5xl leading-[0.94] tracking-[-0.03em] md:text-7xl">
-            <TypewriterText text="Belajar membangun web, satu project pada satu waktu." />
+            <TypewriterText text="Merancang dan membangun aplikasi web melalui proses belajar." />
           </h1>
           <p className="mt-7 max-w-sm text-sm leading-6 text-foreground/65">
-            Hai, saya Haikal. Saya lagi belajar merancang dan membangun website yang rapi, simpel, dan enak diliat.
+            Hai, saya Haikal. Saya lagi belajar merancang dan membangun website yang rapi, simpel, dan minimalis.
           </p>
           <Link href="#portofolio" className="editorial-link mt-8 inline-flex items-center gap-3">
             Lihat Karya saya <span aria-hidden="true">↘</span>
           </Link>
-        </div>
-        <div className="hero-collage" aria-label="Kolase tekstur dan bentuk alami">
-          <div className="hero-image hero-image-one" />
-          <div className="hero-image hero-image-two" />
-          <div className="hero-image hero-image-three" />
-          <span className="hero-stamp">Karya<br />terpilih</span>
+          <div className="hero-meta">
+            <span>Personal project / PKL</span>
+            <span>2026 — sekarang</span>
+            <span className="hero-scroll-cue">Scroll untuk menjelajah <b aria-hidden="true">↓</b></span>
+          </div>
         </div>
       </section>
 
@@ -72,11 +71,19 @@ export default async function HomePage() {
           <div className="materials-image materials-image-three" />
           <div className="materials-image materials-image-four" />
           <div className="materials-copy">
-            <p className="section-index">01 / proses visual</p>
-            <h2 id="materials-title" className="font-serif">Bentuk dari rasa ingin tahu</h2>
+            <p className="section-index">01 / yang sedang saya pelajari</p>
+            <h2 id="materials-title" className="font-serif">Proses belajar</h2>
             <p>
-              Setiap project dimulai dari potongan ide, gambar, dan percobaan kecil yang perlahan menemukan bentuknya.
+              Saat ini saya sedang mempelajari bagaimana membangun sebuah website dari awal sampai siap digunakan.
+              Mulai dari menyusun struktur halaman, merancang tampilan yang nyaman dilihat, sampai mengembangkan fitur
+              yang terhubung dengan database.
             </p>
+            <ul className="materials-learning" aria-label="Hal yang sedang dipelajari">
+              <li><span>01</span>Pengembangan website dengan Next.js</li>
+              <li><span>02</span>Desain UI/UX dan responsive layout</li>
+              <li><span>03</span>Database dan autentikasi pengguna</li>
+              <li><span>04</span>Interaksi, animasi, dan pengalaman pengguna</li>
+            </ul>
           </div>
         </section>
       </ScrollReveal>
@@ -137,7 +144,7 @@ export default async function HomePage() {
           <div className="mb-8 flex items-end justify-between gap-6">
             <div>
               <p className="section-index">04 / catatan & jurnal</p>
-              <h2 className="mt-4 max-w-2xl font-serif text-4xl md:text-5xl">Catatan dari proses berkarya</h2>
+              <h2 className="mt-4 max-w-2xl font-serif text-4xl md:text-5xl">my articles</h2>
             </div>
             <Link href="/artikel" className="editorial-link hidden md:inline-flex">Semua artikel ↗</Link>
           </div>
@@ -182,7 +189,7 @@ export default async function HomePage() {
         <section id="contact" className="contact-section">
           <p className="section-index">04 / mari ngobrol</p>
           <h2 className="mt-6 max-w-3xl font-serif text-5xl leading-[0.95] tracking-[-0.03em] md:text-7xl">
-            Punya ide yang ingin diberi bentuk?
+            Punya ide yang ingin diberi?
           </h2>
           <a href="mailto:mlbbus0208@gmail.com" className="editorial-link mt-8 inline-flex items-center gap-3">
             mlbbus0208@gmail.com <span aria-hidden="true">↗</span>

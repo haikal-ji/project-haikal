@@ -12,7 +12,7 @@ export default function AboutPage() {
         {/* Kolom kiri: headline besar + cerita */}
         <div>
           <h1 className="font-serif text-5xl leading-[1.1] md:text-6xl">
-            About saya dan proses yang sedang saya jalani
+          About me and the process I am currently going through.
           </h1>
 
           <p className="mt-10 max-w-[50ch] leading-relaxed text-foreground/80">

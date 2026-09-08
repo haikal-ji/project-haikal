@@ -17,7 +17,7 @@ export default function ContactPage() {
         <p className="section-index">Contact</p>
         <Link href="/" className="editorial-link">← Beranda</Link>
       </div>
-      <h1 className="font-serif">Mari terhubung dengan saya.</h1>
+      <h1 className="font-serif">Mari ngobrol.</h1>
       <div className="contact-layout">
         <form className="contact-form" onSubmit={handleSubmit}>
           <p>Terbuka untuk kolaborasi, percakapan, atau sekadar bertukar ide.</p>
