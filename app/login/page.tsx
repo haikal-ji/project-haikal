@@ -4,6 +4,7 @@ import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import LoginMessage from '@/components/LoginMessage'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -76,6 +77,8 @@ export default function LoginPage() {
           <h1 className="font-serif text-3xl">Selamat Datang</h1>
           <p className="text-sm text-foreground/60">Masuk ke akun kamu</p>
         </div>
+
+        <LoginMessage />
 
         <div className="space-y-2.5">
           {/* Tombol Google */}

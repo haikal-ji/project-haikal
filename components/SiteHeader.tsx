@@ -64,9 +64,17 @@ export default function SiteHeader({
             </Link>
           )}
           {isLoggedIn ? (
-            <button onClick={handleLogout} className="nav-link text-foreground/50">
-              Logout
-            </button>
+            <>
+              <Link
+                href="/profile"
+                className={`nav-link ${pathname === '/profile' ? 'text-clay font-semibold' : ''}`}
+              >
+                Profil
+              </Link>
+              <button onClick={handleLogout} className="nav-link text-foreground/50">
+                Logout
+              </button>
+            </>
           ) : (
             <Link
               href="/login"
@@ -112,7 +120,16 @@ export default function SiteHeader({
             </Link>
           )}
           {isLoggedIn ? (
-            <button onClick={handleLogout}>Logout</button>
+            <>
+              <Link
+                href="/profile"
+                onClick={() => setMenuOpen(false)}
+                className={pathname === '/profile' ? 'text-clay font-semibold' : ''}
+              >
+                Profil
+              </Link>
+              <button onClick={handleLogout}>Logout</button>
+            </>
           ) : (
             <Link
               href="/login"

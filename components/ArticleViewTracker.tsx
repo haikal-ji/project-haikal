@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export default function ArticleViewTracker({
   articleId,
@@ -10,8 +10,12 @@ export default function ArticleViewTracker({
   initialViewCount: number
 }) {
   const [viewCount, setViewCount] = useState(initialViewCount)
+  const trackedArticle = useRef<string | null>(null)
 
   useEffect(() => {
+    if (trackedArticle.current === articleId) return
+    trackedArticle.current = articleId
+
     void fetch(`/api/articles/${articleId}/view`, { method: 'POST' })
       .then((response) => response.ok ? response.json() : null)
       .then((data: { viewCount?: number } | null) => {

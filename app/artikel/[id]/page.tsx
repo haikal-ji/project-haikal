@@ -2,8 +2,12 @@ import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import CopyUrlButton from '@/components/CopyUrlButton'
+import CommentForm from '@/components/CommentForm'
+import Avatar from '@/components/Avatar'
 import type { Metadata } from 'next'
 import ArticleViewTracker from '@/components/ArticleViewTracker'
+import ReactionButtons from '@/components/ReactionButtons'
+import { createClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,6 +46,8 @@ export default async function ArtikelDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+  const supabase = await createClient()
+  const { data: { user: authUser } } = await supabase.auth.getUser()
 
   const article = await prisma.article.findUnique({
     where: { id },
@@ -58,6 +64,12 @@ export default async function ArtikelDetailPage({
 
   const likeCount = article.reactions.filter((r) => r.type === 'LIKE').length
   const dislikeCount = article.reactions.filter((r) => r.type === 'DISLIKE').length
+  const currentUser = authUser?.email
+    ? await prisma.user.findUnique({ where: { email: authUser.email }, select: { id: true } })
+    : null
+  const currentReaction = currentUser
+    ? article.reactions.find((reaction) => reaction.user_id === currentUser.id)?.type ?? null
+    : null
   const readingTime = estimateReadingTime(article.content)
 
   return (
@@ -97,17 +109,39 @@ export default async function ArtikelDetailPage({
       />
 
       <div className="article-reactions">
-        <span>👍 {likeCount} Suka</span>
-        <span>👎 {dislikeCount} Tidak Suka</span>
+        <ReactionButtons
+          articleId={article.id}
+          initialLikeCount={likeCount}
+          initialDislikeCount={dislikeCount}
+          initialReaction={currentReaction}
+          isLoggedIn={Boolean(authUser)}
+        />
       </div>
 
       <section className="article-comments">
         <h2 className="font-serif">Komentar <span>({article.comments.length})</span></h2>
+
+        <div className="comment-form-wrapper">
+          <CommentForm articleId={article.id} isLoggedIn={Boolean(authUser)} />
+        </div>
+
         <div>
           {article.comments.map((comment) => (
             <div key={comment.id} className="article-comment">
-              <p>{comment.user.name}</p>
-              <span>{comment.content}</span>
+              <Avatar src={comment.user.avatar} name={comment.user.name} />
+              <div className="comment-body">
+                <div className="comment-meta">
+                  <p className="comment-author">{comment.user.name}</p>
+                  <span className="comment-date">
+                    {new Date(comment.created_at).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </span>
+                </div>
+                <span className="comment-content">{comment.content}</span>
+              </div>
             </div>
           ))}
           {article.comments.length === 0 && (

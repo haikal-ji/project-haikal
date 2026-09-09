@@ -23,7 +23,7 @@ export async function syncUserToDb(supabase: SupabaseClient) {
 
   return prisma.user.upsert({
     where: { email: user.email },
-    update: { name, avatar },
+    update: {}, // jangan timpa nama/avatar kalau user sudah pernah custom sendiri lewat /profile
     create: { email: user.email, name, avatar },
   })
 }
