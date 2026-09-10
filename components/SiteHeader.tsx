@@ -101,8 +101,29 @@ export default function SiteHeader({
 
             {/* Floating dropdown card */}
             {mobileOpen && (
-              <nav className="absolute right-0 top-full mt-3 w-44 rounded-2xl border border-text-secondary/15 bg-background/95 dark:bg-[#111111]/95 backdrop-blur-md shadow-xl flex flex-col gap-0.5 p-2 z-50">
-                <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">Account</div>
+              <nav className="absolute right-0 top-full mt-3 w-52 rounded-2xl border border-text-secondary/15 bg-background/95 dark:bg-[#111111]/95 backdrop-blur-md shadow-xl flex flex-col gap-0.5 p-2.5 z-50">
+                {/* Mobile Section Links (hidden on desktop where they are in navbar) */}
+                <div className="md:hidden">
+                  <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                    Navigasi
+                  </div>
+                  {mainLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileOpen(false)}
+                      className="px-3 py-2 rounded-xl text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-thirdary transition-colors flex items-center justify-between"
+                    >
+                      <span>{link.label}</span>
+                      <span className="text-xs opacity-50">→</span>
+                    </Link>
+                  ))}
+                  <div className="my-1.5 border-t border-text-secondary/10" />
+                </div>
+
+                <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+                  Account
+                </div>
                 {isOwner && (
                   <Link
                     href="/dashboard"
@@ -125,7 +146,7 @@ export default function SiteHeader({
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="px-3 py-2 rounded-xl text-left text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-thirdary transition-colors"
+                    className="px-3 py-2 rounded-xl text-left text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-thirdary transition-colors cursor-pointer"
                   >
                     Logout
                   </button>

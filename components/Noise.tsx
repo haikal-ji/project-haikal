@@ -13,75 +13,81 @@ interface NoiseProps {
 
 const Noise: React.FC<NoiseProps> = ({
   patternSize = 250,
-  patternScaleX = 1,
-  patternScaleY = 1,
-  patternRefreshInterval = 2,
-  patternAlpha = 15,
+  patternRefreshInterval = 3,
+  patternAlpha = 14,
   className = '',
 }) => {
-  const grainRef = useRef<HTMLCanvasElement | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    const canvas = grainRef.current
-    if (!canvas) return
-
-    const ctx = canvas.getContext('2d', { alpha: true })
+    // Ukuran tile pattern untuk butiran grain yang halus (1:1 physical pixel, tidak melar/chunky)
+    const size = Math.min(Math.max(patternSize || 250, 150), 300)
+    const offscreen = document.createElement('canvas')
+    offscreen.width = size
+    offscreen.height = size
+    const ctx = offscreen.getContext('2d')
     if (!ctx) return
 
-    let frame = 0
-    let animationId: number
-
-    const canvasSize = 1024
-
-    const resize = () => {
-      if (!canvas) return
-      canvas.width = canvasSize
-      canvas.height = canvasSize
-
-      canvas.style.width = '100vw'
-      canvas.style.height = '100vh'
-    }
-
-    const drawGrain = () => {
-      const imageData = ctx.createImageData(canvasSize, canvasSize)
-      const data = imageData.data
-
-      for (let i = 0; i < data.length; i += 4) {
-        const value = Math.random() * 255
-        data[i] = value
-        data[i + 1] = value
-        data[i + 2] = value
-        data[i + 3] = patternAlpha
+    // Pre-bake 3 frame grain halus sekali saja saat mount (bebas alokasi di animation loop)
+    const dataUrls: string[] = []
+    for (let f = 0; f < 3; f++) {
+      const imgData = ctx.createImageData(size, size)
+      const d = imgData.data
+      for (let i = 0; i < d.length; i += 4) {
+        const v = (Math.random() * 255) | 0
+        d[i] = v
+        d[i + 1] = v
+        d[i + 2] = v
+        d[i + 3] = patternAlpha
       }
-
-      ctx.putImageData(imageData, 0, 0)
+      ctx.putImageData(imgData, 0, 0)
+      dataUrls.push(offscreen.toDataURL('image/png'))
     }
 
-    const loop = () => {
-      if (frame % patternRefreshInterval === 0) {
-        drawGrain()
+    const el = containerRef.current
+    if (!el) return
+
+    el.style.backgroundImage = `url(${dataUrls[0]})`
+    el.style.backgroundRepeat = 'repeat'
+    el.style.backgroundSize = `${size}px ${size}px`
+
+    // Di perangkat mobile / layar sentuh: cukup gunakan tekstur statis 1 frame.
+    // Tidak menjalankan loop requestAnimationFrame sama sekali -> 0% beban CPU, scroll tetap super ringan 60/120fps.
+    const isMobile =
+      typeof window !== 'undefined' &&
+      (window.innerWidth < 768 || window.matchMedia('(pointer: coarse)').matches)
+
+    if (isMobile) {
+      return
+    }
+
+    let current = 0
+    let count = 0
+    let animId: number
+
+    const tick = () => {
+      count++
+      if (count % patternRefreshInterval === 0) {
+        current = (current + 1) % dataUrls.length
+        if (el) {
+          el.style.backgroundImage = `url(${dataUrls[current]})`
+        }
       }
-      frame++
-      animationId = window.requestAnimationFrame(loop)
+      animId = requestAnimationFrame(tick)
     }
 
-    window.addEventListener('resize', resize)
-    resize()
-    loop()
+    animId = requestAnimationFrame(tick)
 
     return () => {
-      window.removeEventListener('resize', resize)
-      window.cancelAnimationFrame(animationId)
+      cancelAnimationFrame(animId)
     }
-  }, [patternSize, patternScaleX, patternScaleY, patternRefreshInterval, patternAlpha])
+  }, [patternSize, patternRefreshInterval, patternAlpha])
 
   return (
-    <canvas
-      className={`pointer-events-none fixed inset-0 h-screen w-screen select-none z-40 ${className}`}
-      ref={grainRef}
-      style={{
-        imageRendering: 'pixelated',
-      }}
+    <div
+      ref={containerRef}
+      aria-hidden="true"
+      className={`pointer-events-none fixed inset-0 w-full h-full z-20 select-none ${className}`}
     />
   )
 }

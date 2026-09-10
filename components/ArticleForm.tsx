@@ -4,6 +4,7 @@ import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import RichTextEditor from './RichTextEditor'
+import ArrowUpRight from '@/components/ui/ArrowUpRight'
 
 type ArticleFormProps = {
   mode: 'create' | 'edit'
@@ -100,7 +101,7 @@ export default function ArticleForm({
             required
             placeholder="Ketik judul artikel..."
             aria-label="Judul artikel"
-            className="w-full text-2xl sm:text-4xl font-extrabold tracking-tight bg-transparent text-text-primary placeholder:text-text-secondary/40 focus:outline-none border-b border-text-secondary/20 focus:border-text-primary pb-4 transition-colors"
+            className="w-full text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight bg-transparent text-text-primary placeholder:text-text-secondary/40 focus:outline-none border-b border-text-secondary/20 focus:border-text-primary pb-3 sm:pb-4 transition-colors"
           />
           <p className="mt-2.5 text-xs text-text-secondary">
             Tulis dengan gaya bahasa dan perspektif personalmu. Ide sederhana seringkali jadi tulisan terbaik.
@@ -108,7 +109,7 @@ export default function ArticleForm({
         </div>
 
         {/* Rich Text Editor Card */}
-        <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md p-5 sm:p-7 shadow-xs">
+        <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md p-4 sm:p-7 shadow-xs">
           <RichTextEditor content={content} onChange={setContent} />
         </div>
       </div>
@@ -205,7 +206,7 @@ export default function ArticleForm({
               ) : (
                 <>
                   <span>{mode === 'create' ? 'Publikasikan Artikel' : 'Simpan Perubahan'}</span>
-                  <span className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
+                  <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                 </>
               )}
             </button>

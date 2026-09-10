@@ -5,6 +5,9 @@ import ScrollVelocity from '@/components/ScrollVelocity'
 import TechIcon from '@/components/TechIcon'
 import ContactSection from '@/components/ContactSection'
 import ScrollStack, { ScrollStackItem } from '@/components/ScrollStack'
+import BlurReveal from '@/components/BlurReveal'
+import AccordionGallery from '@/components/AccordionGallery'
+import ArrowUpRight from '@/components/ui/ArrowUpRight'
 
 export const dynamic = 'force-dynamic'
 
@@ -116,7 +119,7 @@ export default async function HomePage() {
         id="home"
         className="w-full max-w-7xl mx-auto cursor-default grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center px-6 md:px-12 pt-28 pb-20 md:pt-36 md:pb-28 overflow-hidden"
       >
-        <div className="flex flex-col gap-2">
+        <BlurReveal delay={0.1} className="flex flex-col gap-2">
           <div>
             <h1 className="text-text-primary text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-tight">
               Hi, I&apos;m
@@ -202,23 +205,23 @@ export default async function HomePage() {
               </a>
             </div>
           </div>
-        </div>
+        </BlurReveal>
 
         {/* RIGHT COLUMN: CIRCLE PHOTO & EXACT RYHAR STACKED FLOATING BADGES */}
-        <div className="flex flex-col items-center justify-center relative mt-12 md:mt-0">
+        <BlurReveal delay={0.25} yOffset={25} className="flex flex-col items-center justify-center relative mt-12 md:mt-0 pb-12 sm:pb-0">
           <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 via-blue-500/15 to-purple-500/20 rounded-full scale-110 opacity-70 blur-3xl pointer-events-none" />
           <div className="relative z-10 p-2 sm:p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full shadow-2xl">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/about.jpg"
+              src="/haikal-hero.jpg"
               alt="Muhammad Haikal"
-              className="w-64 h-64 sm:w-80 sm:h-80 lg:w-[380px] lg:h-[380px] rounded-full object-cover aspect-square transition-all duration-700 hover:scale-[1.02]"
+              className="w-64 h-64 sm:w-80 sm:h-80 lg:w-[380px] lg:h-[380px] rounded-full object-cover [object-position:center_58%] aspect-square transition-all duration-700 hover:scale-[1.02]"
             />
           </div>
-          <div className="absolute -bottom-10 md:-bottom-12 -left-4 md:-left-10 z-20 flex flex-col gap-3">
-            <div className="floating flex items-center gap-3 bg-background/90 backdrop-blur-md border border-text-secondary/10 p-3 pr-5 rounded-2xl shadow-xl hover:-translate-y-1 transition-transform duration-300">
-              <div className="bg-text-primary text-background p-2 rounded-xl">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+          <div className="absolute -bottom-8 left-2 sm:-bottom-10 sm:-left-4 md:-bottom-12 md:-left-10 z-20 flex flex-col gap-2.5 sm:gap-3 max-w-[calc(100%-1rem)] sm:max-w-none">
+            <div className="floating flex items-center gap-2.5 sm:gap-3 bg-background/95 dark:bg-[#111111]/95 backdrop-blur-md border border-text-secondary/15 p-2.5 pr-4 sm:p-3 sm:pr-5 rounded-2xl shadow-xl hover:-translate-y-1 transition-transform duration-300">
+              <div className="bg-text-primary text-background p-1.5 sm:p-2 rounded-xl shrink-0">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                 </svg>
               </div>
@@ -227,11 +230,11 @@ export default async function HomePage() {
               </span>
             </div>
             <div
-              className="floating flex items-center gap-3 bg-background/90 backdrop-blur-md border border-text-secondary/10 p-3 pr-5 rounded-2xl shadow-xl hover:-translate-y-1 transition-transform duration-300"
+              className="floating flex items-center gap-2.5 sm:gap-3 bg-background/95 dark:bg-[#111111]/95 backdrop-blur-md border border-text-secondary/15 p-2.5 pr-4 sm:p-3 sm:pr-5 rounded-2xl shadow-xl hover:-translate-y-1 transition-transform duration-300"
               style={{ animationDelay: '150ms' }}
             >
-              <div className="bg-text-primary text-background p-2 rounded-xl">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <div className="bg-text-primary text-background p-1.5 sm:p-2 rounded-xl shrink-0">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m8 8-4 4 4 4m8 0 4-4-4-4m-2-3-4 14" />
                 </svg>
               </div>
@@ -240,11 +243,11 @@ export default async function HomePage() {
               </span>
             </div>
             <div
-              className="floating flex items-center gap-3 bg-background/90 backdrop-blur-md border border-text-secondary/10 p-3 pr-5 rounded-2xl shadow-xl hover:-translate-y-1 transition-transform duration-300"
+              className="floating flex items-center gap-2.5 sm:gap-3 bg-background/95 dark:bg-[#111111]/95 backdrop-blur-md border border-text-secondary/15 p-2.5 pr-4 sm:p-3 sm:pr-5 rounded-2xl shadow-xl hover:-translate-y-1 transition-transform duration-300"
               style={{ animationDelay: '300ms' }}
             >
-              <div className="bg-text-primary text-background p-2 rounded-xl">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <div className="bg-text-primary text-background p-1.5 sm:p-2 rounded-xl shrink-0">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M5 12V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v5M5 12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2M5 12h14m-7 4v3m-4 0h8" />
                 </svg>
               </div>
@@ -253,7 +256,7 @@ export default async function HomePage() {
               </span>
             </div>
           </div>
-        </div>
+        </BlurReveal>
       </section>
 
       {/* 2. ABOUT ME SECTION */}
@@ -261,21 +264,21 @@ export default async function HomePage() {
         id="about"
         className="w-full max-w-7xl mx-auto py-24 md:py-32 cursor-default bg-background overflow-hidden border-t border-text-secondary/10"
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-16 md:mb-24 w-full text-left">
+        <BlurReveal className="max-w-7xl mx-auto px-6 md:px-12 mb-16 md:mb-24 w-full text-left">
           <h2 className="text-sm font-bold tracking-[0.2em] text-text-secondary uppercase mb-4">Discover</h2>
           <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter">About Me</h3>
-        </div>
+        </BlurReveal>
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 px-6 md:px-12">
+        <BlurReveal delay={0.15} className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 px-6 md:px-12">
           {/* Left: Photo Card in 4/5 Aspect with DEV Watermark */}
           <div className="lg:col-span-5 hidden lg:flex flex-col items-center justify-center relative">
             <div className="w-full max-w-[360px] lg:max-w-[440px] relative">
               <div className="relative z-10 p-2 bg-background border border-text-secondary/10 rounded-3xl shadow-2xl overflow-hidden aspect-[4/5] w-full group transition-all duration-500 hover:shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_40px_-5px_rgba(255,255,255,0.05)] hover:-translate-y-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/about.jpg"
+                  src="/whatsapp.jpeg"
                   alt="Muhammad Haikal"
-                  className="object-cover transition-all duration-700 scale-100 group-hover:scale-105 rounded-2xl w-full h-full"
+                  className="object-cover [object-position:center_25%] transition-all duration-700 scale-100 group-hover:scale-105 rounded-2xl w-full h-full"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-40 dark:opacity-60 group-hover:opacity-10 dark:group-hover:opacity-20 transition-opacity duration-500 rounded-3xl pointer-events-none" />
               </div>
@@ -343,7 +346,7 @@ export default async function HomePage() {
               </div>
             </div>
           </div>
-        </div>
+        </BlurReveal>
 
         {/* 3. SCROLL VELOCITY BANNER */}
         <div className="mt-24 md:mt-32 pb-6 border-t border-neutral-200 dark:border-neutral-800/80 pt-10 overflow-hidden">
@@ -363,10 +366,10 @@ export default async function HomePage() {
         id="experience"
         className="w-full max-w-7xl mx-auto py-24 md:py-32 cursor-default bg-background relative border-t border-text-secondary/10"
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12 md:mb-16 w-full text-left">
+        <BlurReveal className="max-w-7xl mx-auto px-6 md:px-12 mb-12 md:mb-16 w-full text-left">
           <h2 className="text-sm font-bold tracking-[0.2em] text-text-secondary uppercase mb-4">Career Path</h2>
           <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter">Work Experience</h3>
-        </div>
+        </BlurReveal>
 
         <div className="max-w-7xl mx-auto px-6 md:px-12">
           <ScrollStack
@@ -427,12 +430,12 @@ export default async function HomePage() {
         id="techstack"
         className="w-full max-w-7xl mx-auto py-24 md:py-32 cursor-default bg-background relative border-t border-text-secondary/10 overflow-hidden"
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-16 md:mb-24 w-full text-left">
+        <BlurReveal className="max-w-7xl mx-auto px-6 md:px-12 mb-16 md:mb-24 w-full text-left">
           <h2 className="text-sm font-bold tracking-[0.2em] text-text-secondary uppercase mb-4">Skills &amp; Tools</h2>
           <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter">My Tech Stack</h3>
-        </div>
+        </BlurReveal>
 
-        <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col gap-16">
+        <BlurReveal delay={0.15} className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col gap-16">
           {skillGroups.map((group) => (
             <div key={group.title} className="flex flex-col md:flex-row gap-8 md:gap-16 items-start">
               <div className="md:w-1/3">
@@ -454,7 +457,7 @@ export default async function HomePage() {
               </div>
             </div>
           ))}
-        </div>
+        </BlurReveal>
       </section>
 
       {/* 6. PORTFOLIO / SELECTED WORKS */}
@@ -462,77 +465,64 @@ export default async function HomePage() {
         id="projects"
         className="w-full max-w-7xl mx-auto py-24 md:py-32 cursor-default bg-background relative border-t border-text-secondary/10"
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-16 md:mb-24 w-full text-left">
-          <h2 className="text-sm font-bold tracking-[0.2em] text-text-secondary uppercase mb-4">Portfolio</h2>
-          <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter">Selected Works</h3>
-        </div>
+        {/* Section Header */}
+        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12 md:mb-16 w-full flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <BlurReveal>
+            <h2 className="text-sm font-bold tracking-[0.2em] text-text-secondary uppercase mb-4">Portfolio</h2>
+            <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter">
+              Selected Works
+            </h3>
+            <p className="mt-3 text-sm md:text-base text-text-secondary max-w-xl font-medium leading-relaxed">
+              Koleksi karya eksplorasi visual, identitas artistik, dan eksperimen desain monokrom. Arahkan kursor atau sentuh untuk melihat detailnya.
+            </p>
+          </BlurReveal>
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-6 md:px-12">
-          {projects.map((project) => (
-            <div
-              key={project.name}
-              className="relative overflow-hidden group flex flex-col h-full bg-background border border-text-secondary/20 hover:border-text-primary/50 rounded-xl overflow-hidden transition-all duration-500 shadow-sm hover:shadow-2xl"
+          <BlurReveal delay={0.1}>
+            <Link
+              href="/collection"
+              className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-text-secondary/20 hover:border-text-primary text-text-primary hover:bg-text-primary hover:text-background text-xs font-bold uppercase tracking-wider transition-all duration-300 w-fit shadow-sm hover:shadow-md group"
             >
-              <div className="project-card-shine" />
-              <div className="relative overflow-hidden aspect-[16/10] bg-text-secondary/5 border-b border-text-secondary/10">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={project.image}
-                  alt={project.name}
-                  className="object-cover w-full h-full transition-all duration-700 group-hover:scale-105"
-                />
-                <div className="absolute top-4 right-4 flex flex-wrap gap-2 justify-end z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-[-10px] group-hover:translate-y-0">
-                  {project.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="text-[10px] font-bold bg-background/90 text-text-primary px-2 py-1 rounded backdrop-blur-md border border-text-secondary/20 uppercase tracking-widest shadow-sm"
-                    >
-                      {t}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="p-6 md:p-8 flex flex-col flex-grow relative">
-                <div className="absolute top-0 right-6 -translate-y-1/2 bg-background border border-text-secondary/20 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest text-text-secondary shadow-sm">
-                  {project.number}
-                </div>
-                <div className="flex justify-between items-start mb-4">
-                  <h4 className="text-2xl font-black text-text-primary tracking-tight leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-text-primary group-hover:to-text-secondary transition-all duration-500">
-                    {project.name}
-                  </h4>
-                </div>
-                <p className="text-sm text-text-secondary font-medium leading-relaxed mb-8 flex-grow line-clamp-3">
-                  {project.description}
-                </p>
-                <div className="flex items-center justify-between mt-auto pt-4 border-t border-text-secondary/10">
-                  <Link
-                    href="/collection"
-                    className="text-xs font-bold tracking-[0.2em] uppercase text-text-primary flex items-center gap-3 group/btn"
-                  >
-                    View Details
-                    <span className="w-8 h-[2px] bg-text-primary group-hover/btn:w-12 transition-all duration-300" />
-                  </Link>
-                  <Link
-                    href="/collection"
-                    className="p-2 border border-text-secondary/20 rounded-full text-text-secondary hover:text-background hover:bg-text-primary hover:border-text-primary transition-all duration-300"
-                    title="Open collection"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
+              <span>Explore Collection</span>
+              <ArrowUpRight size={13} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </Link>
+          </BlurReveal>
         </div>
+
+        {/* Accordion Gallery Showcase */}
+        <BlurReveal delay={0.2} className="max-w-7xl mx-auto px-6 md:px-12">
+          <AccordionGallery
+            items={projects.map((p) => ({
+              image: p.image,
+              label: `${p.number} — ${p.name}`,
+              link: '/collection',
+              alt: p.name,
+              objectFit: p.number === '02' ? 'contain' : 'cover',
+            }))}
+            defaultIndex={1}
+            expandRatio={0.52}
+            trigger="hover"
+            accentColor="#ffffff"
+            overlayColor="#0a0a0a"
+            textColor="#ffffff"
+            grayscale={false}
+            showLabels={true}
+            duration={0.65}
+            ease="power3.out"
+            parallax={0.4}
+            tilt={6}
+            stagger={0.06}
+            height={480}
+            gap={14}
+            radius={24}
+            orientation="horizontal"
+          />
+        </BlurReveal>
       </section>
 
       {/* 7. JOURNAL / ARTICLES */}
       <section className="w-full max-w-7xl mx-auto py-24 md:py-32 cursor-default bg-background relative border-t border-text-secondary/10">
         {/* Section Header */}
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12 md:mb-16 w-full flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <BlurReveal className="max-w-7xl mx-auto px-6 md:px-12 mb-12 md:mb-16 w-full flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary/40 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-4">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -551,14 +541,14 @@ export default async function HomePage() {
             className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full border border-text-secondary/20 hover:border-text-primary text-text-primary hover:bg-text-primary hover:text-background text-xs font-bold uppercase tracking-wider transition-all duration-300 w-fit shadow-sm hover:shadow-md group"
           >
             <span>Semua Artikel</span>
-            <span className="transition-transform duration-300 group-hover:translate-x-1">↗</span>
+            <ArrowUpRight size={13} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </Link>
-        </div>
+        </BlurReveal>
 
         {/* Articles Content */}
         {latestArticles.length === 1 ? (
           /* MINIMALIST FEATURED ARTICLE CARD (WITHOUT CLUTTERED COMPANION BOX) */
-          <div className="max-w-7xl mx-auto px-6 md:px-12">
+          <BlurReveal delay={0.15} className="max-w-7xl mx-auto px-6 md:px-12">
             <Link
               href={`/artikel/${latestArticles[0].id}`}
               className="group relative flex flex-col lg:flex-row overflow-hidden rounded-3xl border border-text-secondary/20 hover:border-text-primary bg-background shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
@@ -634,89 +624,92 @@ export default async function HomePage() {
                 </div>
               </div>
             </Link>
-          </div>
+          </BlurReveal>
         ) : latestArticles.length > 1 ? (
           /* GRID LAYOUT FOR MULTIPLE ARTICLES */
           <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {latestArticles.map((article, idx) => (
-              <Link
-                key={article.id}
-                href={`/artikel/${article.id}`}
-                className="group relative flex flex-col overflow-hidden rounded-3xl border border-text-secondary/20 hover:border-text-primary bg-background shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 h-full"
-              >
-                {/* Thumbnail */}
-                <div className="relative aspect-[16/10] w-full overflow-hidden bg-text-secondary/5 border-b border-text-secondary/10">
-                  {article.thumbnail ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={article.thumbnail}
-                      alt={article.title}
-                      className="object-cover w-full h-full transition-all duration-700 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-thirdary/50 text-text-secondary text-sm font-semibold tracking-wider uppercase">
-                      Haikal Journal
+              <BlurReveal key={article.id} delay={idx * 0.1} className="h-full">
+                <Link
+                  href={`/artikel/${article.id}`}
+                  className="group relative flex flex-col overflow-hidden rounded-3xl border border-text-secondary/20 hover:border-text-primary bg-background shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 h-full"
+                >
+                  {/* Thumbnail */}
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-text-secondary/5 border-b border-text-secondary/10">
+                    {article.thumbnail ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={article.thumbnail}
+                        alt={article.title}
+                        className="object-cover w-full h-full transition-all duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center bg-thirdary/50 text-text-secondary text-sm font-semibold tracking-wider uppercase">
+                        Haikal Journal
+                      </div>
+                    )}
+
+                    <div className="absolute top-4 left-4 z-10 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-text-secondary/20 text-[10px] font-mono font-bold tracking-wider text-text-primary shadow-sm">
+                      #{String(idx + 1).padStart(2, '0')}
                     </div>
-                  )}
 
-                  <div className="absolute top-4 left-4 z-10 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-text-secondary/20 text-[10px] font-mono font-bold tracking-wider text-text-primary shadow-sm">
-                    #{String(idx + 1).padStart(2, '0')}
+                    <div className="absolute top-4 right-4 z-10 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-text-secondary/20 text-[10px] font-semibold text-text-secondary shadow-sm">
+                      ⏱️ {getReadingTime(article.content)}
+                    </div>
                   </div>
 
-                  <div className="absolute top-4 right-4 z-10 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-text-secondary/20 text-[10px] font-semibold text-text-secondary shadow-sm">
-                    ⏱️ {getReadingTime(article.content)}
-                  </div>
-                </div>
+                  {/* Details */}
+                  <div className="p-6 sm:p-8 flex flex-col flex-grow justify-between">
+                    <div>
+                      <div className="flex items-center justify-between text-xs text-text-secondary mb-3">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-text-secondary/80">
+                          Article
+                        </span>
+                        <time className="font-medium">
+                          {new Date(article.created_at).toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: 'numeric',
+                          })}
+                        </time>
+                      </div>
 
-                {/* Details */}
-                <div className="p-6 sm:p-8 flex flex-col flex-grow justify-between">
-                  <div>
-                    <div className="flex items-center justify-between text-xs text-text-secondary mb-3">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-text-secondary/80">
-                        Article
+                      <h4 className="text-xl sm:text-2xl font-black text-text-primary tracking-tight leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-text-primary group-hover:to-text-secondary transition-all duration-500 mb-3 line-clamp-2">
+                        {article.title}
+                      </h4>
+
+                      <p className="text-sm text-text-secondary font-medium leading-relaxed mb-6 line-clamp-3">
+                        {getExcerpt(article.content, 140)}
+                      </p>
+                    </div>
+
+                    <div className="pt-4 border-t border-text-secondary/10 flex items-center justify-between mt-auto">
+                      <span className="flex items-center gap-1.5 text-xs text-text-secondary font-medium">
+                        👁️ {article.view_count} views
                       </span>
-                      <time className="font-medium">
-                        {new Date(article.created_at).toLocaleDateString('id-ID', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </time>
+                      <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-text-primary group-hover:translate-x-1 transition-transform">
+                        Baca <span>→</span>
+                      </span>
                     </div>
-
-                    <h4 className="text-xl sm:text-2xl font-black text-text-primary tracking-tight leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-text-primary group-hover:to-text-secondary transition-all duration-500 mb-3 line-clamp-2">
-                      {article.title}
-                    </h4>
-
-                    <p className="text-sm text-text-secondary font-medium leading-relaxed mb-6 line-clamp-3">
-                      {getExcerpt(article.content, 140)}
-                    </p>
                   </div>
-
-                  <div className="pt-4 border-t border-text-secondary/10 flex items-center justify-between mt-auto">
-                    <span className="flex items-center gap-1.5 text-xs text-text-secondary font-medium">
-                      👁️ {article.view_count} views
-                    </span>
-                    <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-text-primary group-hover:translate-x-1 transition-transform">
-                      Baca <span>→</span>
-                    </span>
-                  </div>
-                </div>
-              </Link>
+                </Link>
+              </BlurReveal>
             ))}
           </div>
         ) : (
           /* EMPTY STATE */
-          <div className="max-w-7xl mx-auto px-6 md:px-12 py-16 text-center border border-dashed border-text-secondary/20 rounded-3xl bg-thirdary/10">
+          <BlurReveal delay={0.15} className="max-w-7xl mx-auto px-6 md:px-12 py-16 text-center border border-dashed border-text-secondary/20 rounded-3xl bg-thirdary/10">
             <p className="text-text-secondary text-base font-medium">
               Belum ada artikel yang dipublikasikan. Silakan cek kembali nanti!
             </p>
-          </div>
+          </BlurReveal>
         )}
       </section>
 
       {/* 8. CONTACT SECTION */}
-      <ContactSection />
+      <BlurReveal>
+        <ContactSection />
+      </BlurReveal>
     </div>
   )
 }

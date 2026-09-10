@@ -3,6 +3,7 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import ArrowUpRight from '@/components/ui/ArrowUpRight'
 
 export default function ProfileForm({
   initialName,
@@ -82,7 +83,7 @@ export default function ProfileForm({
         )}
         <label className="profile-upload-control">
           <span>Foto profil</span>
-          <strong>Ganti foto ↗</strong>
+          <strong>Ganti foto</strong>
           <input type="file" accept="image/*" onChange={handleAvatarChange} />
         </label>
       </div>
@@ -102,7 +103,7 @@ export default function ProfileForm({
       {success && <p className="profile-success">Profil tersimpan.</p>}
 
       <button type="submit" disabled={loading} className="editorial-link profile-submit">
-        {loading ? 'Menyimpan...' : 'Simpan profil ↗'}
+        {loading ? 'Menyimpan...' : 'Simpan profil'}
       </button>
     </form>
   )

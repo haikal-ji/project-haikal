@@ -4,6 +4,7 @@ import { useState, useEffect, type ChangeEvent, type FormEvent, type DragEvent }
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import ArrowUpRight from '@/components/ui/ArrowUpRight'
 
 type ProfileClientViewProps = {
   user: {
@@ -272,7 +273,7 @@ export default function ProfileClientView({
           disabled={loggingOut}
           className="profile-logout-button"
         >
-          {loggingOut ? 'Keluar...' : 'Keluar dari akun ↗'}
+          {loggingOut ? 'Keluar...' : 'Keluar dari akun'}
         </button>
       </aside>
 
@@ -418,7 +419,7 @@ export default function ProfileClientView({
                   disabled={loading || !name.trim()}
                   className="profile-save-btn"
                 >
-                  {loading ? 'Menyimpan Perubahan...' : 'Simpan Profil ↗'}
+                  {loading ? 'Menyimpan Perubahan...' : 'Simpan Profil'}
                 </button>
               </div>
             </form>
@@ -444,7 +445,7 @@ export default function ProfileClientView({
                   Kamu belum pernah berkomentar di artikel mana pun. Jelajahi tulisan terbaru dan bagikan pendapatmu!
                 </p>
                 <Link href="/artikel" className="empty-state-link">
-                  Jelajahi Artikel ↗
+                  Jelajahi Artikel
                 </Link>
               </div>
             ) : (
@@ -454,7 +455,7 @@ export default function ProfileClientView({
                     <div className="feed-card-header">
                       <span className="feed-article-label">Artikel</span>
                       <Link href={`/artikel/${item.article.id}`} className="feed-article-link font-serif">
-                        {item.article.title} ↗
+                        {item.article.title}
                       </Link>
                       <time className="feed-card-date">{item.createdAt}</time>
                     </div>
@@ -487,7 +488,7 @@ export default function ProfileClientView({
                   Beri reaksi suka pada artikel yang memberi inspirasi atau pengetahuan baru bagimu.
                 </p>
                 <Link href="/artikel" className="empty-state-link">
-                  Mulai Membaca ↗
+                  Mulai Membaca
                 </Link>
               </div>
             ) : (
@@ -503,7 +504,7 @@ export default function ProfileClientView({
                       <time className="like-date">{article.createdAt}</time>
                     </div>
                     <h3 className="like-title font-serif">{article.title}</h3>
-                    <span className="like-read-more">Baca selengkapnya ↗</span>
+                    <span className="like-read-more">Baca selengkapnya</span>
                   </Link>
                 ))}
               </div>
@@ -622,7 +623,7 @@ export default function ProfileClientView({
                               }
                             }}
                           >
-                            {appealLoading ? 'Mengirim...' : 'Kirim Permohonan Unban ↗'}
+                            {appealLoading ? 'Mengirim...' : 'Kirim Permohonan Unban'}
                           </button>
                         </>
                       )}
@@ -643,7 +644,7 @@ export default function ProfileClientView({
                     disabled={loggingOut}
                     className="account-logout-btn"
                   >
-                    {loggingOut ? 'Sedang keluar...' : 'Keluar dari Sesi Ini ↗'}
+                    {loggingOut ? 'Sedang keluar...' : 'Keluar dari Sesi Ini'}
                   </button>
                 </div>
               </div>

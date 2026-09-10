@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import DeleteArticleButton from './DeleteArticleButton'
+import ArrowUpRight from '@/components/ui/ArrowUpRight'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,7 +42,7 @@ export default async function DashboardPage() {
           className="inline-flex items-center gap-2 bg-button-hero hover:bg-button-hero-hover text-background font-semibold text-xs sm:text-sm py-2.5 px-5 rounded-full transition-all shadow-xs group w-fit"
         >
           <span>＋ Tulis Artikel Baru</span>
-          <span className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
+          <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
         </Link>
       </div>
 
@@ -81,12 +82,17 @@ export default async function DashboardPage() {
             <h2 className="text-lg font-bold text-text-primary tracking-tight">Daftar Publikasi</h2>
             <span className="text-xs text-text-secondary font-mono">({articles.length})</span>
           </div>
+          {articles.length > 0 && (
+            <p className="text-[11px] text-text-secondary sm:hidden flex items-center gap-1 font-medium bg-thirdary/60 px-2.5 py-1 rounded-full border border-text-secondary/15">
+              <span>↔️</span> Geser ke samping
+            </p>
+          )}
         </div>
 
         {articles.length > 0 ? (
           <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full min-w-[640px] text-left text-sm">
                 <thead className="border-b border-text-secondary/10 bg-thirdary/70 text-[11px] font-bold uppercase tracking-wider text-text-secondary">
                   <tr>
                     <th scope="col" className="px-5 py-3.5 w-14">No.</th>
@@ -169,7 +175,7 @@ export default async function DashboardPage() {
               href="/dashboard/artikel/tambah"
               className="inline-flex items-center gap-2 bg-button-hero hover:bg-button-hero-hover text-background font-medium text-xs py-2 px-4 rounded-full transition-all shadow-xs"
             >
-              Mulai Menulis ↗
+              Mulai Menulis
             </Link>
           </div>
         )}

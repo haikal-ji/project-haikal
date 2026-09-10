@@ -1,7 +1,6 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import Link from 'next/link'
 import LogoLoop, { type LogoItem } from '@/components/LogoLoop'
 import {
   SiNextdotjs,
@@ -141,25 +140,27 @@ export default function SiteFooter() {
         />
       </div>
 
-      {/* 2. Main Footer Content */}
-      <div className="mx-auto grid max-w-7xl gap-10 px-6 py-14 md:grid-cols-3 md:px-10">
-        <div>
-          <p className="text-lg font-bold tracking-tight text-text-primary">
-            HAiKAL<span className="text-text-secondary">.</span>
-          </p>
-          <p className="mt-3 max-w-xs text-sm leading-6 text-text-secondary">
-            Personal website &amp; portfolio. Crafting high quality web apps and digital experiences.
-          </p>
+      {/* 2. Main Footer Content (RyHar layout with GMAIL) */}
+      <div className="mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 max-w-7xl px-6 py-8 md:px-12">
+        <div className="flex flex-col gap-1 text-center sm:text-left text-xs sm:text-sm text-text-secondary">
+          <p>© {new Date().getFullYear()} Haikal. All rights reserved.</p>
+          <p className="text-xs text-text-secondary/70">Built with Next.js &amp; Tailwind CSS</p>
         </div>
 
-        <div className="flex flex-col gap-2.5 text-sm">
+        <div className="flex items-center gap-6 sm:gap-8 text-xs font-bold uppercase tracking-widest">
           <a
             href="https://github.com/haikal-ji"
             target="_blank"
             rel="noopener noreferrer"
             className="text-text-secondary hover:text-text-primary transition-colors duration-200"
           >
-            GitHub
+            GITHUB
+          </a>
+          <a
+            href="mailto:mlbbus0208@gmail.com"
+            className="text-text-secondary hover:text-text-primary transition-colors duration-200"
+          >
+            GMAIL
           </a>
           <a
             href="https://instagram.com/__02ekall"
@@ -167,18 +168,8 @@ export default function SiteFooter() {
             rel="noopener noreferrer"
             className="text-text-secondary hover:text-text-primary transition-colors duration-200"
           >
-            Instagram
+            INSTAGRAM
           </a>
-          <Link href="/uses" className="text-text-secondary hover:text-text-primary transition-colors duration-200">
-            Uses / Stack
-          </Link>
-          <Link href="/changelog" className="text-text-secondary hover:text-text-primary transition-colors duration-200">
-            Changelog
-          </Link>
-        </div>
-
-        <div className="text-sm text-text-secondary md:text-right flex flex-col justify-end">
-          <p>© {new Date().getFullYear()} Haikal. All rights reserved.</p>
         </div>
       </div>
     </footer>

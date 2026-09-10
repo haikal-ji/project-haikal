@@ -96,13 +96,8 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       if (!useWindowScroll && scrollerRef.current) {
         return element.offsetTop
       }
-      let top = 0
-      let curr: HTMLElement | null = element
-      while (curr) {
-        top += curr.offsetTop
-        curr = curr.offsetParent as HTMLElement | null
-      }
-      return top
+      const rect = element.getBoundingClientRect()
+      return rect.top + (window.scrollY || window.pageYOffset || 0)
     },
     [useWindowScroll]
   )
@@ -217,17 +212,27 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 
   const setupLenis = useCallback(() => {
     try {
+      // On mobile touch devices, do not hijack touch scrolling — allow native 60/120fps kinetic scroll
+      const isTouch =
+        typeof window !== 'undefined' &&
+        (window.matchMedia('(pointer: coarse)').matches ||
+          'ontouchstart' in window ||
+          window.innerWidth < 768)
+
+      if (isTouch) {
+        return null
+      }
+
       if (useWindowScroll) {
         const lenis = new Lenis({
-          duration: 1.2,
+          duration: 1.0,
           easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
           smoothWheel: true,
-          touchMultiplier: 2,
+          touchMultiplier: 1.5,
           infinite: false,
           wheelMultiplier: 1,
           lerp: 0.1,
-          syncTouch: true,
-          syncTouchLerp: 0.075,
+          syncTouch: false,
         })
 
         lenis.on('scroll', handleScroll)
@@ -247,16 +252,15 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
         const lenis = new Lenis({
           wrapper: scroller,
           content: scroller.querySelector('.scroll-stack-inner') as HTMLElement,
-          duration: 1.2,
+          duration: 1.0,
           easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
           smoothWheel: true,
-          touchMultiplier: 2,
+          touchMultiplier: 1.5,
           infinite: false,
           gestureOrientation: 'vertical',
           wheelMultiplier: 1,
           lerp: 0.1,
-          syncTouch: true,
-          syncTouchLerp: 0.075,
+          syncTouch: false,
         })
 
         lenis.on('scroll', handleScroll)

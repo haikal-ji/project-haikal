@@ -61,7 +61,7 @@ export default function CollectionPage() {
               <h2>{project.name}</h2>
               <p>{project.description}</p>
               <Link href="/#projects" className="collection-reference-link">
-                View details <span>↗</span>
+                View details
               </Link>
             </div>
           </article>

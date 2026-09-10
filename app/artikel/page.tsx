@@ -22,7 +22,7 @@ export default async function ArtikelListPage() {
   }))
 
   return (
-    <main className="min-h-screen bg-background text-text-primary px-6 py-16 md:px-12 md:py-20 max-w-7xl mx-auto transition-colors duration-200">
+    <main className="min-h-screen bg-background text-text-primary px-6 pt-24 sm:pt-28 pb-16 md:px-12 md:pt-32 md:pb-20 max-w-7xl mx-auto transition-colors duration-200">
       <header className="mb-12">
         <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-4">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />

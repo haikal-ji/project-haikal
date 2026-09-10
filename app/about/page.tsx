@@ -28,9 +28,9 @@ export default function AboutPage() {
         <div className="overflow-hidden bg-line">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/about.jpg"
+            src="/whatsapp.jpeg"
             alt="Tentang Haikal"
-            className="w-full object-cover grayscale transition duration-500 hover:grayscale-0"
+            className="w-full object-cover [object-position:center_20%] grayscale transition duration-500 hover:grayscale-0"
           />
         </div>
       </div>

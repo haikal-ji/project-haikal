@@ -13,7 +13,7 @@ export default function DashboardNav() {
     { href: '/dashboard', label: 'Overview', exact: true },
     { href: '/dashboard/artikel/tambah', label: 'Tulis Artikel', exact: false },
     { href: '/dashboard/komunitas', label: 'Komunitas', exact: false },
-    { href: '/artikel', label: 'Lihat Web ↗', exact: false, external: true },
+    { href: '/artikel', label: 'Lihat Web', exact: false, external: true },
   ]
 
   const isActive = (item: (typeof navItems)[0]) => {

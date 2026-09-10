@@ -75,7 +75,7 @@ export default async function ArtikelDetailPage({
   const readingTime = estimateReadingTime(article.content)
 
   return (
-    <main className="min-h-screen bg-background text-text-primary px-6 py-12 md:px-10 md:py-16 max-w-4xl mx-auto transition-colors duration-200">
+    <main className="min-h-screen bg-background text-text-primary px-6 pt-24 sm:pt-28 pb-16 md:px-10 md:pt-32 md:pb-20 max-w-4xl mx-auto transition-colors duration-200">
       <Link
         href="/artikel"
         className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-text-primary transition mb-8"
