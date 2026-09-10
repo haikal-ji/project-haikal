@@ -1,13 +1,21 @@
 import type { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://haikal.vercel.app'
 
-  const articles = await prisma.article.findMany({
-    select: { id: true, created_at: true },
-    orderBy: { created_at: 'desc' },
-  })
+  let articles: { id: string; created_at: Date }[] = []
+
+  try {
+    articles = await prisma.article.findMany({
+      select: { id: true, created_at: true },
+      orderBy: { created_at: 'desc' },
+    })
+  } catch {
+    // Sitemap dasar tetap tersedia ketika database belum dapat dijangkau.
+  }
 
   const articleUrls = articles.map((article) => ({
     url: `${baseUrl}/artikel/${article.id}`,

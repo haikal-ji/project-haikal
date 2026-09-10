@@ -1,16 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Fraunces } from "next/font/google";
+import { Poppins, Geist_Mono, Fraunces } from "next/font/google";
 import { createClient } from "@/lib/supabase/server";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import ReadingProgress from "@/components/ReadingProgress";
 import CustomCursor from "@/components/CustomCursor";
 import ThemeInitializer from "@/components/ThemeInitializer";
+import LoadingScreen from "@/components/LoadingScreen";
+import Noise from "@/components/Noise";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+export const dynamic = "force-dynamic";
+
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -80,12 +86,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="id"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`dark ${poppins.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+      <body className="min-h-full flex flex-col bg-background text-text-primary font-sans">
         <ThemeInitializer />
+        <LoadingScreen />
         <ReadingProgress />
         <CustomCursor />
+        <Noise patternSize={250} patternRefreshInterval={3} patternAlpha={14} />
         <SiteHeader isLoggedIn={isLoggedIn} isOwner={isOwner} />
         <main className="flex-1">{children}</main>
         <SiteFooter />

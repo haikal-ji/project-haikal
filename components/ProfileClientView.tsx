@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type ChangeEvent, type FormEvent, type DragEvent } from 'react'
+import { useState, useEffect, type ChangeEvent, type FormEvent, type DragEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -34,6 +34,12 @@ type ProfileClientViewProps = {
   }>
 }
 
+type BanStatus = {
+  is_banned: boolean
+  ban_reason: string | null
+  active_appeal: { id: string; reason: string; created_at: string } | null
+}
+
 type TabType = 'identity' | 'comments' | 'likes' | 'account'
 
 export default function ProfileClientView({
@@ -58,6 +64,20 @@ export default function ProfileClientView({
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+
+  // Ban status & appeal form
+  const [banStatus, setBanStatus] = useState<BanStatus | null>(null)
+  const [appealReason, setAppealReason] = useState('')
+  const [appealLoading, setAppealLoading] = useState(false)
+  const [appealError, setAppealError] = useState<string | null>(null)
+  const [appealSuccess, setAppealSuccess] = useState(false)
+
+  useEffect(() => {
+    fetch('/api/profile/ban-status')
+      .then((r) => r.json())
+      .then((data) => setBanStatus(data))
+      .catch(() => {})
+  }, [])
 
   // Handle file selection
   function handleFile(file: File) {
@@ -109,10 +129,15 @@ export default function ProfileClientView({
     try {
       setLoggingOut(true)
       await supabase.auth.signOut()
-      router.push('/')
-      router.refresh()
+      await fetch('/auth/signout', {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+      })
     } catch {
-      setLoggingOut(false)
+      // Abaikan jika error jaringan
+    } finally {
+      router.replace('/login')
+      router.refresh()
     }
   }
 
@@ -530,6 +555,81 @@ export default function ProfileClientView({
                   <span>{user.createdAt}</span>
                 </div>
               </div>
+
+              {/* Ban Status Section */}
+              {banStatus?.is_banned && (
+                <div className="account-ban-section">
+                  <div className="account-ban-banner">
+                    <div className="account-ban-icon">⊘</div>
+                    <div>
+                      <strong className="account-ban-title">Akun kamu telah dinonaktifkan</strong>
+                      {banStatus.ban_reason && (
+                        <p className="account-ban-reason">Alasan: {banStatus.ban_reason}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {banStatus.active_appeal ? (
+                    <div className="account-appeal-pending">
+                      <span className="account-appeal-pending-icon">🕐</span>
+                      <div>
+                        <strong>Permohonan sedang ditinjau</strong>
+                        <p>Admin akan memproses permohonanmu. Harap bersabar.</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="account-appeal-form">
+                      <p className="account-appeal-intro">
+                        Kamu dapat mengajukan permohonan pemulihan akun. Jelaskan alasanmu dengan jujur dan admin akan meninjaunya.
+                      </p>
+                      {appealSuccess ? (
+                        <div className="account-appeal-success">
+                          ✓ Permohonan berhasil dikirim. Tunggu tinjauan dari admin.
+                        </div>
+                      ) : (
+                        <>
+                          <textarea
+                            value={appealReason}
+                            onChange={(e) => setAppealReason(e.target.value)}
+                            placeholder="Jelaskan mengapa akunmu seharusnya dipulihkan... (minimal 20 karakter)"
+                            className="account-appeal-textarea"
+                            rows={4}
+                            disabled={appealLoading}
+                          />
+                          {appealError && <p className="appeal-error-msg">{appealError}</p>}
+                          <button
+                            type="button"
+                            disabled={appealLoading || appealReason.trim().length < 20}
+                            className="account-appeal-submit"
+                            onClick={async () => {
+                              setAppealLoading(true)
+                              setAppealError(null)
+                              try {
+                                const res = await fetch('/api/admin/appeal', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ reason: appealReason }),
+                                })
+                                const data = await res.json()
+                                if (!res.ok) {
+                                  setAppealError(data.error)
+                                } else {
+                                  setAppealSuccess(true)
+                                  setBanStatus((prev) => prev ? { ...prev, active_appeal: data.appeal } : prev)
+                                }
+                              } finally {
+                                setAppealLoading(false)
+                              }
+                            }}
+                          >
+                            {appealLoading ? 'Mengirim...' : 'Kirim Permohonan Unban ↗'}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div className="account-spec-row account-danger-zone">
                 <div className="spec-label">

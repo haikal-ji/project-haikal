@@ -18,99 +18,133 @@ export default async function DashboardPage() {
   })
 
   return (
-    <div className="dashboard-shell">
-      <aside className="dashboard-sidebar">
-        <Link href="/" className="dashboard-brand">HAiKAL<span>.</span></Link>
-        <p className="dashboard-label">Workspace</p>
-        <nav className="dashboard-nav" aria-label="Navigasi dashboard">
-          <Link href="/dashboard" className="dashboard-nav-active"><span>◌</span> Overview</Link>
-          <Link href="/dashboard/artikel/tambah"><span>＋</span> Tulis artikel</Link>
-          <Link href="/artikel"><span>↗</span> Lihat website</Link>
-        </nav>
-        <div className="dashboard-sidebar-note">
-          <span className="dashboard-status-dot" />
-          <p>Ruang kerja pribadi<br /><span>Semua perubahan tersimpan di project.</span></p>
+    <div className="space-y-10 animate-fade-in">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-text-secondary/15 pb-6">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary px-3 py-1 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-3">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span>{todayLabel}</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary">
+            Overview & Konten
+          </h1>
+          <p className="mt-2 text-sm text-text-secondary max-w-xl">
+            {articles.length === 0
+              ? 'Selamat datang! Ruang kerja ini siap untuk mencatat ide dan publikasi pertamamu.'
+              : 'Kelola artikel, dokumentasi teknis, dan catatan yang sudah kamu publikasikan.'}
+          </p>
         </div>
-      </aside>
 
-      <main className="dashboard-main">
-        <header className="dashboard-topbar">
-          <div>
-            <p className="dashboard-kicker">{todayLabel}</p>
-            <h1>Selamat datang kembali.</h1>
-          </div>
-          <Link href="/dashboard/artikel/tambah" className="dashboard-primary-action">
-            <span aria-hidden="true">＋</span> Artikel baru
-          </Link>
-        </header>
+        <Link
+          href="/dashboard/artikel/tambah"
+          className="inline-flex items-center gap-2 bg-button-hero hover:bg-button-hero-hover text-background font-semibold text-xs sm:text-sm py-2.5 px-5 rounded-full transition-all shadow-xs group w-fit"
+        >
+          <span>＋ Tulis Artikel Baru</span>
+          <span className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform">↗</span>
+        </Link>
+      </div>
 
-        <section className="dashboard-intro">
-          <div>
-            <p className="dashboard-kicker">Content desk</p>
-            <h2>Ide yang sudah menemukan bentuk.</h2>
-          </div>
-          <p>{articles.length === 0 ? 'Mulai dengan menulis catatan pertamamu.' : 'Kelola catatan, proses, dan cerita yang ingin kamu bagikan.'}</p>
-        </section>
+      {/* Stats Summary Grid */}
+      <section className="grid grid-cols-1 sm:grid-cols-3 gap-5" aria-label="Ringkasan artikel">
+        <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md p-6 shadow-xs transition-colors">
+          <p className="text-xs font-bold uppercase tracking-wider text-text-secondary">Total Artikel</p>
+          <p className="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary">
+            {String(articles.length).padStart(2, '0')}
+          </p>
+          <p className="mt-2 text-xs text-text-secondary">Catatan yang tersimpan & live</p>
+        </div>
 
-        <section className="dashboard-stats" aria-label="Ringkasan artikel">
-          <div className="dashboard-stat dashboard-stat-featured">
-            <span className="dashboard-stat-label">Total artikel</span>
-            <strong>{String(articles.length).padStart(2, '')}</strong>
-            <span className="dashboard-stat-meta">Catatan yang tersimpan</span>
-          </div>
-          <div className="dashboard-stat">
-            <span className="dashboard-stat-label">Terakhir ditulis</span>
-            <strong>{articles[0] ? new Date(articles[0].created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) : '—'}</strong>
-            <span className="dashboard-stat-meta">Update terbaru</span>
-          </div>
-          <div className="dashboard-stat">
-            <span className="dashboard-stat-label">Dengan cover</span>
-            <strong>{String(articles.filter((article) => article.thumbnail).length).padStart(2, '')}</strong>
-            <span className="dashboard-stat-meta">Artikel punya thumbnail</span>
-          </div>
-        </section>
+        <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md p-6 shadow-xs transition-colors">
+          <p className="text-xs font-bold uppercase tracking-wider text-text-secondary">Terakhir Ditulis</p>
+          <p className="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary">
+            {articles[0]
+              ? new Date(articles[0].created_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' })
+              : '—'}
+          </p>
+          <p className="mt-2 text-xs text-text-secondary">Pembaruan konten paling mutakhir</p>
+        </div>
 
-        <section className="dashboard-articles">
-          <div className="dashboard-section-heading">
-            <div>
-              <p className="dashboard-kicker">Library</p>
-              <h2>Artikel kamu</h2>
-            </div>
-            <span>{articles.length} item</span>
-          </div>
+        <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md p-6 shadow-xs transition-colors">
+          <p className="text-xs font-bold uppercase tracking-wider text-text-secondary">Dengan Cover</p>
+          <p className="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary">
+            {String(articles.filter((a) => a.thumbnail).length).padStart(2, '0')}
+          </p>
+          <p className="mt-2 text-xs text-text-secondary">Artikel dengan visual thumbnail</p>
+        </div>
+      </section>
 
-          {articles.length > 0 ? (
-            <div className="dashboard-table-wrap">
-              <table className="dashboard-table">
-                <thead>
+      {/* Articles Management Table */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-bold text-text-primary tracking-tight">Daftar Publikasi</h2>
+            <span className="text-xs text-text-secondary font-mono">({articles.length})</span>
+          </div>
+        </div>
+
+        {articles.length > 0 ? (
+          <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md overflow-hidden shadow-xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead className="border-b border-text-secondary/10 bg-thirdary/70 text-[11px] font-bold uppercase tracking-wider text-text-secondary">
                   <tr>
-                    <th>No.</th>
-                    <th>Artikel</th>
-                    <th>Dibuat</th>
-                    <th>Status</th>
-                    <th>Aksi</th>
+                    <th scope="col" className="px-5 py-3.5 w-14">No.</th>
+                    <th scope="col" className="px-5 py-3.5">Artikel</th>
+                    <th scope="col" className="px-5 py-3.5">Tanggal</th>
+                    <th scope="col" className="px-5 py-3.5">Status</th>
+                    <th scope="col" className="px-5 py-3.5 text-right">Aksi</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-text-secondary/10">
                   {articles.map((article, index) => (
-                    <tr key={article.id}>
-                      <td className="dashboard-table-number">{String(index + 1).padStart(2, '0')}</td>
-                      <td>
-                        <div className="dashboard-table-article">
+                    <tr key={article.id} className="hover:bg-thirdary/50 transition-colors">
+                      <td className="px-5 py-4 font-mono text-xs text-text-secondary">
+                        {String(index + 1).padStart(2, '0')}
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3">
                           {article.thumbnail ? (
                             // eslint-disable-next-line @next/next/no-img-element
-                            <img src={article.thumbnail} alt="" className="dashboard-article-thumb" />
+                            <img
+                              src={article.thumbnail}
+                              alt=""
+                              className="w-12 h-12 rounded-lg object-cover border border-text-secondary/15 shrink-0"
+                            />
                           ) : (
-                            <div className="dashboard-article-thumb dashboard-article-thumb-empty" aria-hidden="true"><span>Haikal</span></div>
+                            <div className="w-12 h-12 rounded-lg bg-thirdary flex items-center justify-center text-[10px] font-mono text-text-secondary uppercase border border-text-secondary/15 shrink-0">
+                              No Img
+                            </div>
                           )}
-                          <strong>{article.title}</strong>
+                          <Link
+                            href={`/artikel/${article.id}`}
+                            className="font-semibold text-text-primary hover:underline line-clamp-1"
+                          >
+                            {article.title}
+                          </Link>
                         </div>
                       </td>
-                      <td className="dashboard-table-date">{new Date(article.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</td>
-                      <td><span className="dashboard-article-status"><i /> Live</span></td>
-                      <td>
-                        <div className="dashboard-article-actions">
-                          <Link href={`/dashboard/artikel/edit/${article.id}`} aria-label={`Edit ${article.title}`}>Edit</Link>
+                      <td className="px-5 py-4 text-xs text-text-secondary whitespace-nowrap">
+                        {new Date(article.created_at).toLocaleDateString('id-ID', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </td>
+                      <td className="px-5 py-4 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          Live
+                        </span>
+                      </td>
+                      <td className="px-5 py-4 text-right whitespace-nowrap">
+                        <div className="inline-flex items-center gap-2">
+                          <Link
+                            href={`/dashboard/artikel/edit/${article.id}`}
+                            className="px-3 py-1 rounded-full text-xs font-medium text-text-primary hover:bg-thirdary border border-text-secondary/20 transition-colors"
+                          >
+                            Edit
+                          </Link>
                           <DeleteArticleButton id={article.id} />
                         </div>
                       </td>
@@ -119,15 +153,27 @@ export default async function DashboardPage() {
                 </tbody>
               </table>
             </div>
-          ) : (
-            <div className="dashboard-empty-state">
-              <h3>Belum ada artikel.</h3>
-              <p>Ruang ini siap diisi dengan catatan pertamamu.</p>
-              <Link href="/dashboard/artikel/tambah" className="editorial-link">Mulai menulis ↗</Link>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md p-12 text-center space-y-4">
+            <div className="mx-auto w-12 h-12 rounded-full bg-thirdary flex items-center justify-center text-text-secondary">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
             </div>
-          )}
-        </section>
-      </main>
+            <div>
+              <h3 className="text-base font-bold text-text-primary">Belum ada artikel</h3>
+              <p className="text-xs text-text-secondary mt-1">Ruang kerja ini siap diisi dengan tulisan pertamamu.</p>
+            </div>
+            <Link
+              href="/dashboard/artikel/tambah"
+              className="inline-flex items-center gap-2 bg-button-hero hover:bg-button-hero-hover text-background font-medium text-xs py-2 px-4 rounded-full transition-all shadow-xs"
+            >
+              Mulai Menulis ↗
+            </Link>
+          </div>
+        )}
+      </section>
     </div>
   )
 }

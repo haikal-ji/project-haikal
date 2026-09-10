@@ -40,7 +40,7 @@ export default function LoginPage() {
         redirectTo: `${window.location.origin}/auth/callback`,
         queryParams: {
           access_type: 'offline',
-          prompt: 'consent',
+          prompt: 'select_account consent',
         },
       },
     })
@@ -66,27 +66,39 @@ export default function LoginPage() {
     // Sinkronkan user ke tabel User di database
     await fetch('/api/auth/sync-user', { method: 'POST' })
 
-    router.push('/')
+    router.replace('/')
     router.refresh()
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-73px)] items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="space-y-1 text-center">
-          <h1 className="font-serif text-3xl">Selamat Datang</h1>
-          <p className="text-sm text-foreground/60">Masuk ke akun kamu</p>
+    <div className="login-page-shell min-h-screen flex items-center justify-center px-6 py-16 bg-background text-text-primary relative overflow-hidden transition-colors duration-200">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-text-primary/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <Link
+        href="/"
+        className="absolute top-8 left-6 md:left-10 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-text-primary transition z-20"
+      >
+        <span>←</span> Kembali ke beranda
+      </Link>
+
+      <div className="login-page-card w-full max-w-md bg-thirdary/60 dark:bg-thirdary/80 border border-text-secondary/15 rounded-2xl p-8 sm:p-10 shadow-2xl backdrop-blur-xl relative z-10">
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-block text-xl font-bold tracking-tight text-text-primary mb-2">
+            HAiKAL<span className="text-text-secondary">.</span>
+          </Link>
+          <h1 className="text-2xl font-bold tracking-tight text-text-primary">Selamat Datang</h1>
+          <p className="text-sm text-text-secondary mt-1">Masuk ke akun kamu untuk berinteraksi</p>
         </div>
 
         <LoginMessage />
 
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {/* Tombol Google */}
           <button
             type="button"
             disabled={oauthLoading !== null}
             onClick={handleGoogleLogin}
-            className="flex w-full items-center justify-center gap-3 rounded-sm border border-line bg-background px-4 py-2.5 text-sm font-medium transition hover:bg-line/40 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-text-secondary/20 bg-background hover:bg-thirdary px-4 py-3 text-sm font-semibold text-text-primary transition disabled:opacity-50 shadow-sm"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path
@@ -106,7 +118,7 @@ export default function LoginPage() {
                 d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
               />
             </svg>
-            <span>{oauthLoading === 'google' ? 'Mengarahkan ke Google...' : 'Login dengan Google'}</span>
+            <span>{oauthLoading === 'google' ? 'Mengarahkan...' : 'Lanjutkan dengan Google'}</span>
           </button>
 
           {/* Tombol GitHub */}
@@ -114,7 +126,7 @@ export default function LoginPage() {
             type="button"
             disabled={oauthLoading !== null}
             onClick={handleGithubLogin}
-            className="flex w-full items-center justify-center gap-3 rounded-sm bg-foreground px-4 py-2.5 text-sm font-medium text-background transition hover:opacity-90 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-3 rounded-xl bg-button-hero hover:bg-button-hero-hover text-background dark:text-foreground px-4 py-3 text-sm font-semibold transition disabled:opacity-50 shadow-sm"
           >
             <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
               <path
@@ -123,55 +135,59 @@ export default function LoginPage() {
                 d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
               />
             </svg>
-            <span>{oauthLoading === 'github' ? 'Mengarahkan ke GitHub...' : 'Login dengan GitHub'}</span>
+            <span>{oauthLoading === 'github' ? 'Mengarahkan...' : 'Lanjutkan dengan GitHub'}</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="h-px flex-1 bg-line" />
-          <span className="text-xs text-foreground/50">atau email</span>
-          <div className="h-px flex-1 bg-line" />
+        <div className="flex items-center gap-3 my-6">
+          <div className="h-px flex-1 bg-text-secondary/15" />
+          <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">atau email</span>
+          <div className="h-px flex-1 bg-text-secondary/15" />
         </div>
 
         <form onSubmit={handleManualLogin} className="space-y-4">
           <div>
-            <label className="mb-1 block text-xs font-medium text-foreground/60">Email</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">Email</label>
             <input
               type="email"
               placeholder="nama@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full rounded-sm border border-line bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-clay"
+              className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-foreground/60">Password</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">Password</label>
             <input
               type="password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full rounded-sm border border-line bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-clay"
+              className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
             />
           </div>
 
-          {error && <p className="rounded-sm bg-clay/10 p-2.5 text-xs text-clay">{error}</p>}
+          {error && (
+            <p className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-xs font-medium text-red-500">
+              {error}
+            </p>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-sm bg-clay px-4 py-2.5 text-sm font-semibold text-background transition hover:opacity-90 disabled:opacity-50"
+            className="w-full rounded-xl bg-button-hero hover:bg-button-hero-hover text-background dark:text-foreground py-3.5 text-sm font-semibold tracking-wide transition disabled:opacity-50 shadow-md"
           >
             {loading ? 'Memproses...' : 'Login'}
           </button>
         </form>
 
-        <p className="text-center text-xs text-foreground/60">
+        <p className="mt-8 text-center text-xs text-text-secondary">
           Belum punya akun?{' '}
-          <Link href="/register" className="font-semibold text-clay hover:underline">
-            Daftar
+          <Link href="/register" className="font-semibold text-text-primary underline underline-offset-4 hover:opacity-80">
+            Daftar sekarang
           </Link>
         </p>
       </div>

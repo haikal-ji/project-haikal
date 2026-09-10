@@ -17,11 +17,14 @@ model User {
   name       String
   email      String   @unique
   avatar     String?
+  is_banned  Boolean  @default(false)
+  ban_reason String?
   created_at DateTime @default(now())
 
-  articles  Article[]
-  reactions Reaction[]
-  comments  Comment[]
+  articles      Article[]
+  reactions     Reaction[]
+  comments      Comment[]
+  unban_appeals UnbanAppeal[]
 }
 
 model Article {
@@ -66,4 +69,22 @@ model Comment {
 
   user    User    @relation(fields: [user_id], references: [id])
   article Article @relation(fields: [article_id], references: [id])
+}
+
+model UnbanAppeal {
+  id          String        @id @default(uuid())
+  user_id     String
+  reason      String
+  status      AppealStatus  @default(PENDING)
+  admin_note  String?
+  created_at  DateTime      @default(now())
+  reviewed_at DateTime?
+
+  user User @relation(fields: [user_id], references: [id])
+}
+
+enum AppealStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

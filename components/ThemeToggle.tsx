@@ -14,14 +14,15 @@ function getSnapshot() {
 }
 
 function getServerSnapshot() {
-  return false
+  return true
 }
 
 export default function ThemeToggle() {
   const dark = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 
   function toggleTheme() {
-    const next = !dark
+    const isCurrentlyDark = document.documentElement.classList.contains('dark')
+    const next = !isCurrentlyDark
     document.documentElement.classList.toggle('dark', next)
     window.localStorage.setItem(STORAGE_KEY, next ? 'dark' : 'light')
     window.dispatchEvent(new Event('haikal-theme-change'))
@@ -33,7 +34,7 @@ export default function ThemeToggle() {
       className="theme-toggle"
       onClick={toggleTheme}
       aria-label={dark ? 'Gunakan mode terang' : 'Gunakan mode gelap'}
-      title={dark ? 'Mode terang' : 'Warm espresso'}
+      title={dark ? 'Mode terang' : 'Mode gelap'}
     >
       {dark ? '☼' : '◐'}
     </button>

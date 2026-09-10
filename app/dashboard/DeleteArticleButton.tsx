@@ -26,7 +26,7 @@ export default function DeleteArticleButton({ id }: { id: string }) {
     <button
       onClick={handleDelete}
       disabled={loading}
-      className="dashboard-delete-action disabled:opacity-50"
+      className="px-3 py-1 rounded-full text-xs font-medium text-red-500 hover:text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-all disabled:opacity-50"
     >
       {loading ? 'Menghapus...' : 'Hapus'}
     </button>

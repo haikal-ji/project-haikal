@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="mx-auto max-w-6xl px-6 py-16">
+    <main className="reference-page about-reference-page mx-auto max-w-6xl px-6 py-16">
       <div className="grid gap-10 md:grid-cols-[1fr_1.1fr] md:items-start">
         {/* Kolom kiri: headline besar + cerita */}
         <div>
@@ -65,6 +65,6 @@ export default function AboutPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   )
 }
