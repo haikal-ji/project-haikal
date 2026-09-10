@@ -177,11 +177,8 @@ export default function SiteFooter() {
           </Link>
         </div>
 
-        <div className="text-sm text-text-secondary md:text-right flex flex-col justify-between">
+        <div className="text-sm text-text-secondary md:text-right flex flex-col justify-end">
           <p>© {new Date().getFullYear()} Haikal. All rights reserved.</p>
-          <p className="text-xs text-text-secondary/60 mt-2">
-            Designed with inspiration from modern developer portfolios.
-          </p>
         </div>
       </div>
     </footer>
