@@ -71,6 +71,14 @@ const AccordionGallery = ({
   const firstRunRef = useRef(true);
   const mediaSizeRef = useRef(320);
 
+  // Track whether user is on a touch / pointer-coarse device
+  const isTouchRef = useRef(false);
+  useEffect(() => {
+    isTouchRef.current =
+      typeof window !== 'undefined' &&
+      (window.matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window);
+  }, []);
+
   const vertical = orientation === 'vertical';
   const count = items.length;
   const [active, setActive] = useState(Math.min(Math.max(defaultIndex, 0), count - 1));
@@ -187,10 +195,22 @@ const AccordionGallery = ({
   );
 
   const handleEnter = (i: number) => {
-    if (trigger === 'hover') setActive(i);
+    if (trigger === 'hover' && !isTouchRef.current) setActive(i);
   };
 
   const handleClick = (i: number, e: MouseEvent) => {
+    // On touch devices: first tap on any panel just expands it.
+    // Only allow navigation if the panel was ALREADY active when tapped.
+    if (isTouchRef.current) {
+      if (i !== active) {
+        e.preventDefault();
+        setActive(i);
+      }
+      // if i === active and it has a link, let the browser follow it naturally
+      return;
+    }
+
+    // Desktop: prevent nav when clicking an inactive panel
     if (i !== active) {
       e.preventDefault();
       setActive(i);

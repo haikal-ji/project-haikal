@@ -61,6 +61,10 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
   const cardsRef = useRef<HTMLElement[]>([])
   const lastTransformsRef = useRef(new Map<number, any>())
   const isUpdatingRef = useRef(false)
+  // Cached absolute offsets — updated at mount + resize, not per-scroll
+  const cachedOffsetsRef = useRef<number[]>([])
+  // RAF throttle flag
+  const rafScheduledRef = useRef(false)
 
   const calculateProgress = useCallback((scrollTop: number, start: number, end: number) => {
     if (scrollTop < start) return 0
@@ -102,6 +106,16 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
     [useWindowScroll]
   )
 
+  // Re-measure and cache all card offsets (called on mount + resize)
+  const cacheOffsets = useCallback(() => {
+    cachedOffsetsRef.current = cardsRef.current.map((card) => {
+      if (!card) return 0
+      if (!useWindowScroll && scrollerRef.current) return card.offsetTop
+      const rect = card.getBoundingClientRect()
+      return rect.top + (window.scrollY || window.pageYOffset || 0)
+    })
+  }, [useWindowScroll])
+
   const updateCardTransforms = useCallback(() => {
     if (!cardsRef.current.length || isUpdatingRef.current) return
 
@@ -117,7 +131,8 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
     cardsRef.current.forEach((card, i) => {
       if (!card) return
 
-      const cardTop = getElementOffset(card)
+      // Use cached offset; fall back to live measurement if cache is stale
+      const cardTop = cachedOffsetsRef.current[i] ?? getElementOffset(card)
       const triggerStart = cardTop - stackPositionPx - itemStackDistance * i
       const triggerEnd = cardTop - scaleEndPositionPx
       const pinStart = cardTop - stackPositionPx - itemStackDistance * i
@@ -207,7 +222,13 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
   ])
 
   const handleScroll = useCallback(() => {
-    updateCardTransforms()
+    // Throttle to one rAF per frame — keeps mobile smooth
+    if (rafScheduledRef.current) return
+    rafScheduledRef.current = true
+    requestAnimationFrame(() => {
+      rafScheduledRef.current = false
+      updateCardTransforms()
+    })
   }, [updateCardTransforms])
 
   const setupLenis = useCallback(() => {
@@ -301,11 +322,19 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
     })
 
     setupLenis()
+    // Cache card positions once at mount (not on every scroll)
+    cacheOffsets()
     updateCardTransforms()
+
+    const handleResize = () => {
+      // Re-cache positions after resize, then update
+      cacheOffsets()
+      handleScroll()
+    }
 
     if (useWindowScroll) {
       window.addEventListener('scroll', handleScroll, { passive: true })
-      window.addEventListener('resize', handleScroll, { passive: true })
+      window.addEventListener('resize', handleResize, { passive: true })
     }
 
     return () => {
@@ -317,7 +346,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       }
       if (useWindowScroll) {
         window.removeEventListener('scroll', handleScroll)
-        window.removeEventListener('resize', handleScroll)
+        window.removeEventListener('resize', handleResize)
       }
       stackCompletedRef.current = false
       cardsRef.current = []
@@ -337,6 +366,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
     useWindowScroll,
     onStackComplete,
     setupLenis,
+    cacheOffsets,
     updateCardTransforms,
     handleScroll,
   ])
