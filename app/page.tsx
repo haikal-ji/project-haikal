@@ -15,31 +15,31 @@ export const dynamic = 'force-dynamic'
 const projects = [
   {
     number: '01',
-    name: 'Raw Anatomy',
-    description: 'Entitas tanpa suara yang mendiami batas antara intuisi dan realita. Dibuat sebagai jurnal visual untuk menampung ekspresi mentah, narasi tersembunyi, dan eksplorasi bentuk.',
-    image: '/9.jpg',
-    tags: [''],
+    name: 'OVRTHINK',
+    description: 'Eksplorasi visual dan identitas streetwear modern. Menggabungkan tipografi minimalis, fotografi fashion urban, dan komposisi editorial kontemporer.',
+    image: '/25.png',
+    tags: ['Fashion & Editorial', 'Brand Identity', 'Visual Design'],
   },
   {
     number: '02',
-    name: 'Ephemera',
-    description: 'Metamorfosis bentuk dan ide dalam garis-garis sederhana. Menangkap momen presisi di mana keindahan alam bertemu dengan ketenangan garis lukis.',
-    image: '/8.png',
-    tags: [''],
+    name: 'Matcha Cream Latte',
+    description: 'Desain poster promosi minuman dengan sentuhan dinamis dan elegan. Komposisi visual splash matcha dengan palet warna earthy pastel yang menonjolkan kesegaran.',
+    image: '/26.png',
+    tags: ['Poster Design', 'Commercial Art', 'Beverage Branding'],
   },
   {
     number: '03',
-    name: 'Celestial Gaze',
-    description: 'Entitas surgawi dalam wujud garis monokrom. Menghadirkan kembali estetika ukiran klasik ke dalam konteks desain modern.',
-    image: '/5.jpg',
-    tags: [''],
+    name: 'Puding Mas Hambali',
+    description: 'Poster promosi kuliner dessert bergaya playful dan hangat. Menghadirkan fotografi produk yang menggugah selera dengan tipografi hand-drawn yang ramah.',
+    image: '/27.png',
+    tags: ['Culinary Branding', 'Social Media Ads', 'Graphic Design'],
   },
   {
     number: '04',
-    name: 'Nocturnal Visage',
-    description: 'Potret teaterikal yang mengaburkan batas antara komedi dan tragedi. Menangkap keheningan seorang pelakon melalui kontras hitam-putih yang dramatis.',
-    image: '/24.png',
-    tags: [''],
+    name: 'Promo Tiap Hari',
+    description: 'Materi promosi bundling kopi harian Aksara Caffè dengan nuansa warm coffee tone yang hangat, estetik, dan komunikatif untuk kampanye digital.',
+    image: '/28.png',
+    tags: ['Campaign Poster', 'Advertising', 'Visual Identity'],
   },
 ]
 
@@ -497,7 +497,7 @@ export default async function HomePage() {
               label: `${p.number} — ${p.name}`,
               link: '/collection',
               alt: p.name,
-              objectFit: p.number === '02' ? 'contain' : 'cover',
+              objectFit: 'cover',
             }))}
             defaultIndex={1}
             expandRatio={0.52}
@@ -527,6 +527,7 @@ export default async function HomePage() {
           </p>
           <div className="mx-auto w-full max-w-[280px] flex flex-col items-center">
             <Stack
+              key={projects.map((p) => p.image).join(',')}
               className="w-[260px] h-[330px]"
               randomRotation={false}
               sensitivity={80}
@@ -543,14 +544,13 @@ export default async function HomePage() {
                   <img
                     src={p.image}
                     alt={p.name}
-                    className={`w-full h-full pointer-events-none select-none ${
-                      p.number === '02' ? 'object-contain p-4 drop-shadow-xl' : 'object-cover'
-                    }`}
+                    className="w-full h-full pointer-events-none select-none object-cover"
                   />
-                  {/* label overlay */}
-                  <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none">
-                    <p className="text-[10px] font-bold tracking-widest text-white/60 uppercase">{p.number}</p>
-                    <p className="text-sm font-bold text-white tracking-tight">{p.name}</p>
+                  {/* top floating badge */}
+                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-[11px] font-mono font-semibold text-white/90 shadow-md flex items-center gap-1.5 pointer-events-none">
+                    <span className="text-white/60">{p.number}</span>
+                    <span className="text-white/30">•</span>
+                    <span className="font-sans font-medium text-white">{p.name}</span>
                   </div>
                 </div>
               ))}

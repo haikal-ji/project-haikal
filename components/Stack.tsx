@@ -152,8 +152,7 @@ export default function Stack({
 
   useEffect(() => {
     setStack(cards.map((content, index) => ({ id: index + 1, initialIndex: index, content })));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cards.length]);
+  }, [cards]);
 
   const sendToBack = useCallback(
     (id?: number) => {
