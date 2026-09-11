@@ -7,6 +7,7 @@ import ContactSection from '@/components/ContactSection'
 import ScrollStack, { ScrollStackItem } from '@/components/ScrollStack'
 import BlurReveal from '@/components/BlurReveal'
 import AccordionGallery from '@/components/AccordionGallery'
+import Stack from '@/components/Stack'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
 
 export const dynamic = 'force-dynamic'
@@ -488,8 +489,8 @@ export default async function HomePage() {
           </BlurReveal>
         </div>
 
-        {/* Accordion Gallery Showcase */}
-        <BlurReveal delay={0.2} className="max-w-7xl mx-auto px-6 md:px-12">
+        {/* Desktop: Accordion Gallery */}
+        <BlurReveal delay={0.2} className="hidden md:block max-w-7xl mx-auto px-6 md:px-12">
           <AccordionGallery
             items={projects.map((p) => ({
               image: p.image,
@@ -516,6 +517,51 @@ export default async function HomePage() {
             radius={24}
             orientation="horizontal"
           />
+        </BlurReveal>
+
+        {/* Mobile: draggable Stack card */}
+        <BlurReveal delay={0.2} className="md:hidden max-w-7xl mx-auto px-6">
+          {/* hint text */}
+          <p className="text-center text-xs text-text-secondary/60 mb-5 tracking-wide">
+            Geser kartu untuk melihat karya lainnya
+          </p>
+          <div className="mx-auto" style={{ width: 260, height: 320 }}>
+            <Stack
+              randomRotation={false}
+              sensitivity={120}
+              sendToBackOnClick={true}
+              animationConfig={{ stiffness: 280, damping: 22 }}
+              autoplay={true}
+              autoplayDelay={3500}
+              pauseOnHover={false}
+              cards={projects.map((p, i) => (
+                <div key={i} className="relative w-full h-full overflow-hidden rounded-2xl bg-neutral-900">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className={`w-full h-full pointer-events-none ${
+                      p.number === '02' ? 'object-contain p-4 drop-shadow-xl' : 'object-cover'
+                    }`}
+                  />
+                  {/* label overlay */}
+                  <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                    <p className="text-[10px] font-bold tracking-widest text-white/60 uppercase">{p.number}</p>
+                    <p className="text-sm font-bold text-white tracking-tight">{p.name}</p>
+                  </div>
+                </div>
+              ))}
+            />
+          </div>
+          <div className="mt-8 flex justify-center">
+            <Link
+              href="/collection"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-text-secondary/20 text-text-primary text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:bg-text-primary hover:text-background group"
+            >
+              <span>Lihat Semua Karya</span>
+              <ArrowUpRight size={12} className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </Link>
+          </div>
         </BlurReveal>
       </section>
 

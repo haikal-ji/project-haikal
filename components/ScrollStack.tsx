@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useLayoutEffect, useEffect, useRef, useCallback } from 'react'
+import React, { useLayoutEffect, useEffect, useRef, useCallback, useState } from 'react'
 import type { ReactNode } from 'react'
 import Lenis from 'lenis'
 
@@ -13,11 +13,7 @@ export interface ScrollStackItemProps {
 
 export const ScrollStackItem: React.FC<ScrollStackItemProps> = ({ children, itemClassName = '' }) => (
   <div
-    className={`scroll-stack-card relative w-full min-h-[18rem] sm:min-h-[20rem] my-6 sm:my-8 p-6 sm:p-10 md:p-12 rounded-[28px] sm:rounded-[36px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)] border border-text-secondary/20 bg-background/95 dark:bg-[#141414]/95 backdrop-blur-xl box-border origin-top will-change-transform transition-colors duration-300 ${itemClassName}`.trim()}
-    style={{
-      backfaceVisibility: 'hidden',
-      transformStyle: 'preserve-3d',
-    }}
+    className={`scroll-stack-card relative w-full min-h-[18rem] sm:min-h-[20rem] my-6 sm:my-8 p-6 sm:p-10 md:p-12 rounded-[28px] sm:rounded-[36px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)] border border-text-secondary/20 bg-background/95 dark:bg-[#141414]/95 backdrop-blur-xl box-border origin-top transition-colors duration-300 ${itemClassName}`.trim()}
   >
     {children}
   </div>
@@ -39,7 +35,18 @@ interface ScrollStackProps {
   onStackComplete?: () => void
 }
 
-const ScrollStack: React.FC<ScrollStackProps> = ({
+// ─── Mobile fallback: plain vertical list, zero JS animation ─────────────────
+const MobileScrollStack: React.FC<Pick<ScrollStackProps, 'children' | 'className'>> = ({
+  children,
+  className = '',
+}) => (
+  <div className={`relative w-full ${className}`.trim()}>
+    <div className="w-full space-y-6">{children}</div>
+  </div>
+)
+
+// ─── Desktop: full JS-driven stacked scroll animation ────────────────────────
+const DesktopScrollStack: React.FC<ScrollStackProps> = ({
   children,
   className = '',
   itemDistance = 60,
@@ -48,7 +55,6 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
   stackPosition = '22%',
   scaleEndPosition = '12%',
   baseScale = 0.9,
-  scaleDuration = 0.5,
   rotationAmount = 0,
   blurAmount = 0,
   useWindowScroll = true,
@@ -59,11 +65,9 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
   const animationFrameRef = useRef<number | null>(null)
   const lenisRef = useRef<Lenis | null>(null)
   const cardsRef = useRef<HTMLElement[]>([])
-  const lastTransformsRef = useRef(new Map<number, any>())
+  const lastTransformsRef = useRef(new Map<number, { translateY: number; scale: number; rotation: number; blur: number }>())
   const isUpdatingRef = useRef(false)
-  // Cached absolute offsets — updated at mount + resize, not per-scroll
   const cachedOffsetsRef = useRef<number[]>([])
-  // RAF throttle flag
   const rafScheduledRef = useRef(false)
 
   const calculateProgress = useCallback((scrollTop: number, start: number, end: number) => {
@@ -106,7 +110,6 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
     [useWindowScroll]
   )
 
-  // Re-measure and cache all card offsets (called on mount + resize)
   const cacheOffsets = useCallback(() => {
     cachedOffsetsRef.current = cardsRef.current.map((card) => {
       if (!card) return 0
@@ -131,7 +134,6 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
     cardsRef.current.forEach((card, i) => {
       if (!card) return
 
-      // Use cached offset; fall back to live measurement if cache is stale
       const cardTop = cachedOffsetsRef.current[i] ?? getElementOffset(card)
       const triggerStart = cardTop - stackPositionPx - itemStackDistance * i
       const triggerEnd = cardTop - scaleEndPositionPx
@@ -147,13 +149,12 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       if (blurAmount) {
         let topCardIndex = 0
         for (let j = 0; j < cardsRef.current.length; j++) {
-          const jCardTop = getElementOffset(cardsRef.current[j])
+          const jCardTop = cachedOffsetsRef.current[j] ?? getElementOffset(cardsRef.current[j])
           const jTriggerStart = jCardTop - stackPositionPx - itemStackDistance * j
           if (scrollTop >= jTriggerStart) {
             topCardIndex = j
           }
         }
-
         if (i < topCardIndex) {
           const depthInStack = topCardIndex - i
           blur = Math.max(0, depthInStack * blurAmount)
@@ -222,7 +223,6 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
   ])
 
   const handleScroll = useCallback(() => {
-    // Throttle to one rAF per frame — keeps mobile smooth
     if (rafScheduledRef.current) return
     rafScheduledRef.current = true
     requestAnimationFrame(() => {
@@ -233,23 +233,11 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
 
   const setupLenis = useCallback(() => {
     try {
-      // On mobile touch devices, do not hijack touch scrolling — allow native 60/120fps kinetic scroll
-      const isTouch =
-        typeof window !== 'undefined' &&
-        (window.matchMedia('(pointer: coarse)').matches ||
-          'ontouchstart' in window ||
-          window.innerWidth < 768)
-
-      if (isTouch) {
-        return null
-      }
-
       if (useWindowScroll) {
         const lenis = new Lenis({
           duration: 1.0,
           easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
           smoothWheel: true,
-          touchMultiplier: 1.5,
           infinite: false,
           wheelMultiplier: 1,
           lerp: 0.1,
@@ -276,7 +264,6 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
           duration: 1.0,
           easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
           smoothWheel: true,
-          touchMultiplier: 1.5,
           infinite: false,
           gestureOrientation: 'vertical',
           wheelMultiplier: 1,
@@ -312,22 +299,17 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       if (i < cards.length - 1) {
         card.style.marginBottom = `${itemDistance}px`
       }
-      card.style.willChange = 'transform, filter'
+      card.style.willChange = 'transform'
       card.style.transformOrigin = 'top center'
       card.style.backfaceVisibility = 'hidden'
       card.style.transform = 'translateZ(0)'
-      card.style.webkitTransform = 'translateZ(0)'
-      card.style.perspective = '1000px'
-      card.style.webkitPerspective = '1000px'
     })
 
     setupLenis()
-    // Cache card positions once at mount (not on every scroll)
     cacheOffsets()
     updateCardTransforms()
 
     const handleResize = () => {
-      // Re-cache positions after resize, then update
       cacheOffsets()
       handleScroll()
     }
@@ -360,7 +342,6 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
     stackPosition,
     scaleEndPosition,
     baseScale,
-    scaleDuration,
     rotationAmount,
     blurAmount,
     useWindowScroll,
@@ -380,11 +361,42 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
     >
       <div className="scroll-stack-inner w-full">
         {children}
-        {/* Spacer so the last pin can release cleanly */}
         <div className="scroll-stack-end w-full h-[25vh]" />
       </div>
     </div>
   )
+}
+
+// ─── Public component: auto-detects mobile and switches implementation ────────
+const ScrollStack: React.FC<ScrollStackProps> = (props) => {
+  const [isMobile, setIsMobile] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    const check = () =>
+      setIsMobile(
+        window.matchMedia('(pointer: coarse)').matches ||
+          'ontouchstart' in window ||
+          window.innerWidth < 768
+      )
+    check()
+    window.addEventListener('resize', check, { passive: true })
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  // SSR / first paint: render nothing special (avoid hydration mismatch)
+  if (isMobile === null) {
+    return (
+      <div className={`relative w-full ${props.className ?? ''}`.trim()}>
+        <div className="w-full">{props.children}</div>
+      </div>
+    )
+  }
+
+  if (isMobile) {
+    return <MobileScrollStack className={props.className} children={props.children} />
+  }
+
+  return <DesktopScrollStack {...props} />
 }
 
 export default ScrollStack
