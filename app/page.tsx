@@ -520,32 +520,35 @@ export default async function HomePage() {
         </BlurReveal>
 
         {/* Mobile: draggable Stack card */}
-        <BlurReveal delay={0.2} className="md:hidden max-w-7xl mx-auto px-6">
+        <BlurReveal delay={0.1} className="md:hidden max-w-7xl mx-auto px-6">
           {/* hint text */}
           <p className="text-center text-xs text-text-secondary/60 mb-5 tracking-wide">
-            Geser kartu untuk melihat karya lainnya
+            Geser atau ketuk kartu untuk melihat karya lainnya
           </p>
-          <div className="mx-auto" style={{ width: 260, height: 320 }}>
+          <div className="mx-auto w-full max-w-[280px] flex flex-col items-center">
             <Stack
+              className="w-[260px] h-[330px]"
               randomRotation={false}
-              sensitivity={120}
+              sensitivity={80}
               sendToBackOnClick={true}
-              animationConfig={{ stiffness: 280, damping: 22 }}
+              animationConfig={{ stiffness: 320, damping: 26 }}
               autoplay={true}
-              autoplayDelay={3500}
-              pauseOnHover={false}
+              autoplayDelay={4000}
+              pauseOnHover={true}
+              showDots={true}
+              showNavButtons={true}
               cards={projects.map((p, i) => (
-                <div key={i} className="relative w-full h-full overflow-hidden rounded-2xl bg-neutral-900">
+                <div key={i} className="relative w-full h-full overflow-hidden rounded-2xl bg-neutral-900 select-none shadow-xl border border-white/10">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={p.image}
                     alt={p.name}
-                    className={`w-full h-full pointer-events-none ${
+                    className={`w-full h-full pointer-events-none select-none ${
                       p.number === '02' ? 'object-contain p-4 drop-shadow-xl' : 'object-cover'
                     }`}
                   />
                   {/* label overlay */}
-                  <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                  <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none">
                     <p className="text-[10px] font-bold tracking-widest text-white/60 uppercase">{p.number}</p>
                     <p className="text-sm font-bold text-white tracking-tight">{p.name}</p>
                   </div>

@@ -13,7 +13,7 @@ export interface ScrollStackItemProps {
 
 export const ScrollStackItem: React.FC<ScrollStackItemProps> = ({ children, itemClassName = '' }) => (
   <div
-    className={`scroll-stack-card relative w-full min-h-[18rem] sm:min-h-[20rem] my-6 sm:my-8 p-6 sm:p-10 md:p-12 rounded-[28px] sm:rounded-[36px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)] border border-text-secondary/20 bg-background/95 dark:bg-[#141414]/95 backdrop-blur-xl box-border origin-top transition-colors duration-300 ${itemClassName}`.trim()}
+    className={`scroll-stack-card relative w-full min-h-[16rem] sm:min-h-[20rem] my-3 sm:my-8 p-6 sm:p-10 md:p-12 rounded-[24px] sm:rounded-[36px] shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.6)] border border-text-secondary/20 bg-background dark:bg-[#141414] md:backdrop-blur-xl box-border origin-top transition-colors duration-300 ${itemClassName}`.trim()}
   >
     {children}
   </div>
@@ -35,15 +35,32 @@ interface ScrollStackProps {
   onStackComplete?: () => void
 }
 
-// ─── Mobile fallback: plain vertical list, zero JS animation ─────────────────
+// ─── Mobile: CSS sticky stacking with 100% native compositor scroll (zero JS lag) ──
 const MobileScrollStack: React.FC<Pick<ScrollStackProps, 'children' | 'className'>> = ({
   children,
   className = '',
-}) => (
-  <div className={`relative w-full ${className}`.trim()}>
-    <div className="w-full space-y-6">{children}</div>
-  </div>
-)
+}) => {
+  const items = React.Children.toArray(children)
+  return (
+    <div className={`relative w-full pb-12 ${className}`.trim()}>
+      <div className="w-full relative">
+        {items.map((child, idx) => (
+          <div
+            key={idx}
+            className="sticky transition-transform duration-200"
+            style={{
+              top: `${80 + idx * 16}px`,
+              zIndex: idx + 1,
+              marginBottom: idx < items.length - 1 ? '24px' : '0px',
+            }}
+          >
+            {child}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 // ─── Desktop: full JS-driven stacked scroll animation ────────────────────────
 const DesktopScrollStack: React.FC<ScrollStackProps> = ({
