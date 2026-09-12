@@ -479,7 +479,7 @@ export default async function HomePage() {
               Selected Works
             </h3>
             <p className="mt-3 text-sm md:text-base text-text-secondary max-w-xl font-medium leading-relaxed">
-              Koleksi karya eksplorasi visual, identitas artistik, dan eksperimen desain monokrom. Arahkan kursor atau sentuh untuk melihat detailnya.
+              Koleksi proyek desain visual dan eksperimen kreatif pilihan saya dalam membangun identitas brand serta materi promosi yang menarik.
             </p>
           </BlurReveal>
 
@@ -546,7 +546,7 @@ export default async function HomePage() {
               Latest Articles
             </h3>
             <p className="mt-3 text-sm md:text-base text-text-secondary max-w-xl font-medium leading-relaxed">
-              Catatan seputar proses pembuatan software, pemecahan masalah teknis, serta ide dan eksplorasi yang sedang saya jalani.
+              Berbagi cerita, sudut pandang, dan catatan perjalanan saya di dunia digital, eksplorasi desain, serta hal-hal baru yang saya pelajari.
             </p>
           </div>
 

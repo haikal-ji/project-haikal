@@ -322,7 +322,7 @@ export default function ProfileClientView({
           <div className="profile-tab-content">
             <div className="profile-tab-header">
               <p className="profile-kicker">Identitas Publik</p>
-              <h2 className="profile-tab-title font-serif">Personalisasi Karaktermu</h2>
+              <h2 className="profile-tab-title">Personalisasi Karaktermu</h2>
               <p className="profile-tab-desc">
                 Sesuaikan nama dan foto profil agar mudah dikenali oleh sesama pembaca dan penulis artikel.
               </p>
@@ -431,7 +431,7 @@ export default function ProfileClientView({
           <div className="profile-tab-content">
             <div className="profile-tab-header">
               <p className="profile-kicker">Riwayat Interaksi</p>
-              <h2 className="profile-tab-title font-serif">Komentar yang Kamu Tulis</h2>
+              <h2 className="profile-tab-title">Komentar yang Kamu Tulis</h2>
               <p className="profile-tab-desc">
                 Daftar tanggapan dan sudut pandang yang pernah kamu bagikan di berbagai artikel.
               </p>
@@ -454,7 +454,7 @@ export default function ProfileClientView({
                   <article key={item.id} className="profile-feed-card">
                     <div className="feed-card-header">
                       <span className="feed-article-label">Artikel</span>
-                      <Link href={`/artikel/${item.article.id}`} className="feed-article-link font-serif">
+                      <Link href={`/artikel/${item.article.id}`} className="feed-article-link">
                         {item.article.title}
                       </Link>
                       <time className="feed-card-date">{item.createdAt}</time>
@@ -474,7 +474,7 @@ export default function ProfileClientView({
           <div className="profile-tab-content">
             <div className="profile-tab-header">
               <p className="profile-kicker">Koleksi Apresiasi</p>
-              <h2 className="profile-tab-title font-serif">Artikel yang Kamu Sukai</h2>
+              <h2 className="profile-tab-title">Artikel yang Kamu Sukai</h2>
               <p className="profile-tab-desc">
                 Daftar artikel yang telah kamu beri apresiasi dan mungkin ingin kamu baca kembali.
               </p>
@@ -503,7 +503,7 @@ export default function ProfileClientView({
                       <span className="like-badge">Disukai</span>
                       <time className="like-date">{article.createdAt}</time>
                     </div>
-                    <h3 className="like-title font-serif">{article.title}</h3>
+                    <h3 className="like-title">{article.title}</h3>
                     <span className="like-read-more">Baca selengkapnya</span>
                   </Link>
                 ))}
@@ -517,7 +517,7 @@ export default function ProfileClientView({
           <div className="profile-tab-content">
             <div className="profile-tab-header">
               <p className="profile-kicker">Keamanan & Otentikasi</p>
-              <h2 className="profile-tab-title font-serif">Rincian Akun</h2>
+              <h2 className="profile-tab-title">Rincian Akun</h2>
               <p className="profile-tab-desc">
                 Informasi teknis dan kredensial akun yang terhubung dengan sesi ini.
               </p>

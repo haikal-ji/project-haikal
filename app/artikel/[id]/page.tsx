@@ -1,10 +1,9 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
-import CopyUrlButton from '@/components/CopyUrlButton'
 import CommentForm from '@/components/CommentForm'
+import CommentItem from '@/components/CommentItem'
 import Avatar from '@/components/Avatar'
-import DeleteCommentButton from '@/components/DeleteCommentButton'
 import type { Metadata } from 'next'
 import ArticleViewTracker from '@/components/ArticleViewTracker'
 import ReactionButtons from '@/components/ReactionButtons'
@@ -26,10 +25,12 @@ export async function generateMetadata({
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
-  const article = await prisma.article.findUnique({ where: { id } })
+  const article = await prisma.article.findUnique({
+    where: { id },
+  })
   if (!article) return {}
   return {
-    title: article.title,
+    title: `${article.title} | Haikal Journal`,
     description: article.content.replace(/<[^>]*>/g, '').slice(0, 155) + '...',
     openGraph: {
       title: article.title,
@@ -48,14 +49,33 @@ export default async function ArtikelDetailPage({
 }) {
   const { id } = await params
   const supabase = await createClient()
-  const { data: { user: authUser } } = await supabase.auth.getUser()
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser()
 
   const article = await prisma.article.findUnique({
     where: { id },
     include: {
+      author: {
+        select: {
+          id: true,
+          name: true,
+          avatar: true,
+          email: true,
+        },
+      },
       comments: {
         orderBy: { created_at: 'desc' },
-        include: { user: true },
+        include: {
+          user: {
+            include: {
+              badges: {
+                include: { badge: true },
+                orderBy: { awarded_at: 'asc' },
+              },
+            },
+          },
+        },
       },
       reactions: true,
     },
@@ -66,116 +86,170 @@ export default async function ArtikelDetailPage({
   const likeCount = article.reactions.filter((r) => r.type === 'LIKE').length
   const dislikeCount = article.reactions.filter((r) => r.type === 'DISLIKE').length
   const isOwner = Boolean(authUser?.email && authUser.email === process.env.OWNER_EMAIL)
+
   const currentUser = authUser?.email
-    ? await prisma.user.findUnique({ where: { email: authUser.email }, select: { id: true } })
+    ? await prisma.user.findUnique({
+        where: { email: authUser.email },
+        select: { id: true, name: true, avatar: true, email: true },
+      })
     : null
+
   const currentReaction = currentUser
     ? article.reactions.find((reaction) => reaction.user_id === currentUser.id)?.type ?? null
     : null
+
   const readingTime = estimateReadingTime(article.content)
+  const formattedDate = new Date(article.created_at).toLocaleDateString('id-ID', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
 
   return (
-    <main className="min-h-screen bg-background text-text-primary px-6 pt-24 sm:pt-28 pb-16 md:px-10 md:pt-32 md:pb-20 max-w-4xl mx-auto transition-colors duration-200">
-      <Link
-        href="/artikel"
-        className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-text-primary transition mb-8"
-      >
-        <span>←</span> Kembali ke artikel
-      </Link>
+    <main className="min-h-screen bg-background text-text-primary px-6 pt-24 sm:pt-28 pb-20 md:px-10 md:pt-32 md:pb-24 max-w-4xl mx-auto transition-colors duration-200">
+      {/* Back to Articles */}
+      <div className="mb-8">
+        <Link
+          href="/artikel"
+          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-text-secondary/20 hover:border-text-primary text-text-secondary hover:text-text-primary text-xs font-semibold uppercase tracking-wider transition-all duration-200 bg-thirdary/30 shadow-2xs hover:-translate-x-0.5 group"
+        >
+          <span className="transition-transform group-hover:-translate-x-0.5">←</span>
+          <span>Semua Artikel</span>
+        </Link>
+      </div>
 
-      <header className="mb-10 text-center sm:text-left">
-        <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-4">
-          <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
-          <span>Journal / Article</span>
+      {/* Editorial Header */}
+      <header className="mb-8">
+        <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary/50 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-4 shadow-2xs">
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>Journal &amp; Insights</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-text-primary leading-tight">
+
+        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-text-primary leading-[1.12]">
           {article.title}
         </h1>
-        <div className="mt-4 flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs text-text-secondary">
-          <span>
-            {new Date(article.created_at).toLocaleDateString('id-ID', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-            })}
-          </span>
-          <span className="opacity-40">·</span>
-          <span>Baca ~{readingTime} menit</span>
-          <span className="opacity-40">·</span>
-          <ArticleViewTracker articleId={article.id} initialViewCount={article.view_count} />
-        </div>
-        <div className="mt-4 flex justify-center sm:justify-start">
-          <CopyUrlButton />
+
+        {/* Author Meta Strip */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-y border-text-secondary/15 py-4 my-8">
+          <div className="flex items-center gap-3">
+            <Avatar
+              src={article.author?.avatar || null}
+              name={article.author?.name || 'Muhammad Haikal'}
+            />
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-sm text-text-primary">
+                  {article.author?.name || 'Muhammad Haikal'}
+                </span>
+                <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded-full bg-text-primary/10 text-text-primary border border-text-primary/20">
+                  Author
+                </span>
+              </div>
+              <p className="text-xs text-text-secondary">Software &amp; Visual Design</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 text-xs text-text-secondary font-medium flex-wrap">
+            <span className="inline-flex items-center gap-1.5">
+              <span>📅</span>
+              <span>{formattedDate}</span>
+            </span>
+            <span className="opacity-30">·</span>
+            <span className="inline-flex items-center gap-1.5">
+              <span>⏱️</span>
+              <span>~{readingTime} menit baca</span>
+            </span>
+            <span className="opacity-30">·</span>
+            <ArticleViewTracker articleId={article.id} initialViewCount={article.view_count} />
+          </div>
         </div>
       </header>
 
+      {/* Featured Thumbnail */}
       {article.thumbnail && (
-        <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-text-secondary/15 my-8 bg-thirdary shadow-md">
+        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-3xl border border-text-secondary/15 my-10 shadow-2xl bg-thirdary/30">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={article.thumbnail}
             alt={article.title}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
           />
         </div>
       )}
 
+      {/* Article Content */}
       <div
-        className="article-detail-content text-base sm:text-lg leading-relaxed text-text-primary space-y-6 my-10"
+        className="article-detail-content max-w-none text-base sm:text-lg leading-relaxed text-text-primary space-y-6 my-12"
         dangerouslySetInnerHTML={{ __html: article.content }}
       />
 
-      <div className="border-y border-text-secondary/15 py-6 my-10">
+      {/* Reactions Bar */}
+      <div className="my-14">
         <ReactionButtons
           articleId={article.id}
           initialLikeCount={likeCount}
           initialDislikeCount={dislikeCount}
           initialReaction={currentReaction}
           isLoggedIn={Boolean(authUser)}
+          articleTitle={article.title}
         />
       </div>
 
-      <section className="mt-12">
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-text-primary mb-6">
-          Komentar <span className="text-text-secondary font-normal text-lg">({article.comments.length})</span>
-        </h2>
-
-        <div className="mb-8">
-          <CommentForm articleId={article.id} isLoggedIn={Boolean(authUser)} />
+      {/* Comments Section */}
+      <section className="mt-16 pt-12 border-t border-text-secondary/15">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+          <div>
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">
+              <span>💬</span>
+              <span>Ruang Diskusi</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-text-primary">
+              Komentar Komunitas{' '}
+              <span className="text-text-secondary font-normal text-xl">
+                ({article.comments.length})
+              </span>
+            </h2>
+            <p className="text-xs sm:text-sm text-text-secondary mt-1">
+              Bagikan gagasan, tanggapan, atau umpan balik seputar tulisan ini.
+            </p>
+          </div>
         </div>
 
-        <div className="divide-y divide-text-secondary/15">
-          {article.comments.map((comment) => (
-            <div key={comment.id} className="py-6 flex gap-4 items-start">
-              <Avatar src={comment.user.avatar} name={comment.user.name} />
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-4 mb-1">
-                  <p className="text-sm font-semibold text-text-primary">{comment.user.name}</p>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-text-secondary">
-                      {new Date(comment.created_at).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
-                        year: 'numeric',
-                      })}
-                    </span>
-                    <DeleteCommentButton
-                      commentId={comment.id}
-                      isOwner={isOwner}
-                      isAuthor={comment.user_id === currentUser?.id}
-                    />
-                  </div>
-                </div>
-                <p className="text-sm text-text-secondary leading-relaxed mt-1">{comment.content}</p>
-              </div>
-            </div>
-          ))}
-          {article.comments.length === 0 && (
-            <div className="py-10 text-center text-text-secondary text-sm">
-              Belum ada komentar. Jadilah yang pertama berkomentar!
-            </div>
-          )}
+        {/* Comment Form */}
+        <div className="mb-10">
+          <CommentForm
+            articleId={article.id}
+            isLoggedIn={Boolean(authUser)}
+            currentUser={currentUser}
+          />
         </div>
+
+        {/* Comments Stack */}
+        {article.comments.length > 0 ? (
+          <div className="space-y-4">
+            {article.comments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                isOwner={isOwner}
+                isAuthor={comment.user_id === currentUser?.id}
+                isArticleAuthor={comment.user.id === article.author_id}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-3xl border border-dashed border-text-secondary/20 p-10 sm:p-14 text-center bg-thirdary/10">
+            <div className="w-12 h-12 rounded-2xl bg-thirdary/60 border border-text-secondary/15 flex items-center justify-center text-xl mx-auto mb-3 shadow-xs">
+              💭
+            </div>
+            <h3 className="text-base font-bold text-text-primary tracking-tight">
+              Belum ada komentar
+            </h3>
+            <p className="text-xs sm:text-sm text-text-secondary mt-1 max-w-sm mx-auto">
+              Jadilah orang pertama yang memulai percakapan dan membagikan sudut pandangmu!
+            </p>
+          </div>
+        )}
       </section>
     </main>
   )

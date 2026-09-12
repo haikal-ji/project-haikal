@@ -1,18 +1,42 @@
 export default function ArtikelDetailLoading() {
   return (
-    <main className="article-detail-page">
-      <div style={{ width: 130, height: 12, background: '#29292e', borderRadius: 2 }} />
-      <header className="article-detail-heading">
-        <div style={{ width: 90, height: 11, background: '#29292e', borderRadius: 2, margin: '0 auto' }} />
-        <div style={{ marginTop: 24, width: '75%', height: 80, background: '#202024', borderRadius: 2, margin: '24px auto 0' }} />
-        <div style={{ marginTop: 25, width: 140, height: 11, background: '#29292e', borderRadius: 2, margin: '25px auto 0' }} />
+    <main className="min-h-screen bg-background text-text-primary px-6 pt-24 sm:pt-28 pb-20 md:px-10 md:pt-32 md:pb-24 max-w-4xl mx-auto animate-pulse">
+      {/* Back button skeleton */}
+      <div className="mb-8">
+        <div className="w-28 h-7 rounded-full bg-thirdary/60 border border-text-secondary/15" />
+      </div>
+
+      {/* Header skeleton */}
+      <header className="mb-8 space-y-4">
+        <div className="w-36 h-6 rounded-full bg-thirdary/60" />
+        <div className="w-4/5 h-12 sm:h-16 rounded-2xl bg-thirdary/80" />
+        <div className="w-3/5 h-10 sm:h-12 rounded-2xl bg-thirdary/60" />
+
+        {/* Author Strip skeleton */}
+        <div className="flex items-center justify-between border-y border-text-secondary/15 py-4 my-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-thirdary/80" />
+            <div className="space-y-1.5">
+              <div className="w-28 h-4 rounded bg-thirdary/80" />
+              <div className="w-36 h-3 rounded bg-thirdary/50" />
+            </div>
+          </div>
+          <div className="w-40 h-4 rounded bg-thirdary/50 hidden sm:block" />
+        </div>
       </header>
-      <div style={{ width: 'min(100%, 980px)', height: 480, background: '#29292e', borderRadius: 2, margin: '0 auto 70px', display: 'block' }} />
-      <div className="article-detail-content" style={{ maxWidth: 700, margin: '0 auto' }}>
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} style={{ height: 18, background: '#29292e', borderRadius: 2, marginBottom: 16, width: i % 3 === 2 ? '65%' : '100%' }} />
-        ))}
+
+      {/* Hero Image skeleton */}
+      <div className="aspect-[16/9] w-full rounded-3xl bg-thirdary/40 border border-text-secondary/15 my-10" />
+
+      {/* Content paragraphs */}
+      <div className="space-y-4 my-12 max-w-3xl">
+        <div className="w-full h-4 rounded bg-thirdary/60" />
+        <div className="w-11/12 h-4 rounded bg-thirdary/60" />
+        <div className="w-4/5 h-4 rounded bg-thirdary/50" />
+        <div className="w-full h-4 rounded bg-thirdary/60 mt-6" />
+        <div className="w-3/4 h-4 rounded bg-thirdary/50" />
       </div>
     </main>
   )
 }
+

@@ -423,18 +423,21 @@ main { animation: page-enter 420ms ease both; }
 .article-detail-heading h1 { margin-top: 24px; color: var(--foreground); font-size: clamp(3.3rem, 7vw, 7rem); letter-spacing: -.07em; line-height: .86; }
 .article-detail-date { margin-top: 25px; color: var(--color-text-muted); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; }
 .article-detail-cover { display: block; width: min(100%, 980px); max-height: 620px; margin: 0 auto 70px; object-fit: cover; filter: saturate(.85); border-radius: 12px; }
-.article-detail-content { max-width: 700px; margin: 0 auto; color: var(--foreground); font-size: 1.05rem; line-height: 1.9; overflow-wrap: break-word; word-break: break-word; }
-.article-detail-content h2 { margin: 2.2em 0 .55em; color: var(--foreground); font-family: var(--font-serif); font-size: clamp(1.5rem, 4vw, 2.2rem); font-weight: 700; line-height: 1.2; }
-.article-detail-content h3 { margin: 1.8em 0 .5em; color: var(--foreground); font-size: 1.3rem; font-weight: 600; line-height: 1.3; }
-.article-detail-content p { margin: 1.2em 0; }
-.article-detail-content ul { padding-left: 1.4rem; list-style-type: disc; margin: 1em 0; }
-.article-detail-content ol { padding-left: 1.4rem; list-style-type: decimal; margin: 1em 0; }
-.article-detail-content pre { max-width: 100%; overflow-x: auto; background: var(--thirdary); border: 1px solid var(--color-line); border-radius: 12px; padding: 1rem; margin: 1.5rem 0; font-family: var(--font-mono); font-size: .875rem; }
-.article-detail-content code { font-family: var(--font-mono); background: var(--thirdary); padding: .2rem .4rem; border-radius: 6px; font-size: .85em; }
-.article-detail-content pre code { background: transparent; padding: 0; border-radius: 0; }
-.article-detail-content blockquote { border-left: 3px solid var(--color-line); padding-left: 1rem; font-style: italic; margin: 1.5rem 0; color: var(--color-text-muted); }
-.article-detail-content table { display: block; width: 100%; overflow-x: auto; border-collapse: collapse; margin: 1.5rem 0; }
-.article-detail-content img { display: block; max-width: 100%; height: auto; margin: 2rem auto; border-radius: 12px; border: 1px solid var(--color-line); }
+.article-detail-content { max-width: 760px; margin: 0 auto; color: var(--foreground); font-size: 1.05rem; line-height: 1.85; overflow-wrap: break-word; word-break: break-word; }
+.article-detail-content h2 { margin: 2.4em 0 .6em; color: var(--foreground); font-family: var(--font-sans), sans-serif; font-size: clamp(1.5rem, 3.5vw, 2.1rem); font-weight: 800; letter-spacing: -0.025em; line-height: 1.2; }
+.article-detail-content h3 { margin: 1.9em 0 .5em; color: var(--foreground); font-family: var(--font-sans), sans-serif; font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.3; }
+.article-detail-content p { margin: 1.25em 0; color: color-mix(in srgb, var(--foreground) 90%, transparent); }
+.article-detail-content a { color: var(--foreground); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--foreground) 30%, transparent); text-underline-offset: 4px; transition: text-decoration-color 180ms ease, color 180ms ease; }
+.article-detail-content a:hover { text-decoration-color: var(--foreground); }
+.article-detail-content ul { padding-left: 1.5rem; list-style-type: disc; margin: 1.2em 0; }
+.article-detail-content ol { padding-left: 1.5rem; list-style-type: decimal; margin: 1.2em 0; }
+.article-detail-content li { margin: 0.4em 0; }
+.article-detail-content pre { max-width: 100%; overflow-x: auto; background: var(--thirdary); border: 1px solid var(--color-line); border-radius: 14px; padding: 1.15rem 1.25rem; margin: 1.8rem 0; font-family: var(--font-mono); font-size: .875rem; box-shadow: 0 4px 14px rgba(0,0,0,0.04); }
+.article-detail-content code { font-family: var(--font-mono); background: var(--thirdary); padding: .2rem .45rem; border-radius: 6px; font-size: .85em; border: 1px solid color-mix(in srgb, var(--color-line) 80%, transparent); }
+.article-detail-content pre code { background: transparent; padding: 0; border-radius: 0; border: none; }
+.article-detail-content blockquote { border-left: 3px solid var(--foreground); background: color-mix(in srgb, var(--thirdary) 40%, transparent); border-radius: 0 10px 10px 0; padding: 1rem 1.25rem; font-style: italic; margin: 1.8rem 0; color: color-mix(in srgb, var(--foreground) 80%, transparent); }
+.article-detail-content table { display: block; width: 100%; overflow-x: auto; border-collapse: collapse; margin: 1.8rem 0; }
+.article-detail-content img { display: block; max-width: 100%; height: auto; margin: 2rem auto; border-radius: 16px; border: 1px solid var(--color-line); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
 .article-reactions { display: flex; gap: 24px; max-width: 700px; margin: 58px auto 100px; border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); padding: 18px 0; color: var(--color-text-muted); font-size: .75rem; }
 .reaction-buttons { display: flex; flex-wrap: wrap; gap: 10px; }
 .reaction-button { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--color-line); background: transparent; padding: 9px 13px; color: var(--color-text-muted); font: inherit; font-size: .75rem; border-radius: 6px; transition: all 180ms ease; }
@@ -509,7 +512,7 @@ main { animation: page-enter 420ms ease both; }
 
 /* Tab Content & Headings */
 .profile-tab-header { margin-bottom: 32px; }
-.profile-tab-title { font-size: clamp(1.8rem, 3.2vw, 2.6rem); color: var(--foreground); line-height: 1.1; margin: 8px 0 10px; font-weight: 400; }
+.profile-tab-title { font-size: clamp(1.8rem, 3.2vw, 2.6rem); color: var(--foreground); line-height: 1.15; margin: 8px 0 10px; font-weight: 700; font-family: var(--font-sans), sans-serif !important; letter-spacing: -0.03em; }
 .profile-tab-desc { font-size: .88rem; color: var(--color-text-muted); line-height: 1.65; max-width: 600px; }
 
 /* Tab 1: Form & Dropzone */
@@ -572,14 +575,14 @@ main { animation: page-enter 420ms ease both; }
 .profile-account-specs { display: flex; flex-direction: column; border: 1px solid var(--color-line); border-radius: 8px; background: color-mix(in srgb, var(--background) 95%, var(--foreground)); overflow: hidden; }
 .account-spec-row { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px 24px; border-bottom: 1px solid var(--color-line); }
 .account-spec-row:last-child { border-bottom: none; }
-.account-spec-row.account-danger-zone { background: rgba(239, 68, 68, 0.04); }
+.account-spec-row.account-danger-zone { background: transparent; }
 .spec-label strong { display: block; font-size: .86rem; color: var(--foreground); margin-bottom: 3px; }
 .spec-label span { font-size: .74rem; color: var(--color-text-muted); }
 .spec-value { display: flex; align-items: center; gap: 10px; font-size: .84rem; color: var(--foreground); flex-wrap: wrap; }
 .spec-pill { padding: 4px 10px; border-radius: 4px; background: color-mix(in srgb, var(--foreground) 8%, transparent); font-family: var(--font-mono); font-size: .78rem; color: var(--foreground); }
 .spec-verified-tag { font-size: .7rem; color: #16a34a; font-weight: 600; }
-.account-logout-btn { padding: 8px 15px; border: 1px solid #dc2626; background: transparent; color: #dc2626; border-radius: 4px; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; cursor: pointer; transition: all .2s; }
-.account-logout-btn:hover { background: #dc2626; color: #fff; }
+.account-logout-btn { padding: 8px 16px; border: 1px solid rgba(239, 68, 68, 0.35); background: rgba(239, 68, 68, 0.06); color: #ef4444; border-radius: 8px; font-size: .75rem; letter-spacing: .05em; text-transform: uppercase; font-weight: 600; cursor: pointer; transition: all .2s; }
+.account-logout-btn:hover { background: #dc2626; color: #fff !important; border-color: #dc2626; }
 
 /* Empty States */
 .profile-empty-state { border: 1px dashed var(--color-line); border-radius: 8px; padding: 48px 24px; text-align: center; max-width: 520px; margin: 20px auto; background: color-mix(in srgb, var(--background) 95%, var(--foreground)); }
@@ -882,11 +885,16 @@ body { background: var(--background) !important; color: var(--foreground) !impor
 .profile-dashboard-layout { background: transparent !important; }
 .profile-identity-card, .profile-feed-card, .profile-like-card, .profile-account-specs, .profile-empty-state { background: color-mix(in srgb, var(--background) 92%, var(--foreground)) !important; border-radius: 12px; }
 .profile-preview-box, .profile-dropzone, .profile-text-input { background: var(--background) !important; border-color: var(--color-line) !important; color: var(--foreground) !important; }
-.profile-browse-btn, .profile-save-btn { border-color: var(--color-line) !important; background: var(--foreground) !important; color: var(--background) !important; box-shadow: none !important; border-radius: 999px !important; }
-.profile-tab-btn, .profile-logout-button, .account-logout-btn { color: var(--color-text-muted) !important; }
+.profile-tab-btn, .profile-logout-button { color: var(--color-text-muted) !important; }
 .profile-tab-btn.active, .profile-tab-btn:hover { color: var(--foreground) !important; }
 .profile-card-name { font-family: var(--font-sans), sans-serif !important; font-weight: 750 !important; }
 .profile-save-btn:hover, .profile-browse-btn:hover { opacity: 0.88; background: var(--foreground) !important; }
+
+html.dark .account-spec-row.account-danger-zone { background: transparent !important; }
+html.dark .account-logout-btn { border-color: rgba(239, 68, 68, 0.35) !important; background: rgba(239, 68, 68, 0.08) !important; color: #f87171 !important; }
+html.dark .account-logout-btn:hover { background: #dc2626 !important; color: #ffffff !important; border-color: #dc2626 !important; }
+html.dark .profile-remove-avatar-btn { color: #f87171; }
+html.dark .profile-remove-avatar-btn:hover { color: #fca5a5; }
 
 .uses-page, .changelog-page { background: var(--background) !important; color: var(--foreground) !important; }
 .uses-list, .changelog-list, .uses-item, .changelog-item { border-color: var(--color-line) !important; }

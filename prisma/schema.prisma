@@ -93,7 +93,7 @@ enum AppealStatus {
 model Badge {
   id         String   @id @default(uuid())
   name       String   @unique
-  emoji      String   @default("🏆")
+  emoji      String   @default("✨")
   color      String   @default("#7c4a35")
   created_at DateTime @default(now())
 

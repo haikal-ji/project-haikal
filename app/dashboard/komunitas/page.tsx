@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import BanUserButton from '@/components/BanUserButton'
 import AppealActionButtons from '@/components/AppealActionButtons'
+import UserBadgeManager, { type BadgeItem, type UserBadgeItem } from '@/components/UserBadgeManager'
 
 interface AppealItem {
   id: string
@@ -25,12 +26,13 @@ interface UserItem {
   _count: {
     comments: number
   }
+  badges: UserBadgeItem[]
 }
 
 export const dynamic = 'force-dynamic'
 
 export default async function KomunitasPage() {
-  const [users, pendingAppeals] = (await Promise.all([
+  const [users, pendingAppeals, allBadges] = (await Promise.all([
     prisma.user.findMany({
       orderBy: { created_at: 'desc' },
       select: {
@@ -42,6 +44,21 @@ export default async function KomunitasPage() {
         ban_reason: true,
         created_at: true,
         _count: { select: { comments: true } },
+        badges: {
+          select: {
+            id: true,
+            badge_id: true,
+            badge: {
+              select: {
+                id: true,
+                name: true,
+                emoji: true,
+                color: true,
+              },
+            },
+          },
+          orderBy: { awarded_at: 'asc' },
+        },
       },
     }),
     prisma.unbanAppeal.findMany({
@@ -51,7 +68,16 @@ export default async function KomunitasPage() {
         user: { select: { id: true, name: true, email: true, ban_reason: true } },
       },
     }),
-  ])) as [UserItem[], AppealItem[]]
+    prisma.badge.findMany({
+      orderBy: { created_at: 'asc' },
+      select: {
+        id: true,
+        name: true,
+        emoji: true,
+        color: true,
+      },
+    }),
+  ])) as [UserItem[], AppealItem[], BadgeItem[]]
 
   return (
     <div className="space-y-10 animate-fade-in">
@@ -146,6 +172,7 @@ export default async function KomunitasPage() {
                   <th scope="col" className="px-5 py-3.5">Email</th>
                   <th scope="col" className="px-5 py-3.5">Komentar</th>
                   <th scope="col" className="px-5 py-3.5">Status</th>
+                  <th scope="col" className="px-5 py-3.5">Badge Komunitas</th>
                   <th scope="col" className="px-5 py-3.5 text-right">Moderasi</th>
                 </tr>
               </thead>
@@ -193,6 +220,14 @@ export default async function KomunitasPage() {
                           Aktif
                         </span>
                       )}
+                    </td>
+                    <td className="px-5 py-4">
+                      <UserBadgeManager
+                        userId={user.id}
+                        userName={user.name}
+                        initialUserBadges={user.badges}
+                        allBadges={allBadges}
+                      />
                     </td>
                     <td className="px-5 py-4 text-right whitespace-nowrap">
                       <BanUserButton
