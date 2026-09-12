@@ -25,6 +25,7 @@ model User {
   reactions     Reaction[]
   comments      Comment[]
   unban_appeals UnbanAppeal[]
+  badges        UserBadge[]
 }
 
 model Article {
@@ -87,4 +88,26 @@ enum AppealStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+model Badge {
+  id         String   @id @default(uuid())
+  name       String   @unique
+  emoji      String   @default("🏆")
+  color      String   @default("#7c4a35")
+  created_at DateTime @default(now())
+
+  users UserBadge[]
+}
+
+model UserBadge {
+  id         String   @id @default(uuid())
+  user_id    String
+  badge_id   String
+  awarded_at DateTime @default(now())
+
+  user  User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badge_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, badge_id])
 }

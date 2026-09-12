@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --background: #fdfdfd;
   --foreground: #111827;
@@ -113,9 +117,32 @@ html.dark .login-page-card button[type='submit'] { background: #f4f4f5 !importan
 .collection-reference-heading > p:last-child { max-width: 540px; color: var(--color-text-muted); font-size: 1.05rem; line-height: 1.6; }
 .collection-reference-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 26px; }
 .collection-reference-card { position: relative; overflow: hidden; border: 1px solid #29292e; border-radius: 17px; background: #111113; }
-.collection-reference-image { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #18181b; border-bottom: 1px solid #29292e; }
-.collection-reference-image img { width: 100%; height: 100%; display: block; object-fit: cover; filter: grayscale(.55); transition: filter .5s ease, transform .7s ease; }
-.collection-reference-card:hover .collection-reference-image img { filter: grayscale(0); transform: scale(1.04); }
+.collection-reference-image {
+  position: relative;
+  height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #1c1c23 0%, #111114 100%);
+  border-bottom: 1px solid #29292e;
+  padding: 36px 28px;
+  box-sizing: border-box;
+}
+.collection-reference-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 10px;
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55));
+  transition: transform .5s cubic-bezier(0.16, 1, 0.3, 1), filter .5s ease;
+}
+.collection-reference-card:hover .collection-reference-image img {
+  transform: scale(1.03) translateY(-4px);
+  filter: drop-shadow(0 20px 36px rgba(0, 0, 0, 0.75));
+}
 .collection-reference-number { position: absolute; right: 22px; bottom: -24px; display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid #444449; border-radius: 50%; background: #111113; color: #f0f0f1; font-size: .72rem; }
 .collection-reference-body { padding: 34px 38px 38px; }
 .collection-reference-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
@@ -126,7 +153,9 @@ html.dark .login-page-card button[type='submit'] { background: #f4f4f5 !importan
 .collection-reference-link span { font-size: 1rem; }
 .collection-reference-back { display: inline-block; margin-top: 56px; color: var(--foreground); font-weight: 700; }
 html:not(.dark) .collection-reference-card { border-color: #dedee3; background: #fff; }
-html:not(.dark) .collection-reference-image { background: #f3f4f6; border-color: #dedee3; }
+html:not(.dark) .collection-reference-image { background: radial-gradient(circle at center, #f4f4f8 0%, #e6e6ec 100%); border-color: #dedee3; }
+html:not(.dark) .collection-reference-image img { filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.12)); }
+html:not(.dark) .collection-reference-card:hover .collection-reference-image img { filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.2)); }
 html:not(.dark) .collection-reference-number { border-color: #dedee3; background: #fff; color: #111114; }
 html:not(.dark) .collection-reference-body h2 { color: #111114; }
 html:not(.dark) .collection-reference-body p { color: #62626d; }
@@ -135,6 +164,7 @@ html:not(.dark) .collection-reference-link { border-color: #dedee3; color: #1111
 @media (max-width: 800px) {
   .collection-reference-page { padding-top: 110px; }
   .collection-reference-grid { grid-template-columns: 1fr; }
+  .collection-reference-image { height: 420px; padding: 24px 16px; }
   .collection-reference-body { padding: 26px 24px 28px; }
 }
 

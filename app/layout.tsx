@@ -7,7 +7,7 @@ import ReadingProgress from "@/components/ReadingProgress";
 import CustomCursor from "@/components/CustomCursor";
 import ThemeInitializer from "@/components/ThemeInitializer";
 import LoadingScreen from "@/components/LoadingScreen";
-import Noise from "@/components/Noise";
+
 import ScrollBlur from "@/components/ScrollBlur";
 import "./globals.css";
 
@@ -94,7 +94,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <LoadingScreen />
         <ReadingProgress />
         <CustomCursor />
-        <Noise patternSize={250} patternRefreshInterval={3} patternAlpha={14} />
+
         <ScrollBlur />
         <SiteHeader isLoggedIn={isLoggedIn} isOwner={isOwner} />
         <main className="flex-1">{children}</main>

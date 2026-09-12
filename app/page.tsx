@@ -6,8 +6,8 @@ import TechIcon from '@/components/TechIcon'
 import ContactSection from '@/components/ContactSection'
 import ScrollStack, { ScrollStackItem } from '@/components/ScrollStack'
 import BlurReveal from '@/components/BlurReveal'
-import AccordionGallery from '@/components/AccordionGallery'
 import Stack from '@/components/Stack'
+import TiltedCard from '@/components/TiltedCard'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
 
 export const dynamic = 'force-dynamic'
@@ -160,7 +160,7 @@ export default async function HomePage() {
               </svg>
             </Link>
             <Link
-              href="/about"
+              href="/#about"
               className="cursor-pointer text-sm md:text-base font-bold border-2 border-text-secondary/20 hover:border-text-primary text-text-primary px-8 py-4 rounded-xl flex flex-row items-center justify-center gap-3 hover:-translate-y-1.5 hover:scale-[1.02] hover:bg-thirdary/40 transition-all duration-300 ease-out bg-background/50 backdrop-blur-sm shadow-[0_4px_10px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_10px_rgba(255,255,255,0.02)]"
             >
               About Me
@@ -271,22 +271,27 @@ export default async function HomePage() {
         </BlurReveal>
 
         <BlurReveal delay={0.15} className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 px-6 md:px-12">
-          {/* Left: Photo Card in 4/5 Aspect with DEV Watermark */}
+          {/* Left: TiltedCard Photo */}
           <div className="lg:col-span-5 hidden lg:flex flex-col items-center justify-center relative">
-            <div className="w-full max-w-[360px] lg:max-w-[440px] relative">
-              <div className="relative z-10 p-2 bg-background border border-text-secondary/10 rounded-3xl shadow-2xl overflow-hidden aspect-[4/5] w-full group transition-all duration-500 hover:shadow-[0_20px_40px_-5px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_20px_40px_-5px_rgba(255,255,255,0.05)] hover:-translate-y-1">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/whatsapp.jpeg"
-                  alt="Muhammad Haikal"
-                  className="object-cover [object-position:center_25%] transition-all duration-700 scale-100 group-hover:scale-105 rounded-2xl w-full h-full"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-40 dark:opacity-60 group-hover:opacity-10 dark:group-hover:opacity-20 transition-opacity duration-500 rounded-3xl pointer-events-none" />
-              </div>
-              <div className="absolute -bottom-8 -left-8 text-8xl lg:text-9xl font-black text-text-secondary/5 select-none pointer-events-none tracking-tighter mix-blend-multiply dark:mix-blend-screen z-0">
-                DEV.
-              </div>
-            </div>
+            <TiltedCard
+              imageSrc="/whatsapp.jpeg"
+              altText="Muhammad Haikal"
+              captionText="ekall"
+              containerWidth="440px"
+              containerHeight="520px"
+              imageWidth="440px"
+              imageHeight="520px"
+              rotateAmplitude={12}
+              scaleOnHover={1.05}
+              showMobileWarning={false}
+              showTooltip={true}
+              displayOverlayContent={true}
+              overlayContent={
+                <p className="m-4 px-5 py-2.5 rounded-xl bg-black/80 text-white text-sm font-semibold shadow-lg tracking-wide">
+                  Muhammad Haikal
+                </p>
+              }
+            />
           </div>
 
           {/* Right: Narrative & Personal Details Grid */}
@@ -489,74 +494,34 @@ export default async function HomePage() {
           </BlurReveal>
         </div>
 
-        {/* Desktop: Accordion Gallery */}
-        <BlurReveal delay={0.2} className="hidden md:block max-w-7xl mx-auto px-6 md:px-12">
-          <AccordionGallery
-            items={projects.map((p) => ({
-              image: p.image,
-              label: `${p.number} — ${p.name}`,
-              link: '/collection',
-              alt: p.name,
-              objectFit: 'cover',
-            }))}
-            defaultIndex={1}
-            expandRatio={0.52}
-            trigger="hover"
-            accentColor="#ffffff"
-            overlayColor="#0a0a0a"
-            textColor="#ffffff"
-            grayscale={false}
-            showLabels={true}
-            duration={0.65}
-            ease="power3.out"
-            parallax={0.4}
-            tilt={6}
-            stagger={0.06}
-            height={480}
-            gap={14}
-            radius={24}
-            orientation="horizontal"
-          />
-        </BlurReveal>
-
-        {/* Mobile: draggable Stack card */}
-        <BlurReveal delay={0.1} className="md:hidden max-w-7xl mx-auto px-6">
-          {/* hint text */}
-          <p className="text-center text-xs text-text-secondary/60 mb-5 tracking-wide">
+        {/* Stack Gallery */}
+        <BlurReveal delay={0.2} className="max-w-7xl mx-auto px-6 md:px-12">
+          <p className="text-center text-xs text-text-secondary/60 mb-8 tracking-wide">
             Geser atau ketuk kartu untuk melihat karya lainnya
           </p>
-          <div className="mx-auto w-full max-w-[280px] flex flex-col items-center">
-            <Stack
-              key={projects.map((p) => p.image).join(',')}
-              className="w-[260px] h-[330px]"
-              randomRotation={false}
-              sensitivity={80}
-              sendToBackOnClick={true}
-              animationConfig={{ stiffness: 320, damping: 26 }}
-              autoplay={true}
-              autoplayDelay={4000}
-              pauseOnHover={true}
-              showDots={true}
-              showNavButtons={true}
-              cards={projects.map((p, i) => (
-                <div key={i} className="relative w-full h-full overflow-hidden rounded-2xl bg-neutral-900 select-none shadow-xl border border-white/10">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={p.image}
-                    alt={p.name}
-                    className="w-full h-full pointer-events-none select-none object-cover"
-                  />
-                  {/* top floating badge */}
-                  <div className="absolute top-3 left-3 z-10 px-2.5 py-1 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-[11px] font-mono font-semibold text-white/90 shadow-md flex items-center gap-1.5 pointer-events-none">
-                    <span className="text-white/60">{p.number}</span>
-                    <span className="text-white/30">•</span>
-                    <span className="font-sans font-medium text-white">{p.name}</span>
+          <div className="flex justify-center">
+            <div style={{ width: 340, height: 480 }}>
+              <Stack
+                randomRotation={false}
+                sensitivity={200}
+                sendToBackOnClick={true}
+                autoplay={true}
+                autoplayDelay={4000}
+                pauseOnHover={true}
+                cards={projects.map((p, i) => (
+                  <div key={i} className="relative w-full h-full overflow-hidden rounded-2xl bg-neutral-900 select-none shadow-xl border border-white/10">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className={`w-full h-full pointer-events-none select-none object-cover ${i === 1 ? 'object-bottom' : 'object-center'}`}
+                    />
                   </div>
-                </div>
-              ))}
-            />
+                ))}
+              />
+            </div>
           </div>
-          <div className="mt-8 flex justify-center">
+          <div className="mt-12 flex justify-center">
             <Link
               href="/collection"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-text-secondary/20 text-text-primary text-xs font-bold uppercase tracking-wider transition-all duration-300 hover:bg-text-primary hover:text-background group"

@@ -49,10 +49,9 @@ export default function CollectionPage() {
       <div className="collection-reference-grid">
         {projects.map((project) => (
           <article key={project.number} className="collection-reference-card">
-            <div className="collection-reference-image">
+              <div className="collection-reference-image">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={project.image} alt={project.name} />
-              <span className="collection-reference-number">{project.number}</span>
             </div>
             <div className="collection-reference-body">
               <div className="collection-reference-tags">
