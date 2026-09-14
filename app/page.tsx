@@ -210,7 +210,7 @@ export default async function HomePage() {
 
         {/* RIGHT COLUMN: CIRCLE PHOTO & EXACT RYHAR STACKED FLOATING BADGES */}
         <BlurReveal delay={0.25} yOffset={25} className="flex flex-col items-center justify-center relative mt-12 md:mt-0 pb-12 sm:pb-0">
-          <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 via-blue-500/15 to-purple-500/20 rounded-full scale-110 opacity-70 blur-3xl pointer-events-none" />
+          <div className="absolute inset-0 bg-text-primary/5 rounded-full scale-105 opacity-40 blur-2xl pointer-events-none" />
           <div className="relative z-10 p-2 sm:p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full shadow-2xl">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

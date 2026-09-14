@@ -38,6 +38,13 @@ export const metadata: Metadata = {
     template: "%s | Haikal",
   },
   description: "Web developer & creative technologist yang sedang belajar merancang dan membangun website yang rapi, simpel, dan enak diliat.",
+  icons: {
+    icon: [
+      { url: '/haikal-circle.png?v=3', type: 'image/png' },
+    ],
+    shortcut: '/haikal-circle.png?v=3',
+    apple: '/haikal-circle.png?v=3',
+  },
   keywords: ["portofolio", "web developer", "next.js", "haikal", "desain", "UI/UX"],
   authors: [{ name: "Muh. Haikal" }],
   creator: "Muh. Haikal",
@@ -89,6 +96,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`dark ${poppins.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="icon" type="image/png" href="/haikal-circle.png?v=3" />
+        <link rel="shortcut icon" type="image/png" href="/haikal-circle.png?v=3" />
+        <link rel="apple-touch-icon" href="/haikal-circle.png?v=3" />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-text-primary font-sans">
         <ThemeInitializer />
         <LoadingScreen />
