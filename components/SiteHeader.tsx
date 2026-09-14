@@ -28,8 +28,8 @@ export default function SiteHeader({
     { href: '/#about', label: 'About', sectionId: 'about' },
     { href: '/#experience', label: 'Experience', sectionId: 'experience' },
     { href: '/#projects', label: 'Projects', sectionId: 'projects' },
+    { href: '/#artikel', label: 'Artikel', sectionId: 'artikel' },
     { href: '/#contact', label: 'Contacts', sectionId: 'contact' },
-    { href: '/artikel', label: 'Artikel', sectionId: null },
   ]
 
   async function handleLogout() {
@@ -82,7 +82,7 @@ function NavbarWithScrollspy({
   useEffect(() => {
     if (!isHomePage) return
 
-    const sectionIds = ['home', 'about', 'experience', 'projects', 'contact']
+    const sectionIds = ['home', 'about', 'experience', 'projects', 'artikel', 'contact']
     const observers: IntersectionObserver[] = []
 
     const callback = (entries: IntersectionObserverEntry[]) => {
@@ -97,7 +97,7 @@ function NavbarWithScrollspy({
       const el = document.getElementById(id)
       if (!el) return
       const observer = new IntersectionObserver(callback, {
-        rootMargin: '-40% 0px -55% 0px',
+        rootMargin: '-35% 0px -50% 0px',
         threshold: 0,
       })
       observer.observe(el)
@@ -108,12 +108,17 @@ function NavbarWithScrollspy({
   }, [isHomePage, setActiveSection])
 
   function isLinkActive(link: { href: string; sectionId: string | null }) {
-    if (!link.sectionId) {
-      // Non-hash links: match by pathname
-      return pathname === link.href
+    if (isHomePage) {
+      return activeSection === link.sectionId
     }
-    // Hash links: active by scrollspy on homepage, otherwise inactive
-    return isHomePage && activeSection === link.sectionId
+    // Outside homepage (e.g. /artikel or /artikel/[id])
+    if (link.sectionId === 'artikel') {
+      return pathname.startsWith('/artikel')
+    }
+    if (!link.sectionId) {
+      return pathname === link.href || (link.href !== '/' && pathname.startsWith(link.href))
+    }
+    return false
   }
 
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
@@ -131,7 +136,7 @@ function NavbarWithScrollspy({
 
   return (
     <div className="fixed top-3.5 sm:top-5 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-      <header className="pointer-events-auto relative w-full max-w-3xl rounded-full border border-text-secondary/15 bg-background/80 dark:bg-[#111111]/80 backdrop-blur-md shadow-lg dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] px-6 sm:px-8 py-3.5 transition-all duration-200">
+      <header className="pointer-events-auto relative w-full max-w-3xl rounded-full border border-text-secondary/15 bg-background/80 dark:bg-[#111111]/80 backdrop-blur-md shadow-lg dark:shadow-[0_4px_20px_rgba(0,0,0,0.4)] px-6 sm:px-8 py-3 transition-all duration-200">
         <div className="flex items-center justify-between">
 
           {/* Left: Brand */}
@@ -149,7 +154,7 @@ function NavbarWithScrollspy({
           </Link>
 
           {/* Center: Desktop nav links */}
-          <nav className="hidden md:flex items-center gap-7 lg:gap-10 text-sm lg:text-base">
+          <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm lg:text-base">
             {mainLinks.map((link) => {
               const active = isLinkActive(link)
               return (
@@ -157,13 +162,16 @@ function NavbarWithScrollspy({
                   key={link.href}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className={`font-medium transition-all duration-200 relative ${
+                  className={`font-medium transition-all duration-200 relative px-3 py-1.5 rounded-full flex items-center gap-1.5 ${
                     active
-                      ? 'text-text-primary font-bold'
-                      : 'text-text-secondary hover:text-text-primary'
+                      ? 'text-text-primary font-bold bg-text-primary/10 dark:bg-white/10 shadow-[0_0_12px_rgba(255,255,255,0.1)]'
+                      : 'text-text-secondary hover:text-text-primary hover:bg-text-primary/5'
                   }`}
                 >
-                  {link.label}
+                  {active && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-text-primary shadow-[0_0_8px_currentColor] animate-pulse" />
+                  )}
+                  <span>{link.label}</span>
                 </Link>
               )
             })}
@@ -202,20 +210,32 @@ function NavbarWithScrollspy({
                   <div className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                     Navigasi
                   </div>
-                  {mainLinks.map((link) => (
-                    <Link
-                      key={link.href}
-                      href={link.href}
-                      onClick={(e) => {
-                        handleNavClick(e, link.href)
-                        setMobileOpen(false)
-                      }}
-                      className="px-3 py-2 rounded-xl text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-thirdary transition-colors flex items-center justify-between"
-                    >
-                      <span>{link.label}</span>
-                      <span className="text-xs opacity-50">→</span>
-                    </Link>
-                  ))}
+                  {mainLinks.map((link) => {
+                    const active = isLinkActive(link)
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={(e) => {
+                          handleNavClick(e, link.href)
+                          setMobileOpen(false)
+                        }}
+                        className={`px-3 py-2 rounded-xl text-sm font-medium transition-colors flex items-center justify-between ${
+                          active
+                            ? 'text-text-primary font-bold bg-text-primary/10 dark:bg-white/10'
+                            : 'text-text-secondary hover:text-text-primary hover:bg-thirdary'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          {active && (
+                            <span className="w-1.5 h-1.5 rounded-full bg-text-primary shadow-[0_0_6px_currentColor]" />
+                          )}
+                          <span>{link.label}</span>
+                        </span>
+                        <span className="text-xs opacity-50">→</span>
+                      </Link>
+                    )
+                  })}
                   <div className="my-1.5 border-t border-text-secondary/10" />
                 </div>
 

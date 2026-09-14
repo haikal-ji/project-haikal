@@ -80,7 +80,7 @@ export default function ArticleSearch({ articles }: { articles: ArticleItem[] })
                     })}
                   </span>
                 </div>
-                <h2 className="text-base sm:text-lg font-bold text-text-primary group-hover:text-blue-500 transition-colors line-clamp-2 leading-snug">
+                <h2 className="text-base sm:text-lg font-bold text-text-primary line-clamp-2 leading-snug">
                   {article.title}
                 </h2>
               </div>

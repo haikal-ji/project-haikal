@@ -100,7 +100,7 @@ function getReadingTime(htmlContent: string) {
 
 export default async function HomePage() {
   const latestArticles = await prisma.article.findMany({
-    orderBy: { created_at: 'desc' },
+    orderBy: { created_at: 'asc' },
     take: 3,
     include: {
       author: true,
@@ -534,7 +534,10 @@ export default async function HomePage() {
       </section>
 
       {/* 7. JOURNAL / ARTICLES */}
-      <section className="w-full max-w-7xl mx-auto py-24 md:py-32 cursor-default bg-background relative border-t border-text-secondary/10">
+      <section
+        id="artikel"
+        className="w-full max-w-7xl mx-auto py-24 md:py-32 cursor-default bg-background relative border-t border-text-secondary/10"
+      >
         {/* Section Header */}
         <BlurReveal className="max-w-7xl mx-auto px-6 md:px-12 mb-12 md:mb-16 w-full flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
@@ -567,6 +570,7 @@ export default async function HomePage() {
               href={`/artikel/${latestArticles[0].id}`}
               className="group relative flex flex-col lg:flex-row overflow-hidden rounded-3xl border border-text-secondary/15 hover:border-text-secondary/40 bg-background transition-all duration-500 hover:-translate-y-1"
             >
+              <div className="project-card-shine" />
               {/* Image Section */}
               <div className="relative aspect-[16/10] lg:aspect-auto lg:w-5/12 overflow-hidden bg-text-secondary/5 border-b lg:border-b-0 lg:border-r border-text-secondary/10 min-h-[260px] lg:min-h-[340px] flex items-center justify-center">
                 {latestArticles[0].thumbnail ? (
@@ -660,6 +664,7 @@ export default async function HomePage() {
                   href={`/artikel/${article.id}`}
                   className="group relative flex flex-col overflow-hidden rounded-3xl border border-text-secondary/15 hover:border-text-secondary/40 bg-background transition-all duration-500 hover:-translate-y-1.5 h-full"
                 >
+                  <div className="project-card-shine" />
                   {/* Thumbnail */}
                   <div className="relative aspect-[16/10] w-full overflow-hidden bg-text-secondary/5 border-b border-text-secondary/10 flex items-center justify-center">
                     {article.thumbnail ? (
