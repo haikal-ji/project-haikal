@@ -132,7 +132,11 @@ export default function ContactSection({
           <div className="bg-background border border-text-secondary/20 rounded-3xl overflow-hidden h-[420px] lg:h-auto min-h-[420px] shadow-xl hover:border-text-primary transition-colors duration-500 relative group">
             <div className="absolute top-4 left-4 z-10 bg-background/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-text-secondary/20 shadow-lg pointer-events-none transition-transform duration-300 group-hover:scale-105">
               <p className="text-sm font-bold text-text-primary flex items-center gap-1.5">
-                <span>📍</span> Lasusua, Kolaka Utara
+                <svg className="w-4 h-4 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Lasusua, Kolaka Utara</span>
               </p>
               <p className="text-xs font-medium text-text-secondary">
                 Sulawesi Tenggara, Indonesia

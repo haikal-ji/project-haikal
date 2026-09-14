@@ -9,31 +9,31 @@ export const metadata: Metadata = {
 const projects = [
   {
     number: '01',
-    name: 'OVRTHINK',
-    description: 'Eksplorasi visual dan identitas streetwear modern. Menggabungkan tipografi minimalis, fotografi fashion urban, dan komposisi editorial kontemporer.',
-    image: '/25.png',
-    tags: ['Fashion & Editorial', 'Brand Identity', 'Visual Design'],
+    name: 'Do You Read Me?',
+    description: 'Eksplorasi poster editorial bergaya halftone retro dan zine kontemporer. Memadukan grafis bintang biru berani, tipografi eksperimental, dan tekstur raster yang ekspresif.',
+    image: '/31.jpg',
+    tags: ['Editorial Poster', 'Halftone Art', 'Visual Exploration'],
   },
   {
     number: '02',
-    name: 'Matcha Cream Latte',
-    description: 'Desain poster promosi minuman dengan sentuhan dinamis dan elegan. Komposisi visual splash matcha dengan palet warna earthy pastel yang menonjolkan kesegaran.',
-    image: '/26.png',
-    tags: ['Poster Design', 'Commercial Art', 'Beverage Branding'],
+    name: 'Enjoy the World',
+    description: 'Eksplorasi poster tipografi bernuansa vintage dan nostalgia alam. Menghadirkan kontras visual antara kursi merah tunggal di padang rumput hijau dengan tipografi retro yang hangat dan reflektif.',
+    image: '/30.jpg',
+    tags: ['Vintage Poster', 'Typography Art', 'Visual Exploration'],
   },
   {
     number: '03',
-    name: 'Puding Mas Hambali',
-    description: 'Poster promosi kuliner dessert bergaya playful dan hangat. Menghadirkan fotografi produk yang menggugah selera dengan tipografi hand-drawn yang ramah.',
-    image: '/27.png',
-    tags: ['Culinary Branding', 'Social Media Ads', 'Graphic Design'],
+    name: 'Mikir Kidz',
+    description: 'Karya seni poster satir dan kritik sosial dengan gaya pop-art kontemporer. Memadukan tipografi bold, ilustrasi ekspresif bergaya zine punk, dan palet warna kontras yang mencolok.',
+    image: '/29.jpg',
+    tags: ['Social Satire', 'Pop Art Poster', 'Visual Criticism'],
   },
   {
     number: '04',
-    name: 'Promo Tiap Hari',
-    description: 'Materi promosi bundling kopi harian Aksara Caffè dengan nuansa warm coffee tone yang hangat, estetik, dan komunikatif untuk kampanye digital.',
-    image: '/28.png',
-    tags: ['Campaign Poster', 'Advertising', 'Visual Identity'],
+    name: 'No Fear',
+    description: 'Poster tipografi bergaya brutalist dan seni klasik. Mengangkat narasi keberanian dan keteguhan hati lewat kontras tipografi merah bertekstur tebal dengan komposisi visual yang dramatis.',
+    image: '/32.jpg',
+    tags: ['Brutalist Poster', 'Editorial Art', 'Visual Narrative'],
   },
 ]
 
@@ -51,7 +51,11 @@ export default function CollectionPage() {
           <article key={project.number} className="collection-reference-card">
               <div className="collection-reference-image">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={project.image} alt={project.name} />
+              <img
+                src={project.image}
+                alt={project.name}
+                className={project.image.includes('29') ? '!scale-110' : ''}
+              />
             </div>
             <div className="collection-reference-body">
               <div className="collection-reference-tags">

@@ -83,8 +83,11 @@ export default async function DashboardPage() {
             <span className="text-xs text-text-secondary font-mono">({articles.length})</span>
           </div>
           {articles.length > 0 && (
-            <p className="text-[11px] text-text-secondary sm:hidden flex items-center gap-1 font-medium bg-thirdary/60 px-2.5 py-1 rounded-full border border-text-secondary/15">
-              <span>↔️</span> Geser ke samping
+            <p className="text-[11px] text-text-secondary sm:hidden flex items-center gap-1.5 font-medium bg-thirdary/60 px-2.5 py-1 rounded-full border border-text-secondary/15">
+              <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+              <span>Geser ke samping</span>
             </p>
           )}
         </div>

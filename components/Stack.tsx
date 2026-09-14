@@ -125,6 +125,7 @@ export default function Stack({
     >
       {stack.map((card, index) => {
         const randomRotate = randomRotation ? Math.random() * 10 - 5 : 0;
+        const rotationFactor = isMobile ? 2.8 : 4;
         return (
           <CardRotate
             key={card.id}
@@ -136,7 +137,7 @@ export default function Stack({
               className="rounded-2xl overflow-hidden w-full h-full"
               onClick={() => shouldEnableClick && sendToBack(card.id)}
               animate={{
-                rotateZ: (stack.length - index - 1) * 4 + randomRotate,
+                rotateZ: (stack.length - index - 1) * rotationFactor + randomRotate,
                 scale: 1 + index * 0.06 - stack.length * 0.06,
                 transformOrigin: '90% 90%',
               }}

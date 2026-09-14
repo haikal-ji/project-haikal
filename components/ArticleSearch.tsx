@@ -44,14 +44,23 @@ export default function ArticleSearch({ articles }: { articles: ArticleItem[] })
             className="group relative flex flex-col overflow-hidden rounded-2xl border border-text-secondary/15 bg-thirdary/40 hover:bg-thirdary/80 transition duration-300 p-4 shadow-sm"
           >
             <div className="project-card-shine" />
-            <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-thirdary mb-4">
+            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-thirdary/40 mb-4 flex items-center justify-center">
               {article.thumbnail ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={article.thumbnail}
-                  alt={article.title}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={article.thumbnail}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 h-full w-full object-cover blur-xl opacity-35 scale-110 select-none pointer-events-none"
+                  />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={article.thumbnail}
+                    alt={article.title}
+                    className="relative z-10 h-full w-full object-contain transition-transform duration-500 group-hover:scale-105 select-none"
+                  />
+                </>
               ) : (
                 <div className="flex h-full w-full items-center justify-center bg-thirdary text-text-secondary text-sm font-semibold tracking-wider uppercase">
                   Haikal Journal

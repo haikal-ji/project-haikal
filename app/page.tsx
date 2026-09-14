@@ -15,31 +15,31 @@ export const dynamic = 'force-dynamic'
 const projects = [
   {
     number: '01',
-    name: 'OVRTHINK',
-    description: 'Eksplorasi visual dan identitas streetwear modern. Menggabungkan tipografi minimalis, fotografi fashion urban, dan komposisi editorial kontemporer.',
-    image: '/25.png',
-    tags: ['Fashion & Editorial', 'Brand Identity', 'Visual Design'],
+    name: 'Do You Read Me?',
+    description: 'Eksplorasi poster editorial bergaya halftone retro dan zine kontemporer. Memadukan grafis bintang biru berani, tipografi eksperimental, dan tekstur raster yang ekspresif.',
+    image: '/31.jpg',
+    tags: ['Editorial Poster', 'Halftone Art', 'Visual Exploration'],
   },
   {
     number: '02',
-    name: 'Matcha Cream Latte',
-    description: 'Desain poster promosi minuman dengan sentuhan dinamis dan elegan. Komposisi visual splash matcha dengan palet warna earthy pastel yang menonjolkan kesegaran.',
-    image: '/26.png',
-    tags: ['Poster Design', 'Commercial Art', 'Beverage Branding'],
+    name: 'Enjoy the World',
+    description: 'Eksplorasi poster tipografi bernuansa vintage dan nostalgia alam. Menghadirkan kontras visual antara kursi merah tunggal di padang rumput hijau dengan tipografi retro yang hangat dan reflektif.',
+    image: '/30.jpg',
+    tags: ['Vintage Poster', 'Typography Art', 'Visual Exploration'],
   },
   {
     number: '03',
-    name: 'Puding Mas Hambali',
-    description: 'Poster promosi kuliner dessert bergaya playful dan hangat. Menghadirkan fotografi produk yang menggugah selera dengan tipografi hand-drawn yang ramah.',
-    image: '/27.png',
-    tags: ['Culinary Branding', 'Social Media Ads', 'Graphic Design'],
+    name: 'Mikir Kidz',
+    description: 'Karya seni poster satir dan kritik sosial dengan gaya pop-art kontemporer. Memadukan tipografi bold, ilustrasi ekspresif bergaya zine punk, dan palet warna kontras yang mencolok.',
+    image: '/29.jpg',
+    tags: ['Social Satire', 'Pop Art Poster', 'Visual Criticism'],
   },
   {
     number: '04',
-    name: 'Promo Tiap Hari',
-    description: 'Materi promosi bundling kopi harian Aksara Caffè dengan nuansa warm coffee tone yang hangat, estetik, dan komunikatif untuk kampanye digital.',
-    image: '/28.png',
-    tags: ['Campaign Poster', 'Advertising', 'Visual Identity'],
+    name: 'No Fear',
+    description: 'Poster tipografi bergaya brutalist dan seni klasik. Mengangkat narasi keberanian dan keteguhan hati lewat kontras tipografi merah bertekstur tebal dengan komposisi visual yang dramatis.',
+    image: '/32.jpg',
+    tags: ['Brutalist Poster', 'Editorial Art', 'Visual Narrative'],
   },
 ]
 
@@ -500,7 +500,7 @@ export default async function HomePage() {
             Geser atau ketuk kartu untuk melihat karya lainnya
           </p>
           <div className="flex justify-center">
-            <div style={{ width: 340, height: 480 }}>
+            <div className="w-[265px] h-[375px] sm:w-[310px] sm:h-[440px] md:w-[340px] md:h-[480px] max-w-[85vw]">
               <Stack
                 randomRotation={false}
                 sensitivity={200}
@@ -514,7 +514,9 @@ export default async function HomePage() {
                     <img
                       src={p.image}
                       alt={p.name}
-                      className={`w-full h-full pointer-events-none select-none object-cover ${i === 1 ? 'object-bottom' : 'object-center'}`}
+                      className={`w-full h-full pointer-events-none select-none object-cover transition-transform duration-300 ${
+                        i === 1 ? 'object-center' : 'object-center'
+                      } ${p.image.includes('29') ? 'scale-[0,1]' : ''}`}
                     />
                   </div>
                 ))}
@@ -561,43 +563,52 @@ export default async function HomePage() {
 
         {/* Articles Content */}
         {latestArticles.length === 1 ? (
-          /* MINIMALIST FEATURED ARTICLE CARD (WITHOUT CLUTTERED COMPANION BOX) */
+          /* MINIMALIST FEATURED ARTICLE CARD */
           <BlurReveal delay={0.15} className="max-w-7xl mx-auto px-6 md:px-12">
             <Link
               href={`/artikel/${latestArticles[0].id}`}
-              className="group relative flex flex-col lg:flex-row overflow-hidden rounded-3xl border border-text-secondary/20 hover:border-text-primary bg-background shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
+              className="group relative flex flex-col lg:flex-row overflow-hidden rounded-3xl border border-text-secondary/15 hover:border-text-secondary/40 bg-background transition-all duration-500 hover:-translate-y-1"
             >
               {/* Image Section */}
-              <div className="relative aspect-[16/10] lg:aspect-auto lg:w-5/12 overflow-hidden bg-text-secondary/5 border-b lg:border-b-0 lg:border-r border-text-secondary/10 min-h-[260px] lg:min-h-[340px]">
+              <div className="relative aspect-[16/10] lg:aspect-auto lg:w-5/12 overflow-hidden bg-text-secondary/5 border-b lg:border-b-0 lg:border-r border-text-secondary/10 min-h-[260px] lg:min-h-[340px] flex items-center justify-center">
                 {latestArticles[0].thumbnail ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={latestArticles[0].thumbnail}
-                    alt={latestArticles[0].title}
-                    className="object-cover w-full h-full transition-all duration-700 group-hover:scale-105"
-                  />
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={latestArticles[0].thumbnail}
+                      alt=""
+                      aria-hidden="true"
+                      className="absolute inset-0 w-full h-full object-cover blur-xl opacity-35 scale-110 select-none pointer-events-none"
+                    />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={latestArticles[0].thumbnail}
+                      alt={latestArticles[0].title}
+                      className="relative z-10 object-contain w-full h-full transition-all duration-700 group-hover:scale-105 select-none"
+                    />
+                  </>
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-thirdary/50 text-text-secondary text-sm font-semibold tracking-wider uppercase">
                     Haikal Journal
                   </div>
                 )}
 
-                <div className="absolute top-4 left-4 z-10 bg-background/90 backdrop-blur-md px-3 py-1 rounded-full border border-text-secondary/20 text-[10px] font-bold uppercase tracking-widest text-text-primary shadow-md flex items-center gap-1.5">
+                <div className="absolute top-4 left-4 z-10 bg-background/90 backdrop-blur-md px-3 py-1 rounded-full border border-text-secondary/20 text-[10px] font-bold uppercase tracking-widest text-text-primary flex items-center gap-1.5">
                   <span></span> Featured Story
                 </div>
 
-                <div className="absolute bottom-4 left-4 z-10 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-text-secondary/20 text-[10px] font-semibold text-text-secondary shadow-md">
-                  ⏱️ {getReadingTime(latestArticles[0].content)}
+                <div className="absolute bottom-4 left-4 z-10 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-text-secondary/20 text-[10px] font-medium text-text-secondary flex items-center gap-1.5">
+                  <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {getReadingTime(latestArticles[0].content)}
                 </div>
               </div>
 
               {/* Info Section */}
               <div className="p-6 sm:p-8 lg:p-10 flex flex-col justify-between lg:w-7/12">
                 <div>
-                  <div className="flex items-center justify-between text-xs text-text-secondary mb-4">
-                    <span className="font-mono text-xs font-bold uppercase tracking-wider text-text-secondary">
-                      #01 • Tech &amp; Learning
-                    </span>
+                  <div className="flex items-center justify-end text-xs text-text-secondary mb-4">
                     <time className="font-medium">
                       {new Date(latestArticles[0].created_at).toLocaleDateString('id-ID', {
                         day: 'numeric',
@@ -607,7 +618,7 @@ export default async function HomePage() {
                     </time>
                   </div>
 
-                  <h4 className="text-2xl sm:text-3xl lg:text-4xl font-black text-text-primary tracking-tight leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-text-primary group-hover:to-text-secondary transition-all duration-500 mb-4 line-clamp-2">
+                  <h4 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary tracking-tight leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-text-primary group-hover:to-text-secondary transition-all duration-500 mb-4 line-clamp-2">
                     {latestArticles[0].title}
                   </h4>
 
@@ -617,17 +628,20 @@ export default async function HomePage() {
                 </div>
 
                 <div className="pt-5 border-t border-text-secondary/10 flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-xs font-semibold text-text-secondary">
+                  <div className="flex items-center gap-4 text-xs font-medium text-text-secondary">
                     <span className="flex items-center gap-1.5">
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
                       {latestArticles[0].view_count} views
                     </span>
                     {latestArticles[0]._count?.reactions > 0 && (
-                      <span className="flex items-center gap-1">
-                        ❤️ {latestArticles[0]._count.reactions}
+                      <span className="flex items-center gap-1.5">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        {latestArticles[0]._count.reactions}
                       </span>
                     )}
                   </div>
@@ -646,39 +660,48 @@ export default async function HomePage() {
               <BlurReveal key={article.id} delay={idx * 0.1} className="h-full">
                 <Link
                   href={`/artikel/${article.id}`}
-                  className="group relative flex flex-col overflow-hidden rounded-3xl border border-text-secondary/20 hover:border-text-primary bg-background shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-1.5 h-full"
+                  className="group relative flex flex-col overflow-hidden rounded-3xl border border-text-secondary/15 hover:border-text-secondary/40 bg-background transition-all duration-500 hover:-translate-y-1.5 h-full"
                 >
                   {/* Thumbnail */}
-                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-text-secondary/5 border-b border-text-secondary/10">
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-text-secondary/5 border-b border-text-secondary/10 flex items-center justify-center">
                     {article.thumbnail ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={article.thumbnail}
-                        alt={article.title}
-                        className="object-cover w-full h-full transition-all duration-700 group-hover:scale-105"
-                      />
+                      <>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={article.thumbnail}
+                          alt=""
+                          aria-hidden="true"
+                          className="absolute inset-0 w-full h-full object-cover blur-xl opacity-35 scale-110 select-none pointer-events-none"
+                        />
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={article.thumbnail}
+                          alt={article.title}
+                          className="relative z-10 object-contain w-full h-full transition-all duration-700 group-hover:scale-105 select-none"
+                        />
+                      </>
                     ) : (
                       <div className="flex h-full w-full items-center justify-center bg-thirdary/50 text-text-secondary text-sm font-semibold tracking-wider uppercase">
                         Haikal Journal
                       </div>
                     )}
 
-                    <div className="absolute top-4 left-4 z-10 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-text-secondary/20 text-[10px] font-mono font-bold tracking-wider text-text-primary shadow-sm">
+                    <div className="absolute top-4 left-4 z-10 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-text-secondary/20 text-[10px] font-mono font-bold tracking-wider text-text-primary">
                       #{String(idx + 1).padStart(2, '0')}
                     </div>
 
-                    <div className="absolute top-4 right-4 z-10 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-text-secondary/20 text-[10px] font-semibold text-text-secondary shadow-sm">
-                      ⏱️ {getReadingTime(article.content)}
+                    <div className="absolute top-4 right-4 z-10 bg-background/90 backdrop-blur-md px-2.5 py-1 rounded-full border border-text-secondary/20 text-[10px] font-medium text-text-secondary flex items-center gap-1.5">
+                      <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {getReadingTime(article.content)}
                     </div>
                   </div>
 
                   {/* Details */}
                   <div className="p-6 sm:p-8 flex flex-col flex-grow justify-between">
                     <div>
-                      <div className="flex items-center justify-between text-xs text-text-secondary mb-3">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-text-secondary/80">
-                          Article
-                        </span>
+                      <div className="flex items-center justify-end text-xs text-text-secondary mb-3">
                         <time className="font-medium">
                           {new Date(article.created_at).toLocaleDateString('id-ID', {
                             day: 'numeric',
@@ -688,7 +711,7 @@ export default async function HomePage() {
                         </time>
                       </div>
 
-                      <h4 className="text-xl sm:text-2xl font-black text-text-primary tracking-tight leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-text-primary group-hover:to-text-secondary transition-all duration-500 mb-3 line-clamp-2">
+                      <h4 className="text-xl sm:text-2xl font-bold text-text-primary tracking-tight leading-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-text-primary group-hover:to-text-secondary transition-all duration-500 mb-3 line-clamp-2">
                         {article.title}
                       </h4>
 
@@ -698,9 +721,23 @@ export default async function HomePage() {
                     </div>
 
                     <div className="pt-4 border-t border-text-secondary/10 flex items-center justify-between mt-auto">
-                      <span className="flex items-center gap-1.5 text-xs text-text-secondary font-medium">
-                        👁️ {article.view_count} views
-                      </span>
+                      <div className="flex items-center gap-3 text-xs font-medium text-text-secondary">
+                        <span className="flex items-center gap-1.5">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </svg>
+                          {article.view_count}
+                        </span>
+                        {article._count?.reactions > 0 && (
+                          <span className="flex items-center gap-1.5">
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            {article._count.reactions}
+                          </span>
+                        )}
+                      </div>
                       <span className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-text-primary group-hover:translate-x-1 transition-transform">
                         Baca <span>→</span>
                       </span>
@@ -719,6 +756,7 @@ export default async function HomePage() {
           </BlurReveal>
         )}
       </section>
+
 
       {/* 8. CONTACT SECTION */}
       <BlurReveal>

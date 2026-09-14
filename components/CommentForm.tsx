@@ -30,8 +30,10 @@ export default function CommentForm({
       <div className="rounded-3xl border border-text-secondary/15 bg-gradient-to-br from-thirdary/40 via-thirdary/20 to-transparent backdrop-blur-xl p-6 sm:p-8 shadow-sm">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-text-primary/10 border border-text-secondary/20 flex items-center justify-center text-text-primary text-xl shrink-0 shadow-xs">
-              💬
+            <div className="w-12 h-12 rounded-2xl bg-text-primary/10 border border-text-secondary/20 flex items-center justify-center text-text-primary shrink-0 shadow-xs">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.75">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
             </div>
             <div>
               <h3 className="text-base font-bold text-text-primary tracking-tight">
@@ -124,7 +126,10 @@ export default function CommentForm({
 
           {error && (
             <p className="text-xs text-red-500 bg-red-500/10 border border-red-500/20 p-2.5 rounded-xl flex items-center gap-1.5">
-              <span>⚠️</span> {error}
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span>{error}</span>
             </p>
           )}
 

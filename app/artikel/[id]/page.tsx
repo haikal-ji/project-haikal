@@ -151,12 +151,16 @@ export default async function ArtikelDetailPage({
 
           <div className="flex items-center gap-3 text-xs text-text-secondary font-medium flex-wrap">
             <span className="inline-flex items-center gap-1.5">
-              <span>📅</span>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
               <span>{formattedDate}</span>
             </span>
             <span className="opacity-30">·</span>
             <span className="inline-flex items-center gap-1.5">
-              <span>⏱️</span>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
               <span>~{readingTime} menit baca</span>
             </span>
             <span className="opacity-30">·</span>
@@ -167,12 +171,21 @@ export default async function ArtikelDetailPage({
 
       {/* Featured Thumbnail */}
       {article.thumbnail && (
-        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-3xl border border-text-secondary/15 my-10 shadow-2xl bg-thirdary/30">
+        <div className="relative max-h-[540px] aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden rounded-3xl border border-text-secondary/15 my-10 bg-thirdary/30 flex items-center justify-center">
+          {/* Ambient blurred backdrop */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={article.thumbnail}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 h-full w-full object-cover blur-2xl opacity-30 scale-110 select-none pointer-events-none"
+          />
+          {/* Main crisp uncropped image */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={article.thumbnail}
             alt={article.title}
-            className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.02]"
+            className="relative z-10 max-h-[540px] w-full h-full object-contain transition-transform duration-700 hover:scale-[1.01] select-none"
           />
         </div>
       )}
@@ -200,7 +213,9 @@ export default async function ArtikelDetailPage({
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
             <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">
-              <span>💬</span>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
               <span>Ruang Diskusi</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-text-primary">
@@ -239,8 +254,10 @@ export default async function ArtikelDetailPage({
           </div>
         ) : (
           <div className="rounded-3xl border border-dashed border-text-secondary/20 p-10 sm:p-14 text-center bg-thirdary/10">
-            <div className="w-12 h-12 rounded-2xl bg-thirdary/60 border border-text-secondary/15 flex items-center justify-center text-xl mx-auto mb-3 shadow-xs">
-              💭
+            <div className="w-12 h-12 rounded-2xl bg-thirdary/60 border border-text-secondary/15 flex items-center justify-center text-text-secondary/70 mx-auto mb-3 shadow-xs">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.75">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
             </div>
             <h3 className="text-base font-bold text-text-primary tracking-tight">
               Belum ada komentar

@@ -200,7 +200,9 @@ export default function UserBadgeManager({
           }`}
           title="Kelola Badge"
         >
-          <span>🏅</span>
+          <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+          </svg>
           <span>{userBadges.length === 0 ? '+ Beri Badge' : 'Kelola'}</span>
         </button>
       </div>
@@ -218,9 +220,11 @@ export default function UserBadgeManager({
                 setIsOpen(false)
                 setError(null)
               }}
-              className="text-text-secondary hover:text-text-primary text-sm px-1 cursor-pointer"
+              className="text-text-secondary hover:text-text-primary p-1 cursor-pointer"
             >
-              ✕
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
 
