@@ -7,8 +7,8 @@ const isDev = process.env.NODE_ENV === 'development';
 
 const cspDirectives = [
   "default-src 'self'",
-  // Di mode development, Next.js dev server (Fast Refresh & Turbopack/Webpack) butuh 'unsafe-eval'
-  isDev ? "script-src 'self' 'unsafe-eval' 'unsafe-inline'" : "script-src 'self'",
+  // Next.js App Router uses inline streaming scripts (self.__next_f) for RSC payloads
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline'", // 'unsafe-inline' diperlukan untuk GSAP, Tiptap, dan Tailwind CSS
   "img-src 'self' data: blob: https://avatars.githubusercontent.com https://*.googleusercontent.com https://*.supabase.co",
   "font-src 'self' data:",

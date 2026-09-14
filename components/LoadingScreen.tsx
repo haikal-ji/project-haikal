@@ -9,11 +9,11 @@ export default function LoadingScreen() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setFading(true)
-    }, 900)
+    }, 600)
 
     const removeTimer = setTimeout(() => {
       setVisible(false)
-    }, 1400)
+    }, 1000)
 
     return () => {
       clearTimeout(timer)
@@ -27,11 +27,11 @@ export default function LoadingScreen() {
     <div
       aria-hidden="true"
       onAnimationEnd={() => setVisible(false)}
-      className={`fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center overflow-hidden transition-opacity duration-500 ease-out pointer-events-none ${
+      className={`fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center overflow-hidden transition-opacity duration-400 ease-out pointer-events-none ${
         fading ? 'opacity-0' : 'opacity-100'
       }`}
       style={{
-        animation: 'loadingScreenFade 1.3s cubic-bezier(0.65, 0, 0.35, 1) forwards',
+        animation: 'loadingScreenFade 1.0s cubic-bezier(0.65, 0, 0.35, 1) forwards',
       }}
     >
       {/* Ambient center blur */}

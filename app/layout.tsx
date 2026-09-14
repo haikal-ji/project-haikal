@@ -96,11 +96,6 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       className={`dark ${poppins.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <head>
-        <link rel="icon" type="image/png" href="/haikal-circle.png?v=3" />
-        <link rel="shortcut icon" type="image/png" href="/haikal-circle.png?v=3" />
-        <link rel="apple-touch-icon" href="/haikal-circle.png?v=3" />
-      </head>
       <body className="min-h-full flex flex-col bg-background text-text-primary font-sans">
         <ThemeInitializer />
         <LoadingScreen />
