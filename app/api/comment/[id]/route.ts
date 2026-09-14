@@ -2,11 +2,17 @@ import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { verifySameOrigin } from '@/lib/csrf'
+import { updateCommentSchema } from '@/lib/schemas'
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!verifySameOrigin(request)) {
+    return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
+  }
+
   const { id } = await params
   const supabase = await createClient()
   const {
@@ -46,6 +52,10 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!verifySameOrigin(request)) {
+    return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
+  }
+
   const { id } = await params
   const supabase = await createClient()
   const {
@@ -73,15 +83,16 @@ export async function PATCH(
     )
   }
 
-  const body = await request.json()
-  const { content } = body as { content?: string }
-
-  if (!content || !content.trim()) {
+  const body = await request.json().catch(() => null)
+  const result = updateCommentSchema.safeParse(body)
+  if (!result.success) {
     return NextResponse.json(
-      { error: 'Isi komentar tidak boleh kosong' },
+      { error: 'Data tidak valid', details: result.error.flatten() },
       { status: 400 }
     )
   }
+
+  const { content } = result.data
 
   const updatedComment = await prisma.comment.update({
     where: { id },
@@ -92,3 +103,4 @@ export async function PATCH(
 
   return NextResponse.json({ comment: updatedComment })
 }
+

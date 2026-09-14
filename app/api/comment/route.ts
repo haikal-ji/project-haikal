@@ -3,8 +3,19 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import { containsBadWord } from '@/lib/bad-words'
+import { verifySameOrigin } from '@/lib/csrf'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { createCommentSchema } from '@/lib/schemas'
 
 export async function POST(request: Request) {
+  if (!verifySameOrigin(request)) {
+    return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
+  }
+
+  if (checkRateLimit(request, 'POST:/api/comment', { limit: 10, windowMs: 60_000 })) {
+    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 })
+  }
+
   const supabase = await createClient()
   const {
     data: { user: authUser },
@@ -30,12 +41,16 @@ export async function POST(request: Request) {
     )
   }
 
-  const body = await request.json()
-  const { article_id, content } = body
-
-  if (!article_id || typeof content !== 'string' || !content.trim()) {
-    return NextResponse.json({ error: 'Komentar tidak boleh kosong' }, { status: 400 })
+  const body = await request.json().catch(() => null)
+  const result = createCommentSchema.safeParse(body)
+  if (!result.success) {
+    return NextResponse.json(
+      { error: 'Data tidak valid', details: result.error.flatten() },
+      { status: 400 }
+    )
   }
+
+  const { article_id, content } = result.data
 
   // Bad word filter
   if (containsBadWord(content)) {
@@ -60,3 +75,4 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ comment })
 }
+

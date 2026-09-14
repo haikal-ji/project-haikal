@@ -2,9 +2,20 @@ import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { verifySameOrigin } from '@/lib/csrf'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { createAppealSchema, reviewAppealSchema } from '@/lib/schemas'
 
 // POST: User yang ter-banned mengajukan banding/appeal
 export async function POST(request: Request) {
+  if (!verifySameOrigin(request)) {
+    return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
+  }
+
+  if (checkRateLimit(request, 'POST:/api/admin/appeal', { limit: 3, windowMs: 60_000 })) {
+    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 })
+  }
+
   const supabase = await createClient()
   const {
     data: { user: authUser },
@@ -24,15 +35,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Akun kamu tidak sedang di-banned' }, { status: 400 })
   }
 
-  const body = await request.json()
-  const { reason } = body as { reason: string }
-
-  if (!reason?.trim() || reason.trim().length < 20) {
+  const body = await request.json().catch(() => null)
+  const result = createAppealSchema.safeParse(body)
+  if (!result.success) {
     return NextResponse.json(
-      { error: 'Alasan permohonan harus diisi minimal 20 karakter' },
+      { error: 'Data tidak valid', details: result.error.flatten() },
       { status: 400 }
     )
   }
+
+  const { reason } = result.data
 
   // Cek apakah sudah ada appeal PENDING aktif
   const existingAppeal = await prisma.unbanAppeal.findFirst({
@@ -60,6 +72,10 @@ export async function POST(request: Request) {
 
 // PATCH: Admin menyetujui atau menolak appeal
 export async function PATCH(request: Request) {
+  if (!verifySameOrigin(request)) {
+    return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
+  }
+
   const supabase = await createClient()
   const {
     data: { user: authUser },
@@ -69,16 +85,16 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 })
   }
 
-  const body = await request.json()
-  const { appealId, action, adminNote } = body as {
-    appealId: string
-    action: 'APPROVED' | 'REJECTED'
-    adminNote?: string
+  const body = await request.json().catch(() => null)
+  const result = reviewAppealSchema.safeParse(body)
+  if (!result.success) {
+    return NextResponse.json(
+      { error: 'Data tidak valid', details: result.error.flatten() },
+      { status: 400 }
+    )
   }
 
-  if (!appealId || !['APPROVED', 'REJECTED'].includes(action)) {
-    return NextResponse.json({ error: 'Data tidak valid' }, { status: 400 })
-  }
+  const { appealId, action, adminNote } = result.data
 
   const appeal = await prisma.unbanAppeal.findUnique({ where: { id: appealId } })
   if (!appeal) {
@@ -105,3 +121,4 @@ export async function PATCH(request: Request) {
   revalidatePath('/dashboard/komunitas')
   return NextResponse.json({ appeal: updatedAppeal })
 }
+

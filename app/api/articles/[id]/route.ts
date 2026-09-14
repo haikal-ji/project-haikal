@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { syncUserToDb } from '@/lib/auth-sync'
 import { prisma } from '@/lib/prisma'
+import { verifySameOrigin } from '@/lib/csrf'
+import { articleSchema } from '@/lib/schemas'
 
 async function requireOwner() {
   const supabase = await createClient()
@@ -32,6 +34,10 @@ export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!verifySameOrigin(request)) {
+    return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
+  }
+
   const owner = await requireOwner()
 
   if (!owner) {
@@ -39,25 +45,41 @@ export async function PUT(
   }
 
   const { id } = await params
-  const body = await request.json()
-  const { title, content, thumbnail } = body
-
-  if (!title || !content) {
-    return NextResponse.json({ error: 'Judul dan konten wajib diisi' }, { status: 400 })
+  const body = await request.json().catch(() => null)
+  const result = articleSchema.safeParse(body)
+  if (!result.success) {
+    return NextResponse.json(
+      { error: 'Data tidak valid', details: result.error.flatten() },
+      { status: 400 }
+    )
   }
 
-  const article = await prisma.article.update({
-    where: { id },
-    data: { title, content, thumbnail: thumbnail || null },
-  })
+  const { title, content, thumbnail } = result.data
 
-  return NextResponse.json({ article })
+  try {
+    const article = await prisma.article.update({
+      where: { id },
+      data: { title, content, thumbnail: thumbnail || null },
+    })
+
+    return NextResponse.json({ article })
+  } catch (error: any) {
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Artikel tidak ditemukan' }, { status: 404 })
+    }
+    console.error('Error updating article:', error)
+    return NextResponse.json({ error: 'Gagal memperbarui artikel' }, { status: 500 })
+  }
 }
 
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!verifySameOrigin(request)) {
+    return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
+  }
+
   const owner = await requireOwner()
 
   if (!owner) {
@@ -65,7 +87,16 @@ export async function DELETE(
   }
 
   const { id } = await params
-  await prisma.article.delete({ where: { id } })
 
-  return NextResponse.json({ success: true })
+  try {
+    await prisma.article.delete({ where: { id } })
+    return NextResponse.json({ success: true })
+  } catch (error: any) {
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Artikel tidak ditemukan' }, { status: 404 })
+    }
+    console.error('Error deleting article:', error)
+    return NextResponse.json({ error: 'Gagal menghapus artikel' }, { status: 500 })
+  }
 }
+

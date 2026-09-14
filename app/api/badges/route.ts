@@ -1,13 +1,20 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { verifySameOrigin } from '@/lib/csrf'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { createBadgeSchema } from '@/lib/schemas'
 
 function isOwner(email: string | undefined | null) {
   return Boolean(email && process.env.OWNER_EMAIL && email === process.env.OWNER_EMAIL)
 }
 
 // GET: Mengambil semua badge yang tersedia
-export async function GET() {
+export async function GET(request: Request) {
+  if (checkRateLimit(request, 'GET:/api/badges', { limit: 30, windowMs: 60_000 })) {
+    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 })
+  }
+
   try {
     const badges = await prisma.badge.findMany({
       orderBy: { created_at: 'asc' },
@@ -21,6 +28,10 @@ export async function GET() {
 
 // POST: Membuat badge baru (owner only)
 export async function POST(request: Request) {
+  if (!verifySameOrigin(request)) {
+    return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
+  }
+
   try {
     const supabase = await createClient()
     const {
@@ -31,22 +42,22 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 })
     }
 
-    const body = await request.json()
-    const { name, emoji, color } = body as {
-      name?: string
-      emoji?: string
-      color?: string
+    const body = await request.json().catch(() => null)
+    const result = createBadgeSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json(
+        { error: 'Data tidak valid', details: result.error.flatten() },
+        { status: 400 }
+      )
     }
 
-    if (!name?.trim()) {
-      return NextResponse.json({ error: 'Nama badge harus diisi' }, { status: 400 })
-    }
+    const { name, emoji, color } = result.data
 
     const badge = await prisma.badge.create({
       data: {
-        name: name.trim(),
-        emoji: emoji?.trim() || '🏆',
-        color: color?.trim() || '#7c4a35',
+        name,
+        emoji: emoji || '🏆',
+        color: color || '#7c4a35',
       },
     })
 
@@ -59,3 +70,4 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Gagal membuat badge' }, { status: 500 })
   }
 }
+

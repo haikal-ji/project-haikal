@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
+import { verifySameOrigin } from '@/lib/csrf'
+import { createUserBadgeSchema } from '@/lib/schemas'
 
 function isOwner(email: string | undefined | null) {
   return Boolean(email && process.env.OWNER_EMAIL && email === process.env.OWNER_EMAIL)
@@ -9,6 +11,10 @@ function isOwner(email: string | undefined | null) {
 
 // POST: Memberikan badge ke user (owner only)
 export async function POST(request: Request) {
+  if (!verifySameOrigin(request)) {
+    return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
+  }
+
   try {
     const supabase = await createClient()
     const {
@@ -19,15 +25,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 })
     }
 
-    const body = await request.json()
-    const { user_id, badge_id } = body as {
-      user_id?: string
-      badge_id?: string
+    const body = await request.json().catch(() => null)
+    const result = createUserBadgeSchema.safeParse(body)
+    if (!result.success) {
+      return NextResponse.json(
+        { error: 'Data tidak valid', details: result.error.flatten() },
+        { status: 400 }
+      )
     }
 
-    if (!user_id || !badge_id) {
-      return NextResponse.json({ error: 'user_id dan badge_id diperlukan' }, { status: 400 })
-    }
+    const { user_id, badge_id } = result.data
 
     const userBadge = await prisma.userBadge.create({
       data: {
@@ -57,6 +64,10 @@ export async function POST(request: Request) {
 
 // DELETE: Melepas assignment badge dari user (owner only)
 export async function DELETE(request: Request) {
+  if (!verifySameOrigin(request)) {
+    return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
+  }
+
   try {
     const supabase = await createClient()
     const {
@@ -87,3 +98,4 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'Gagal mencabut badge' }, { status: 500 })
   }
 }
+

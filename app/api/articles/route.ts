@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { syncUserToDb } from '@/lib/auth-sync'
 import { prisma } from '@/lib/prisma'
+import { verifySameOrigin } from '@/lib/csrf'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { articleSchema } from '@/lib/schemas'
 
 async function requireOwner() {
   const supabase = await createClient()
@@ -14,7 +17,11 @@ async function requireOwner() {
   return dbUser
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  if (checkRateLimit(request, 'GET:/api/articles', { limit: 30, windowMs: 60_000 })) {
+    return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 })
+  }
+
   const articles = await prisma.article.findMany({
     orderBy: { created_at: 'desc' },
   })
@@ -22,18 +29,26 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!verifySameOrigin(request)) {
+    return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
+  }
+
   const owner = await requireOwner()
 
   if (!owner) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const body = await request.json()
-  const { title, content, thumbnail } = body
-
-  if (!title || !content) {
-    return NextResponse.json({ error: 'Judul dan konten wajib diisi' }, { status: 400 })
+  const body = await request.json().catch(() => null)
+  const result = articleSchema.safeParse(body)
+  if (!result.success) {
+    return NextResponse.json(
+      { error: 'Data tidak valid', details: result.error.flatten() },
+      { status: 400 }
+    )
   }
+
+  const { title, content, thumbnail } = result.data
 
   const article = await prisma.article.create({
     data: {
@@ -46,3 +61,4 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ article })
 }
+
