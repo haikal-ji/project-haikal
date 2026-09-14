@@ -514,9 +514,7 @@ export default async function HomePage() {
                     <img
                       src={p.image}
                       alt={p.name}
-                      className={`w-full h-full pointer-events-none select-none object-cover transition-transform duration-300 ${
-                        i === 1 ? 'object-center' : 'object-center'
-                      } ${p.image.includes('29') ? 'scale-[0,1]' : ''}`}
+                      className="w-full h-full pointer-events-none select-none object-cover object-center transition-transform duration-300"
                     />
                   </div>
                 ))}
@@ -609,7 +607,7 @@ export default async function HomePage() {
               <div className="p-6 sm:p-8 lg:p-10 flex flex-col justify-between lg:w-7/12">
                 <div>
                   <div className="flex items-center justify-end text-xs text-text-secondary mb-4">
-                    <time className="font-medium">
+                    <time className="font-medium" suppressHydrationWarning>
                       {new Date(latestArticles[0].created_at).toLocaleDateString('id-ID', {
                         day: 'numeric',
                         month: 'short',
@@ -702,7 +700,7 @@ export default async function HomePage() {
                   <div className="p-6 sm:p-8 flex flex-col flex-grow justify-between">
                     <div>
                       <div className="flex items-center justify-end text-xs text-text-secondary mb-3">
-                        <time className="font-medium">
+                        <time className="font-medium" suppressHydrationWarning>
                           {new Date(article.created_at).toLocaleDateString('id-ID', {
                             day: 'numeric',
                             month: 'short',

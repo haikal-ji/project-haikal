@@ -9,22 +9,30 @@ export default function LoadingScreen() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setFading(true)
-      const removeTimer = setTimeout(() => {
-        setVisible(false)
-      }, 500)
-      return () => clearTimeout(removeTimer)
-    }, 1100)
+    }, 900)
 
-    return () => clearTimeout(timer)
+    const removeTimer = setTimeout(() => {
+      setVisible(false)
+    }, 1400)
+
+    return () => {
+      clearTimeout(timer)
+      clearTimeout(removeTimer)
+    }
   }, [])
 
   if (!visible) return null
 
   return (
     <div
+      aria-hidden="true"
+      onAnimationEnd={() => setVisible(false)}
       className={`fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center overflow-hidden transition-opacity duration-500 ease-out pointer-events-none ${
         fading ? 'opacity-0' : 'opacity-100'
       }`}
+      style={{
+        animation: 'loadingScreenFade 1.3s cubic-bezier(0.65, 0, 0.35, 1) forwards',
+      }}
     >
       {/* Ambient center blur */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-text-primary/10 rounded-full blur-[100px]" />
