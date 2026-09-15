@@ -9,6 +9,7 @@ import BlurReveal from '@/components/BlurReveal'
 import Stack from '@/components/Stack'
 import TiltedCard from '@/components/TiltedCard'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
+import DecryptedText from '@/components/DecryptedText'
 
 export const dynamic = 'force-dynamic'
 
@@ -145,7 +146,7 @@ export default async function HomePage() {
 
           <div className="max-w-xl mt-4">
             <p className="text-text-secondary text-base md:text-lg leading-relaxed font-medium">
-              Halo! Saya suka merancang dan membangun sesuatu dari nol. Bagi saya, setiap baris kode adalah cara untuk menghadirkan karya digital yang rapi, bermanfaat, dan terasa tepat.
+              Fokus merancang dan mengembangkan pengalaman web yang interaktif, bersih, dan berorientasi pada detail performa serta estetika visual.
             </p>
           </div>
 
@@ -160,10 +161,10 @@ export default async function HomePage() {
               </svg>
             </Link>
             <Link
-              href="/#about"
+              href="#projects"
               className="cursor-pointer text-sm md:text-base font-bold border-2 border-text-secondary/20 hover:border-text-primary text-text-primary px-8 py-4 rounded-xl flex flex-row items-center justify-center gap-3 hover:-translate-y-1.5 hover:scale-[1.02] hover:bg-thirdary/40 transition-all duration-300 ease-out bg-background/50 backdrop-blur-sm shadow-[0_4px_10px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_10px_rgba(255,255,255,0.02)]"
             >
-              About Me
+              Projects
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
@@ -223,7 +224,7 @@ export default async function HomePage() {
             <div className="floating flex items-center gap-2.5 sm:gap-3 bg-background/95 dark:bg-[#111111]/95 backdrop-blur-md border border-text-secondary/15 p-2.5 pr-4 sm:p-3 sm:pr-5 rounded-2xl shadow-xl hover:-translate-y-1 transition-transform duration-300">
               <div className="bg-text-primary text-background p-1.5 sm:p-2 rounded-xl shrink-0">
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-6l-2-2H5a2 2 0 0 0-2 2z" />
                 </svg>
               </div>
               <span className="text-xs md:text-sm font-semibold text-text-primary whitespace-nowrap">
@@ -476,7 +477,17 @@ export default async function HomePage() {
           <BlurReveal>
             <h2 className="text-sm font-bold tracking-[0.2em] text-text-secondary uppercase mb-4">Portfolio</h2>
             <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter">
-              Selected Works
+              <DecryptedText
+                text="Selected Works"
+                animateOn="inViewHover"
+                speed={50}
+                maxIterations={12}
+                sequential
+                revealDirection="start"
+                useOriginalCharsOnly={false}
+                className="text-text-primary"
+                encryptedClassName="text-text-secondary/50 font-mono"
+              />
             </h3>
             <p className="mt-3 text-sm md:text-base text-text-secondary max-w-xl font-medium leading-relaxed">
               Koleksi proyek desain visual dan eksperimen kreatif pilihan saya dalam membangun identitas brand serta materi promosi yang menarik.
@@ -762,7 +773,7 @@ export default async function HomePage() {
 
 
       {/* 8. CONTACT SECTION */}
-      <BlurReveal>
+      <BlurReveal blurAmount={0}>
         <ContactSection />
       </BlurReveal>
     </div>

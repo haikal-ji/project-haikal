@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from '@/components/ToastProvider'
 
 type ReactionType = 'LIKE' | 'DISLIKE'
 
@@ -67,6 +68,7 @@ export default function ReactionButtons({
     if (typeof window === 'undefined') return
     navigator.clipboard.writeText(window.location.href)
     setCopied(true)
+    toast.success('Tautan disalin ke clipboard')
     setTimeout(() => setCopied(false), 2000)
   }
 

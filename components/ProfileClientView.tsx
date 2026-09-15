@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
+import { toast } from '@/components/ToastProvider'
 
 type ProfileClientViewProps = {
   user: {
@@ -180,9 +181,12 @@ export default function ProfileClientView({
       setSuccess(true)
       setAvatarFile(null)
       setIsRemovingAvatar(false)
+      toast.success('Profil diperbarui!', 'Perubahan identitas berhasil disimpan ke akunmu.')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan sistem')
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan sistem'
+      setError(msg)
+      toast.error('Gagal memperbarui profil', msg)
     } finally {
       setLoading(false)
     }

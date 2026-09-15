@@ -37,12 +37,24 @@ const projects = [
   },
 ]
 
+import DecryptedText from '@/components/DecryptedText'
+
 export default function CollectionPage() {
   return (
     <main className="collection-reference-page">
       <header className="collection-reference-heading">
         <p className="section-index">Collection</p>
-        <h1>Selected Works</h1>
+        <h1>
+          <DecryptedText
+            text="Selected Works"
+            animateOn="inViewHover"
+            speed={50}
+            maxIterations={12}
+            sequential
+            revealDirection="start"
+            useOriginalCharsOnly={false}
+          />
+        </h1>
         <p>Kumpulan project, eksperimen visual, dan bentuk-bentuk yang pernah saya buat.</p>
       </header>
 

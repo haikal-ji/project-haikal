@@ -28,13 +28,13 @@ export default function BlurReveal({
         opacity: 0,
         y: yOffset,
         x: xOffset,
-        filter: `blur(${blurAmount}px)`,
+        ...(blurAmount > 0 ? { filter: `blur(${blurAmount}px)` } : {}),
       }}
       whileInView={{
         opacity: 1,
         y: 0,
         x: 0,
-        filter: 'blur(0px)',
+        ...(blurAmount > 0 ? { filter: 'blur(0px)' } : {}),
       }}
       viewport={{ once: true, margin: '200px 0px 0px 0px', amount: 0 }}
       transition={{

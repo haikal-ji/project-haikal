@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import RichTextEditor from './RichTextEditor'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
+import { toast } from '@/components/ToastProvider'
 
 type ArticleFormProps = {
   mode: 'create' | 'edit'
@@ -79,10 +80,16 @@ export default function ArticleForm({
         throw new Error(data.error || 'Gagal menyimpan artikel')
       }
 
+      toast.success(
+        mode === 'create' ? 'Artikel berhasil diterbitkan' : 'Perubahan disimpan'
+      )
+
       router.push('/dashboard')
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan')
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan'
+      setError(msg)
+      toast.error('Gagal menyimpan artikel', msg)
     } finally {
       setLoading(false)
     }

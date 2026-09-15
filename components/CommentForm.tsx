@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
 import Avatar from '@/components/Avatar'
+import { toast } from '@/components/ToastProvider'
 
 interface CommentFormProps {
   articleId: string
@@ -72,15 +73,19 @@ export default function CommentForm({
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        setError(data.error || 'Gagal mengirim komentar')
+        const errorMsg = data.error || 'Gagal mengirim komentar'
+        setError(errorMsg)
+        toast.error('Gagal mengirim komentar', errorMsg)
         return
       }
 
       setContent('')
+      toast.success('Komentar berhasil dikirim')
       router.refresh()
     } catch (err) {
       console.error(err)
       setError('Terjadi kesalahan jaringan')
+      toast.error('Koneksi terputus', 'Gagal mengirim komentar ke server.')
     } finally {
       setLoading(false)
     }
@@ -107,9 +112,6 @@ export default function CommentForm({
               {currentUser?.name && (
                 <span className="text-text-secondary font-normal">sebagai {currentUser.name}</span>
               )}
-            </span>
-            <span className="text-[11px] text-text-secondary/60 font-mono hidden md:inline">
-              Ctrl + Enter untuk kirim
             </span>
           </div>
 

@@ -10,9 +10,10 @@ const cspDirectives = [
   // Next.js App Router uses inline streaming scripts (self.__next_f) for RSC payloads
   "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
   "style-src 'self' 'unsafe-inline'", // 'unsafe-inline' diperlukan untuk GSAP, Tiptap, dan Tailwind CSS
-  "img-src 'self' data: blob: https://avatars.githubusercontent.com https://*.googleusercontent.com https://*.supabase.co",
-  "font-src 'self' data:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+  "img-src 'self' data: blob: https://avatars.githubusercontent.com https://*.googleusercontent.com https://*.supabase.co https://*.google.com https://*.gstatic.com https://*.googleapis.com https://*.openstreetmap.org",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google.com https://*.googleapis.com",
+  "frame-src 'self' https://www.google.com https://maps.google.com https://*.google.com https://*.openstreetmap.org",
   "frame-ancestors 'none'",
 ].join('; ');
 

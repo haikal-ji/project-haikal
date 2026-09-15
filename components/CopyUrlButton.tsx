@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from '@/components/ToastProvider'
 
 export default function CopyUrlButton() {
   const [copied, setCopied] = useState(false)
@@ -8,6 +9,7 @@ export default function CopyUrlButton() {
   function handleCopy() {
     navigator.clipboard.writeText(window.location.href)
     setCopied(true)
+    toast.success('Tautan disalin ke clipboard')
     setTimeout(() => setCopied(false), 2000)
   }
 

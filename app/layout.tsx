@@ -3,12 +3,12 @@ import { Poppins, Geist_Mono, Fraunces } from "next/font/google";
 import { createClient } from "@/lib/supabase/server";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
-import ReadingProgress from "@/components/ReadingProgress";
 import CustomCursor from "@/components/CustomCursor";
 import ThemeInitializer from "@/components/ThemeInitializer";
 import LoadingScreen from "@/components/LoadingScreen";
 
 import ScrollBlur from "@/components/ScrollBlur";
+import { ToastProvider } from "@/components/ToastProvider";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
@@ -97,15 +97,16 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       className={`dark ${poppins.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-text-primary font-sans">
-        <ThemeInitializer />
-        <LoadingScreen />
-        <ReadingProgress />
-        <CustomCursor />
+        <ToastProvider>
+          <ThemeInitializer />
+          <LoadingScreen />
+          <CustomCursor />
 
-        <ScrollBlur />
-        <SiteHeader isLoggedIn={isLoggedIn} isOwner={isOwner} />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
+          <ScrollBlur />
+          <SiteHeader isLoggedIn={isLoggedIn} isOwner={isOwner} />
+          <main className="flex-1">{children}</main>
+          <SiteFooter />
+        </ToastProvider>
       </body>
     </html>
   );

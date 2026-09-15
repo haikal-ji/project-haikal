@@ -13,6 +13,9 @@ export default function ContactSection({
   className = '',
   isStandalone = false,
 }: ContactSectionProps) {
+  const [isMapInteractive, setIsMapInteractive] = React.useState(false)
+  const googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=Desa+Lambai,+Kolaka+Utara'
+
   const contacts = [
     {
       name: 'GitHub',
@@ -51,7 +54,7 @@ export default function ContactSection({
     {
       name: 'WhatsApp',
       handle: '082396640918',
-      href: 'https://wa.me/?text=Halo%20Haikal',
+      href: 'https://wa.me/6282396640918?text=Halo%20Haikal',
       hoverBorder: 'hover:border-[#25D366]',
       hoverBg: 'hover:bg-[#25D366]/5',
       iconHoverColor: 'group-hover:text-[#25D366]',
@@ -128,27 +131,81 @@ export default function ContactSection({
       <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
           
-          {/* Left: Google Map Card with Floating Location Badge */}
-          <div className="bg-background border border-text-secondary/20 rounded-3xl overflow-hidden h-[420px] lg:h-auto min-h-[420px] shadow-xl hover:border-text-primary transition-colors duration-500 relative group">
-            <div className="absolute top-4 left-4 z-10 bg-background/90 backdrop-blur-md px-4 py-2.5 rounded-xl border border-text-secondary/20 shadow-lg pointer-events-none transition-transform duration-300 group-hover:scale-105">
+          {/* Left: Google Map Card with Clickable Location & Smooth Scroll */}
+          <div
+            className="bg-background border border-text-secondary/20 rounded-3xl overflow-hidden h-[420px] lg:h-auto min-h-[420px] shadow-xl hover:border-text-primary transition-colors duration-500 relative group"
+            onMouseLeave={() => setIsMapInteractive(false)}
+          >
+            {/* Top-left: Location Badge (Clickable link to open Google Maps) */}
+            <a
+              href={googleMapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute top-4 left-4 z-10 bg-background/90 hover:bg-background backdrop-blur-md px-4 py-2.5 rounded-xl border border-text-secondary/20 hover:border-text-primary shadow-lg transition-all duration-300 group/badge"
+              title="Buka lokasi di Google Maps"
+            >
               <p className="text-sm font-bold text-text-primary flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-rose-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg className="w-4 h-4 text-rose-500 shrink-0 group-hover/badge:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span>Lasusua, Kolaka Utara</span>
+                <span>Desa Lambai</span>
+                <svg className="w-3.5 h-3.5 text-text-secondary group-hover/badge:text-text-primary transition-transform group-hover/badge:translate-x-0.5 group-hover/badge:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
               </p>
               <p className="text-xs font-medium text-text-secondary">
-                Sulawesi Tenggara, Indonesia
+                Kolaka Utara, Sulawesi Tenggara
               </p>
+            </a>
+
+            {/* Bottom Floating Bar: Interactive Mode Toggle & Open in Maps Button */}
+            <div className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between gap-2 pointer-events-none">
+              <button
+                type="button"
+                onClick={() => setIsMapInteractive(!isMapInteractive)}
+                className="pointer-events-auto text-xs font-semibold px-3 py-2 rounded-xl bg-background/90 hover:bg-background backdrop-blur-md border border-text-secondary/20 hover:border-text-primary text-text-primary shadow-lg transition-all duration-300 flex items-center gap-1.5"
+                title={isMapInteractive ? 'Kunci peta untuk scroll lancar' : 'Aktifkan kontrol peta (zoom/geser)'}
+              >
+                {isMapInteractive ? (
+                  <>
+                    <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span>Kunci Peta</span>
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-3.5 h-3.5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
+                    </svg>
+                    <span>Interaksi Peta</span>
+                  </>
+                )}
+              </button>
+
+              <a
+                href={googleMapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pointer-events-auto inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-text-primary text-background text-xs font-bold shadow-lg hover:opacity-90 transition-all duration-300"
+              >
+                <span>Buka Maps</span>
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
             </div>
+
+            {/* Embedded Iframe - pointer-events disabled by default to keep scrolling buttery smooth */}
             <iframe
-              src="https://maps.google.com/maps?q=-3.435,120.898&t=&z=14&ie=UTF8&iwloc=&output=embed"
-              title="Peta Lokasi Lasusua Kolaka Utara"
-              className="absolute inset-0 w-full h-full border-0 grayscale hover:grayscale-0 transition-all duration-700"
+              src="https://maps.google.com/maps?q=Desa+Lambai,+Kolaka+Utara&t=&z=14&ie=UTF8&iwloc=&output=embed"
+              title="Peta Lokasi Desa Lambai Kolaka Utara"
+              className={`absolute inset-0 w-full h-full border-0 transition-opacity duration-300 ${
+                isMapInteractive ? 'pointer-events-auto' : 'pointer-events-none'
+              }`}
               allowFullScreen
               loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
 

@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useLayoutEffect, useEffect, useRef, useCallback } from 'react'
+import React, { useLayoutEffect, useEffect, useRef, useCallback, useState } from 'react'
 import type { ReactNode } from 'react'
 import Lenis from 'lenis'
 
@@ -13,7 +13,7 @@ export interface ScrollStackItemProps {
 
 export const ScrollStackItem: React.FC<ScrollStackItemProps> = ({ children, itemClassName = '' }) => (
   <div
-    className={`scroll-stack-card relative w-full min-h-[16rem] sm:min-h-[20rem] my-6 sm:my-8 p-6 sm:p-10 md:p-12 rounded-[28px] sm:rounded-[40px] shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.6)] border border-text-secondary/20 bg-background dark:bg-[#141414] box-border origin-top will-change-transform ${itemClassName}`.trim()}
+    className={`scroll-stack-card relative w-full min-h-[16rem] sm:min-h-[20rem] my-3 sm:my-8 p-6 sm:p-10 md:p-12 rounded-[24px] sm:rounded-[40px] shadow-[0_8px_30px_rgba(0,0,0,0.12)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.6)] border border-text-secondary/20 bg-background dark:bg-[#141414] box-border origin-top will-change-transform ${itemClassName}`.trim()}
     style={{
       backfaceVisibility: 'hidden',
       transformStyle: 'preserve-3d',
@@ -39,7 +39,36 @@ interface ScrollStackProps {
   onStackComplete?: () => void
 }
 
-const ScrollStack: React.FC<ScrollStackProps> = ({
+// ─── Mobile: 100% GPU-accelerated CSS sticky stacking (eliminates Android scroll lag) ──
+const MobileScrollStack: React.FC<{ children: ReactNode; className?: string; itemDistance?: number }> = ({
+  children,
+  className = '',
+  itemDistance = 32,
+}) => {
+  const items = React.Children.toArray(children)
+  return (
+    <div className={`relative w-full pb-16 ${className}`.trim()}>
+      <div className="w-full relative flex flex-col">
+        {items.map((child, idx) => (
+          <div
+            key={idx}
+            className="sticky will-change-transform"
+            style={{
+              top: `${76 + idx * 18}px`,
+              zIndex: idx + 1,
+              marginBottom: idx < items.length - 1 ? `${itemDistance}px` : '0px',
+            }}
+          >
+            {child}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Desktop: Full Reachbits JS-driven smooth scroll stack with Lenis ─────────
+const DesktopScrollStack: React.FC<ScrollStackProps> = ({
   children,
   className = '',
   itemDistance = 100,
@@ -228,8 +257,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
         infinite: false,
         wheelMultiplier: 1,
         lerp: 0.1,
-        syncTouch: true,
-        syncTouchLerp: 0.075,
+        syncTouch: false,
       })
 
       lenis.on('scroll', handleScroll)
@@ -257,8 +285,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
         gestureOrientation: 'vertical',
         wheelMultiplier: 1,
         lerp: 0.1,
-        syncTouch: true,
-        syncTouchLerp: 0.075,
+        syncTouch: false,
       })
 
       lenis.on('scroll', handleScroll)
@@ -318,7 +345,7 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
         window.removeEventListener('resize', handleScroll)
       }
       stackCompletedRef.current = false
-      cardsRef.current = [];
+      cardsRef.current = []
       transformsCache.clear()
       isUpdatingRef.current = false
     }
@@ -364,6 +391,34 @@ const ScrollStack: React.FC<ScrollStackProps> = ({
       </div>
     </div>
   )
+}
+
+// ─── Public Component: Adaptive device-optimized ScrollStack ─────────────────
+const ScrollStack: React.FC<ScrollStackProps> = (props) => {
+  const [isMobile, setIsMobile] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    const check = () =>
+      setIsMobile(
+        window.matchMedia('(pointer: coarse)').matches ||
+          'ontouchstart' in window ||
+          window.innerWidth < 768
+      )
+    check()
+    window.addEventListener('resize', check, { passive: true })
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  // SSR / initial paint: render clean CSS sticky stack
+  if (isMobile === null || isMobile) {
+    return (
+      <MobileScrollStack className={props.className} itemDistance={props.itemDistance}>
+        {props.children}
+      </MobileScrollStack>
+    )
+  }
+
+  return <DesktopScrollStack {...props} />
 }
 
 export default ScrollStack

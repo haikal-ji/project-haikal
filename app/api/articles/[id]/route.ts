@@ -89,7 +89,11 @@ export async function DELETE(
   const { id } = await params
 
   try {
-    await prisma.article.delete({ where: { id } })
+    await prisma.$transaction([
+      prisma.reaction.deleteMany({ where: { article_id: id } }),
+      prisma.comment.deleteMany({ where: { article_id: id } }),
+      prisma.article.delete({ where: { id } }),
+    ])
     return NextResponse.json({ success: true })
   } catch (error: any) {
     if (error?.code === 'P2025') {
