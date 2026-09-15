@@ -11,6 +11,7 @@ export default function ReactionButtons({
   initialLikeCount,
   initialDislikeCount,
   initialReaction,
+  initialShareCount = 0,
   isLoggedIn,
   articleTitle = 'Artikel Haikal',
 }: {
@@ -18,6 +19,7 @@ export default function ReactionButtons({
   initialLikeCount: number
   initialDislikeCount: number
   initialReaction: ReactionType | null
+  initialShareCount?: number
   isLoggedIn: boolean
   articleTitle?: string
 }) {
@@ -25,28 +27,76 @@ export default function ReactionButtons({
   const [likeCount, setLikeCount] = useState(initialLikeCount)
   const [dislikeCount, setDislikeCount] = useState(initialDislikeCount)
   const [reaction, setReaction] = useState<ReactionType | null>(initialReaction)
-  const [loading, setLoading] = useState(false)
+  const [shareCount, setShareCount] = useState(initialShareCount)
   const [copied, setCopied] = useState(false)
   const [isBouncing, setIsBouncing] = useState(false)
+  const [isDislikeBouncing, setIsDislikeBouncing] = useState(false)
 
   function requireLogin() {
     router.push(
-      `/login?message=${encodeURIComponent('Kamu harus login dulu untuk memberikan apresiasi')}`
+      `/login?message=${encodeURIComponent('Kamu harus login dulu untuk memberikan apresiasi')}&type=warning`
     )
   }
 
+  // Optimistic zero-delay reaction handler
   async function react(type: ReactionType) {
     if (!isLoggedIn) {
       requireLogin()
       return
     }
 
+    // 1. Snapshot previous state for rollback on error
+    const prevReaction = reaction
+    const prevLikeCount = likeCount
+    const prevDislikeCount = dislikeCount
+
+    // 2. Compute optimistic updates immediately
+    let nextReaction: ReactionType | null = null
+    let nextLikes = likeCount
+    let nextDislikes = dislikeCount
+
     if (type === 'LIKE') {
+      if (reaction === 'LIKE') {
+        // Toggle off
+        nextReaction = null
+        nextLikes = Math.max(0, likeCount - 1)
+      } else if (reaction === 'DISLIKE') {
+        // Switch from dislike to like
+        nextReaction = 'LIKE'
+        nextLikes = likeCount + 1
+        nextDislikes = Math.max(0, dislikeCount - 1)
+      } else {
+        // New like
+        nextReaction = 'LIKE'
+        nextLikes = likeCount + 1
+      }
       setIsBouncing(true)
-      setTimeout(() => setIsBouncing(false), 500)
+      setTimeout(() => setIsBouncing(false), 400)
+    } else {
+      if (reaction === 'DISLIKE') {
+        // Toggle off
+        nextReaction = null
+        nextDislikes = Math.max(0, dislikeCount - 1)
+      } else if (reaction === 'LIKE') {
+        // Switch from like to dislike
+        nextReaction = 'DISLIKE'
+        nextDislikes = dislikeCount + 1
+        nextLikes = Math.max(0, likeCount - 1)
+      } else {
+        // New dislike
+        nextReaction = 'DISLIKE'
+        nextDislikes = dislikeCount + 1
+      }
+      setIsDislikeBouncing(true)
+      setTimeout(() => setIsDislikeBouncing(false), 400)
     }
 
-    setLoading(true)
+    // Instant UI update (0ms delay!)
+    setReaction(nextReaction)
+    setLikeCount(nextLikes)
+    setDislikeCount(nextDislikes)
+
+    // 3. Send request in background
     try {
       const response = await fetch('/api/reaction', {
         method: 'POST',
@@ -56,11 +106,32 @@ export default function ReactionButtons({
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || 'Gagal menyimpan reaksi')
 
+      // Reconcile with official server count
       setLikeCount(data.likeCount)
       setDislikeCount(data.dislikeCount)
       setReaction(data.userReaction)
-    } finally {
-      setLoading(false)
+    } catch {
+      // Revert to snapshot on network failure
+      setReaction(prevReaction)
+      setLikeCount(prevLikeCount)
+      setDislikeCount(prevDislikeCount)
+      toast.error('Gagal menyimpan reaksi', 'Silakan periksa koneksi internet kamu')
+    }
+  }
+
+  // Track share count optimistically & persist in database
+  async function recordShare() {
+    setShareCount((prev) => prev + 1)
+    try {
+      const res = await fetch(`/api/articles/${articleId}/share`, { method: 'POST' })
+      if (res.ok) {
+        const data = await res.json()
+        if (typeof data.shareCount === 'number') {
+          setShareCount(data.shareCount)
+        }
+      }
+    } catch {
+      // Keep optimistic count
     }
   }
 
@@ -68,6 +139,7 @@ export default function ReactionButtons({
     if (typeof window === 'undefined') return
     navigator.clipboard.writeText(window.location.href)
     setCopied(true)
+    recordShare()
     toast.success('Tautan disalin ke clipboard')
     setTimeout(() => setCopied(false), 2000)
   }
@@ -76,6 +148,7 @@ export default function ReactionButtons({
     if (typeof window === 'undefined') return
     const text = encodeURIComponent(`Baca artikel menarik "${articleTitle}": ${window.location.href}`)
     window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank')
+    recordShare()
   }
 
   function handleShareTwitter() {
@@ -83,11 +156,12 @@ export default function ReactionButtons({
     const text = encodeURIComponent(`"${articleTitle}" oleh Muhammad Haikal`)
     const url = encodeURIComponent(window.location.href)
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank')
+    recordShare()
   }
 
   return (
     <div className="rounded-3xl border border-text-secondary/15 bg-thirdary/30 backdrop-blur-xl p-5 sm:p-6 shadow-sm space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
         {/* Reaction Section */}
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2.5">
@@ -97,9 +171,8 @@ export default function ReactionButtons({
             {/* Love / Like Button */}
             <button
               type="button"
-              disabled={loading}
               onClick={() => void react('LIKE')}
-              className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border transition-all duration-300 cursor-pointer select-none active:scale-95 ${
+              className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border transition-all duration-200 cursor-pointer select-none active:scale-95 ${
                 reaction === 'LIKE'
                   ? 'bg-rose-500/15 border-rose-500/40 text-rose-500 shadow-sm shadow-rose-500/10'
                   : 'bg-background/80 hover:bg-background border-text-secondary/20 hover:border-rose-500/40 text-text-secondary hover:text-rose-500'
@@ -115,7 +188,13 @@ export default function ReactionButtons({
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
               </svg>
               <span>Apresiasi</span>
-              <span className="font-mono text-xs px-2 py-0.5 rounded-full bg-text-secondary/10">
+              <span
+                className={`font-mono text-xs px-2 py-0.5 rounded-full transition-colors ${
+                  reaction === 'LIKE'
+                    ? 'bg-rose-500/20 text-rose-500 font-bold'
+                    : 'bg-text-secondary/10 text-text-secondary'
+                }`}
+              >
                 {likeCount}
               </span>
             </button>
@@ -123,16 +202,20 @@ export default function ReactionButtons({
             {/* Subtle Feedback / Dislike Button */}
             <button
               type="button"
-              disabled={loading}
               onClick={() => void react('DISLIKE')}
               className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium border transition-all duration-200 cursor-pointer select-none active:scale-95 ${
                 reaction === 'DISLIKE'
-                  ? 'bg-text-primary text-background border-text-primary'
+                  ? 'bg-text-primary text-background border-text-primary shadow-xs'
                   : 'bg-background/40 hover:bg-background/80 border-text-secondary/15 hover:border-text-secondary/30 text-text-secondary/70 hover:text-text-secondary'
               }`}
               title="Beri masukan jika ada yang kurang"
             >
-              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 stroke-current fill-none stroke-2">
+              <svg
+                viewBox="0 0 24 24"
+                className={`w-3.5 h-3.5 stroke-current fill-none stroke-2 transition-transform duration-300 ${
+                  isDislikeBouncing ? 'scale-125' : ''
+                }`}
+              >
                 <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
               </svg>
               <span>Masukan</span>
@@ -143,17 +226,29 @@ export default function ReactionButtons({
           </div>
         </div>
 
-        {/* Share Section */}
+        {/* Share Section with Live Share Count */}
         <div className="sm:text-right border-t sm:border-t-0 border-text-secondary/10 pt-3 sm:pt-0">
-          <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2.5">
-            Bagikan Tulisan:
-          </p>
+          <div className="flex items-center sm:justify-end gap-2 mb-2.5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
+              Bagikan Tulisan
+            </p>
+            <span
+              className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-500 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-mono transition-all"
+              title="Jumlah kali artikel ini dibagikan"
+            >
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              <span>{shareCount} kali dibagikan</span>
+            </span>
+          </div>
+
           <div className="inline-flex items-center gap-2">
             {/* Copy Link */}
             <button
               type="button"
               onClick={handleCopy}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 cursor-pointer ${
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 cursor-pointer active:scale-95 ${
                 copied
                   ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-500'
                   : 'bg-background/80 hover:bg-background border-text-secondary/20 hover:border-text-primary text-text-secondary hover:text-text-primary'
@@ -182,7 +277,7 @@ export default function ReactionButtons({
             <button
               type="button"
               onClick={handleShareWhatsApp}
-              className="p-2 rounded-full border border-text-secondary/20 bg-background/80 hover:bg-emerald-500/10 hover:border-emerald-500/40 text-text-secondary hover:text-emerald-500 transition-all cursor-pointer"
+              className="p-2 rounded-full border border-text-secondary/20 bg-background/80 hover:bg-emerald-500/10 hover:border-emerald-500/40 text-text-secondary hover:text-emerald-500 transition-all cursor-pointer active:scale-95"
               title="Bagikan ke WhatsApp"
             >
               <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current">
@@ -194,7 +289,7 @@ export default function ReactionButtons({
             <button
               type="button"
               onClick={handleShareTwitter}
-              className="p-2 rounded-full border border-text-secondary/20 bg-background/80 hover:bg-blue-500/10 hover:border-blue-500/40 text-text-secondary hover:text-blue-400 transition-all cursor-pointer"
+              className="p-2 rounded-full border border-text-secondary/20 bg-background/80 hover:bg-blue-500/10 hover:border-blue-500/40 text-text-secondary hover:text-blue-400 transition-all cursor-pointer active:scale-95"
               title="Bagikan ke X"
             >
               <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current">

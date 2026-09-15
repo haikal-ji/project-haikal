@@ -29,12 +29,13 @@ model User {
 }
 
 model Article {
-  id         String   @id @default(uuid())
-  title      String
-  content    String
-  thumbnail  String?
-  view_count Int      @default(0)
-  created_at DateTime @default(now())
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  thumbnail   String?
+  view_count  Int      @default(0)
+  share_count Int      @default(0)
+  created_at  DateTime @default(now())
 
   author_id String
   author    User   @relation(fields: [author_id], references: [id])

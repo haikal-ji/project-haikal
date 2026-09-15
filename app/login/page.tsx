@@ -4,7 +4,7 @@ import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import LoginMessage from '@/components/LoginMessage'
+import AuthMessage from '@/components/AuthMessage'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -12,6 +12,7 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState<'github' | 'google' | null>(null)
@@ -90,7 +91,7 @@ export default function LoginPage() {
           <p className="text-sm text-text-secondary mt-1">Masuk ke akun kamu untuk berinteraksi</p>
         </div>
 
-        <LoginMessage />
+        <AuthMessage override={error ? { message: error, type: 'error' } : null} />
 
         <div className="space-y-3">
           {/* Tombol Google */}
@@ -100,7 +101,7 @@ export default function LoginPage() {
             onClick={handleGoogleLogin}
             className="flex w-full items-center justify-center gap-3 rounded-xl border border-text-secondary/20 bg-background hover:bg-thirdary px-4 py-3 text-sm font-semibold text-text-primary transition disabled:opacity-50 shadow-sm"
           >
-            <svg className="h-4 w-4" viewBox="0 0 24 24">
+            <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 fill="#4285F4"
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -128,7 +129,7 @@ export default function LoginPage() {
             onClick={handleGithubLogin}
             className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#24292f] hover:bg-[#1b1f23] text-white border border-black/20 dark:border-white/10 px-4 py-3 text-sm font-semibold transition disabled:opacity-50 shadow-sm cursor-pointer"
           >
-            <svg className="h-4 w-4 fill-white shrink-0" viewBox="0 0 24 24">
+            <svg className="h-4 w-4 fill-white shrink-0" viewBox="0 0 24 24" aria-hidden="true">
               <path
                 fillRule="evenodd"
                 clipRule="evenodd"
@@ -147,9 +148,11 @@ export default function LoginPage() {
 
         <form onSubmit={handleManualLogin} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">Email</label>
+            <label htmlFor="login-email" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">Email</label>
             <input
+              id="login-email"
               type="email"
+              autoComplete="email"
               placeholder="nama@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -159,26 +162,42 @@ export default function LoginPage() {
           </div>
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-xs font-semibold uppercase tracking-wider text-text-secondary">Password</label>
+              <label htmlFor="login-password" className="block text-xs font-semibold uppercase tracking-wider text-text-secondary">Password</label>
               <Link href="/forgot-password" className="text-xs text-text-secondary hover:text-text-primary transition underline underline-offset-4">
                 Lupa password?
               </Link>
             </div>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
-            />
+            <div className="relative">
+              <input
+                id="login-password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete="current-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-thirdary/60 transition cursor-pointer"
+                aria-label={showPassword ? 'Sembunyikan password' : 'Lihat password'}
+                title={showPassword ? 'Sembunyikan password' : 'Lihat password'}
+              >
+                {showPassword ? (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
-
-          {error && (
-            <p className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 text-xs font-medium text-red-500">
-              {error}
-            </p>
-          )}
 
           <button
             type="submit"
