@@ -5,18 +5,44 @@ import PublicProfileView, { type PublicProfileUser } from '@/components/PublicPr
 
 export const dynamic = 'force-dynamic'
 
+type MetadataUser = {
+  name: string
+  bio: string | null
+  is_banned: boolean
+} | null
+
+type PublicProfileDbUser = {
+  id: string
+  name: string
+  avatar: string | null
+  bio: string | null
+  created_at: Date
+  email: string
+  is_banned: boolean
+  badges: Array<{
+    id: string
+    badge_id: string
+    badge: {
+      id: string
+      name: string
+      emoji: string | null
+      color: string | null
+    }
+  }>
+} | null
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ id: string }>
 }): Promise<Metadata> {
   const { id } = await params
-  const user = await prisma.user.findUnique({
+  const user = (await (prisma.user as any).findUnique({
     where: { id },
-    select: { name: true, bio: true },
-  })
+    select: { name: true, bio: true, is_banned: true },
+  })) as MetadataUser
 
-  if (!user) {
+  if (!user || user.is_banned) {
     return {
       title: 'Pengguna Tidak Ditemukan',
     }
@@ -35,7 +61,7 @@ export default async function PublicProfilePage({
 }) {
   const { id } = await params
 
-  const dbUser = await prisma.user.findUnique({
+  const dbUser = (await (prisma.user as any).findUnique({
     where: { id },
     select: {
       id: true,
@@ -53,27 +79,8 @@ export default async function PublicProfilePage({
           awarded_at: 'desc',
         },
       },
-      comments: {
-        include: {
-          article: {
-            select: { id: true, title: true },
-          },
-        },
-        orderBy: { created_at: 'desc' },
-        take: 20,
-      },
-      reactions: {
-        where: { type: { in: ['KEREN', 'NGAKAK', 'BERGUNA', 'MANTAP', 'KAGET', 'LIKE'] } },
-        include: {
-          article: {
-            select: { id: true, title: true, created_at: true },
-          },
-        },
-        orderBy: { created_at: 'desc' },
-        take: 20,
-      },
     },
-  })
+  })) as PublicProfileDbUser
 
   if (!dbUser || dbUser.is_banned) {
     notFound()
@@ -98,30 +105,6 @@ export default async function PublicProfilePage({
     year: 'numeric',
   }).format(new Date(dbUser.created_at))
 
-  const formattedComments = dbUser.comments.map((c) => ({
-    id: c.id,
-    content: c.content,
-    createdAt: new Intl.DateTimeFormat('id-ID', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    }).format(new Date(c.created_at)),
-    article: {
-      id: c.article.id,
-      title: c.article.title,
-    },
-  }))
-
-  const formattedLikes = dbUser.reactions.map((r) => ({
-    id: r.article.id,
-    title: r.article.title,
-    createdAt: new Intl.DateTimeFormat('id-ID', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    }).format(new Date(r.article.created_at)),
-  }))
-
   const publicData: PublicProfileUser = {
     id: dbUser.id,
     name: dbUser.name,
@@ -139,8 +122,6 @@ export default async function PublicProfilePage({
       commentsCount: totalComments,
       likesCount: totalLikes,
     },
-    recentComments: formattedComments,
-    likedArticles: formattedLikes,
   }
 
   return <PublicProfileView user={publicData} />

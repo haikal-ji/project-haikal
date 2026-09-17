@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import CommunityBadge from '@/components/CommunityBadge'
-import ArrowUpRight from '@/components/ui/ArrowUpRight'
 
 export type PublicProfileUser = {
   id: string
@@ -22,30 +21,42 @@ export type PublicProfileUser = {
     commentsCount: number
     likesCount: number
   }
-  recentComments: Array<{
-    id: string
-    content: string
-    createdAt: string
-    article: {
-      id: string
-      title: string
-    }
-  }>
-  likedArticles: Array<{
-    id: string
-    title: string
-    createdAt: string
-  }>
 }
 
-type TabType = 'comments' | 'likes'
-
 export default function PublicProfileView({ user }: { user: PublicProfileUser }) {
-  const [activeTab, setActiveTab] = useState<TabType>('comments')
+  const [copied, setCopied] = useState(false)
   const initialLetter = (user.name.trim() || 'U').charAt(0).toUpperCase()
 
+  async function handleShare() {
+    if (typeof window === 'undefined') return
+
+    const shareData = {
+      title: user.name,
+      text: `Lihat profil ${user.name} di Haikal Journal`,
+      url: window.location.href,
+    }
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share(shareData)
+      } catch {
+        // User membatalkan native share sheet atau ditolak browser
+      }
+    } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(window.location.href)
+        setCopied(true)
+        setTimeout(() => {
+          setCopied(false)
+        }, 2000)
+      } catch {
+        // Clipboard write gagal (misal diblokir izin browser)
+      }
+    }
+  }
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+    <div className="max-w-3xl mx-auto px-4 py-8 sm:py-14">
       {/* Tombol Kembali */}
       <div className="mb-6">
         <Link
@@ -70,6 +81,36 @@ export default function PublicProfileView({ user }: { user: PublicProfileUser })
         {/* Subtle background glow effect */}
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-foreground/5 rounded-full blur-3xl pointer-events-none" />
 
+        {/* Tombol Bagikan Profil (Pojok Kanan Atas Card agar tidak menumpuk di mobile) */}
+        <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
+          <button
+            type="button"
+            onClick={handleShare}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 cursor-pointer select-none active:scale-95 shadow-xs backdrop-blur-sm ${
+              copied
+                ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default'
+                : 'border-line bg-background/90 hover:bg-foreground hover:text-background text-text-secondary hover:border-foreground'
+            }`}
+            title={copied ? 'Tautan profil tersalin!' : 'Bagikan profil pengguna ini'}
+          >
+            {copied ? (
+              <>
+                <svg className="w-3.5 h-3.5 animate-in fade-in text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Tersalin!</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-3.5 h-3.5 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                <span>Bagikan<span className="hidden sm:inline"> Profil</span></span>
+              </>
+            )}
+          </button>
+        </div>
+
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8 relative z-10">
           {/* Avatar frame */}
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-line shadow-md shrink-0 bg-secondary flex items-center justify-center">
@@ -90,8 +131,7 @@ export default function PublicProfileView({ user }: { user: PublicProfileUser })
           {/* User details */}
           <div className="flex-1 text-center sm:text-left min-w-0">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase border border-line bg-background text-text-secondary">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide uppercase border border-line bg-background text-text-secondary">
                 {user.isOwner ? 'Official Author' : 'Community Reader'}
               </span>
 
@@ -132,130 +172,6 @@ export default function PublicProfileView({ user }: { user: PublicProfileUser })
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Activity Section */}
-      <div className="mt-8">
-        {/* Tab Controls */}
-        <div className="flex border-b border-line gap-2 mb-6">
-          <button
-            type="button"
-            onClick={() => setActiveTab('comments')}
-            className={`pb-3 px-3 text-sm font-semibold transition-all relative cursor-pointer ${
-              activeTab === 'comments'
-                ? 'text-foreground'
-                : 'text-text-secondary hover:text-foreground'
-            }`}
-          >
-            <span>Komentar Publik</span>
-            <span className="ml-2 px-1.5 py-0.5 text-[10px] rounded-full bg-secondary border border-line text-text-secondary">
-              {user.recentComments.length}
-            </span>
-            {activeTab === 'comments' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
-            )}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab('likes')}
-            className={`pb-3 px-3 text-sm font-semibold transition-all relative cursor-pointer ${
-              activeTab === 'likes'
-                ? 'text-foreground'
-                : 'text-text-secondary hover:text-foreground'
-            }`}
-          >
-            <span>Artikel Disukai</span>
-            <span className="ml-2 px-1.5 py-0.5 text-[10px] rounded-full bg-secondary border border-line text-text-secondary">
-              {user.likedArticles.length}
-            </span>
-            {activeTab === 'likes' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-foreground" />
-            )}
-          </button>
-        </div>
-
-        {/* Tab Content: Komentar */}
-        {activeTab === 'comments' && (
-          <div>
-            {user.recentComments.length === 0 ? (
-              <div className="text-center py-12 px-4 rounded-2xl border border-line bg-secondary/20">
-                <div className="font-serif text-3xl text-text-secondary/50 mb-2">”</div>
-                <p className="text-sm text-text-secondary">
-                  Pengguna ini belum membagikan komentar publik.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {user.recentComments.map((c) => (
-                  <article
-                    key={c.id}
-                    className="p-4 sm:p-5 rounded-2xl border border-line bg-secondary/20 hover:bg-secondary/40 transition-colors"
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-2 text-xs text-text-secondary">
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="font-semibold uppercase tracking-wider text-[10px] text-text-secondary/70">
-                          Pada artikel:
-                        </span>
-                        <Link
-                          href={`/artikel/${c.article.id}`}
-                          className="font-medium text-foreground hover:underline truncate inline-flex items-center gap-1"
-                        >
-                          <span>{c.article.title}</span>
-                          <ArrowUpRight className="w-3 h-3 shrink-0" />
-                        </Link>
-                      </div>
-                      <time className="shrink-0">{c.createdAt}</time>
-                    </div>
-                    <blockquote className="text-sm text-text-primary leading-relaxed">
-                      &ldquo;{c.content}&rdquo;
-                    </blockquote>
-                  </article>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Tab Content: Suka */}
-        {activeTab === 'likes' && (
-          <div>
-            {user.likedArticles.length === 0 ? (
-              <div className="text-center py-12 px-4 rounded-2xl border border-line bg-secondary/20">
-                <div className="font-serif text-3xl text-text-secondary/50 mb-2">♥</div>
-                <p className="text-sm text-text-secondary">
-                  Pengguna ini belum memberikan apresiasi pada artikel apa pun.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                {user.likedArticles.map((article) => (
-                  <Link
-                    key={article.id}
-                    href={`/artikel/${article.id}`}
-                    className="p-4 rounded-2xl border border-line bg-secondary/20 hover:bg-secondary/40 transition-all group flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between text-xs text-text-secondary mb-2">
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                          Disukai
-                        </span>
-                        <time>{article.createdAt}</time>
-                      </div>
-                      <h3 className="font-serif font-bold text-text-primary group-hover:text-foreground text-sm line-clamp-2">
-                        {article.title}
-                      </h3>
-                    </div>
-                    <div className="mt-3 text-xs font-semibold text-text-secondary group-hover:text-foreground flex items-center gap-1">
-                      <span>Baca artikel</span>
-                      <ArrowUpRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   )
