@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import BanUserButton from '@/components/BanUserButton'
+import DeleteUserButton from '@/components/DeleteUserButton'
 import AppealActionButtons from '@/components/AppealActionButtons'
 import UserBadgeManager, { type BadgeItem, type UserBadgeItem } from '@/components/UserBadgeManager'
 
@@ -230,11 +231,24 @@ export default async function KomunitasPage() {
                       />
                     </td>
                     <td className="px-5 py-4 text-right whitespace-nowrap">
-                      <BanUserButton
-                        userId={user.id}
-                        userName={user.name}
-                        isBanned={user.is_banned}
-                      />
+                      {user.email === process.env.OWNER_EMAIL ? (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                          Owner
+                        </span>
+                      ) : (
+                        <div className="inline-flex items-center justify-end gap-2">
+                          <BanUserButton
+                            userId={user.id}
+                            userName={user.name}
+                            isBanned={user.is_banned}
+                          />
+                          <DeleteUserButton
+                            userId={user.id}
+                            userName={user.name}
+                            userEmail={user.email}
+                          />
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}

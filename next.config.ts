@@ -3,6 +3,7 @@ import type { NextConfig } from "next";
 // CSP configuration
 // CATATAN: 'unsafe-inline' diizinkan untuk style-src karena GSAP (manipulasi inline style untuk animasi),
 // Tiptap rich-text editor, Tailwind CSS v4, dan dynamic styling React memerlukan inline styles.
+// Restart trigger for updated Prisma schema
 const isDev = process.env.NODE_ENV === 'development';
 
 const cspDirectives = [

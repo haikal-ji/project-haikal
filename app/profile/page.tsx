@@ -34,14 +34,22 @@ export default async function ProfilePage() {
         take: 20,
       },
       reactions: {
-        where: { type: 'LIKE' },
+        where: { type: { in: ['KEREN', 'NGAKAK', 'BERGUNA', 'MANTAP', 'KAGET', 'LIKE'] } },
         include: {
           article: {
             select: { id: true, title: true, created_at: true },
           },
         },
         orderBy: { created_at: 'desc' },
-        take: 20,
+        take: 10,
+      },
+      badges: {
+        include: {
+          badge: true,
+        },
+        orderBy: {
+          awarded_at: 'desc',
+        },
       },
     },
   })
@@ -69,13 +77,23 @@ export default async function ProfilePage() {
             },
           },
         },
+        badges: {
+          include: {
+            badge: true,
+          },
+        },
       },
     })
   }
 
   const [totalComments, totalLikes] = await Promise.all([
     prisma.comment.count({ where: { user_id: dbUser.id } }),
-    prisma.reaction.count({ where: { user_id: dbUser.id, type: 'LIKE' } }),
+    prisma.reaction.count({
+      where: {
+        user_id: dbUser.id,
+        type: { in: ['KEREN', 'NGAKAK', 'BERGUNA', 'MANTAP', 'KAGET', 'LIKE'] },
+      },
+    }),
   ])
 
   const isOwner = Boolean(process.env.OWNER_EMAIL && user.email === process.env.OWNER_EMAIL)
@@ -131,8 +149,19 @@ export default async function ProfilePage() {
             name: dbUser.name,
             email: dbUser.email,
             avatar: dbUser.avatar,
+            bio: dbUser.bio,
             createdAt: formattedJoinDate,
             isOwner,
+            badges: dbUser.badges.map((b) => ({
+              id: b.id,
+              badge_id: b.badge_id,
+              badge: {
+                id: b.badge.id,
+                name: b.badge.name,
+                emoji: b.badge.emoji,
+                color: b.badge.color,
+              },
+            })),
           }}
           stats={{
             commentsCount: totalComments,

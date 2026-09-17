@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
   }
 
-  if (checkRateLimit(request, 'POST:/api/reaction', { limit: 15, windowMs: 60_000 })) {
+  if (checkRateLimit(request, 'POST:/api/reaction', { limit: 20, windowMs: 60_000 })) {
     return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 })
   }
 
@@ -20,6 +20,16 @@ export async function POST(request: Request) {
 
   if (!user) {
     return NextResponse.json({ error: 'Kamu harus login dulu untuk memberikan reaksi' }, { status: 401 })
+  }
+
+  // Cek apakah user ter-banned
+  if (user.is_banned) {
+    return NextResponse.json(
+      {
+        error: 'Akun kamu telah dinonaktifkan oleh admin karena melanggar aturan komunitas. Kunjungi halaman Profil untuk mengajukan permohonan pemulihan akun.',
+      },
+      { status: 403 }
+    )
   }
 
   const body = await request.json().catch(() => null)
@@ -41,18 +51,26 @@ export async function POST(request: Request) {
   })
 
   if (existing && existing.type === type) {
+    // Toggle: klik reaksi yang sama menghapus reaksi (unlike / undislike)
     await prisma.reaction.delete({ where: { id: existing.id } })
   } else if (existing) {
-    await prisma.reaction.update({ where: { id: existing.id }, data: { type: type as 'LIKE' | 'DISLIKE' } })
+    // Sudah pernah react di artikel yang sama: update type-nya (bukan insert baru)
+    await prisma.reaction.update({ where: { id: existing.id }, data: { type } })
   } else {
+    // Belum pernah react: simpan reaction baru
     await prisma.reaction.create({
-      data: { user_id: user.id, article_id: articleId, type: type as 'LIKE' | 'DISLIKE' },
+      data: { user_id: user.id, article_id: articleId, type },
     })
   }
 
+  // Ambil total like, dislike, dan status reaksi user terkini
   const [likeCount, dislikeCount, current] = await Promise.all([
-    prisma.reaction.count({ where: { article_id: articleId, type: 'LIKE' } }),
-    prisma.reaction.count({ where: { article_id: articleId, type: 'DISLIKE' } }),
+    prisma.reaction.count({
+      where: { article_id: articleId, type: 'LIKE' },
+    }),
+    prisma.reaction.count({
+      where: { article_id: articleId, type: 'DISLIKE' },
+    }),
     prisma.reaction.findUnique({
       where: { user_id_article_id: { user_id: user.id, article_id: articleId } },
       select: { type: true },
@@ -65,4 +83,3 @@ export async function POST(request: Request) {
     userReaction: current?.type ?? null,
   })
 }
-

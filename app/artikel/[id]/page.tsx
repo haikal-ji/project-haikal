@@ -61,14 +61,16 @@ export default async function ArtikelDetailPage({
           id: true,
           name: true,
           avatar: true,
-          email: true,
         },
       },
       comments: {
         orderBy: { created_at: 'desc' },
         include: {
           user: {
-            include: {
+            select: {
+              id: true,
+              name: true,
+              avatar: true,
               badges: {
                 include: { badge: true },
                 orderBy: { awarded_at: 'asc' },
@@ -85,8 +87,17 @@ export default async function ArtikelDetailPage({
 
   const shareCount = article.share_count ?? 0
 
-  const likeCount = article.reactions.filter((r) => r.type === 'LIKE').length
-  const dislikeCount = article.reactions.filter((r) => r.type === 'DISLIKE').length
+  let likeCount = 0
+  let dislikeCount = 0
+
+  for (const r of article.reactions) {
+    if (r.type === 'DISLIKE' || r.type === 'BOSEN') {
+      dislikeCount++
+    } else {
+      likeCount++
+    }
+  }
+
   const isOwner = Boolean(authUser?.email && authUser.email === process.env.OWNER_EMAIL)
 
   const currentUser = authUser?.email
@@ -96,9 +107,16 @@ export default async function ArtikelDetailPage({
       })
     : null
 
-  const currentReaction = currentUser
+  const rawReaction = currentUser
     ? article.reactions.find((reaction) => reaction.user_id === currentUser.id)?.type ?? null
     : null
+
+  const currentReaction: 'LIKE' | 'DISLIKE' | null =
+    rawReaction === 'DISLIKE' || rawReaction === 'BOSEN'
+      ? 'DISLIKE'
+      : rawReaction
+      ? 'LIKE'
+      : null
 
   const readingTime = estimateReadingTime(article.content)
   const formattedDate = new Date(article.created_at).toLocaleDateString('id-ID', {

@@ -25,7 +25,10 @@ export async function DELETE(
 
   const comment = await prisma.comment.findUnique({
     where: { id },
-    include: { user: true, article: { select: { id: true } } },
+    include: {
+      user: { select: { email: true } },
+      article: { select: { id: true } },
+    },
   })
 
   if (!comment) {
@@ -68,7 +71,10 @@ export async function PATCH(
 
   const comment = await prisma.comment.findUnique({
     where: { id },
-    include: { user: true, article: { select: { id: true } } },
+    include: {
+      user: { select: { email: true, is_banned: true } },
+      article: { select: { id: true } },
+    },
   })
 
   if (!comment) {
@@ -79,6 +85,16 @@ export async function PATCH(
   if (comment.user.email !== authUser.email) {
     return NextResponse.json(
       { error: 'Hanya penulis asli yang dapat mengedit komentar ini' },
+      { status: 403 }
+    )
+  }
+
+  // Cek apakah user ter-banned
+  if (comment.user.is_banned) {
+    return NextResponse.json(
+      {
+        error: 'Akun kamu telah dinonaktifkan oleh admin karena melanggar aturan komunitas. Kunjungi halaman Profil untuk mengajukan permohonan pemulihan akun.',
+      },
       { status: 403 }
     )
   }

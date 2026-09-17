@@ -1,35 +1,17 @@
 /**
- * Bad Word Filter dengan Anti-Bypass (Normalisasi Teks)
+ * Bad Word Filter dengan Word-Boundary & Anti-Bypass
  * Mendukung kata kasar Bahasa Indonesia dan Inggris
  */
 
-// Kata-kata terlarang (versi "bersih" setelah normalisasi)
-const BAD_WORDS = [
-  // Bahasa Indonesia - umpatan umum
-  'anjing', 'anj1r', 'bangsat', 'brengsek', 'bajingan', 'kampret',
-  'keparat', 'sialan', 'tai', 'tahi', 'taik', 'kontol', 'memek', 'jancok',
-  'jancuk', 'jangkrik', 'babi', 'celeng', 'idiot', 'goblok', 'tolol',
-  'bodoh', 'bego', 'dungu', 'edan', 'gila', 'setan', 'iblis',
-  'kafir', 'bangke', 'bangkai',
-  // Kata-kata SARA / kebencian
-  'monyet', 'kera', 'biadab',
-  // Bahasa Inggris
-  'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'damn', 'cunt',
-  'dick', 'pussy', 'cock', 'whore', 'slut', 'nigga', 'nigger',
-  'faggot', 'retard', 'idiot',
-  // Promosi judi / spam
-  'slot', 'togel', 'poker', 'bandar', 'judi',
-]
+// Helper escape regex
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
 
-/**
- * Normalisasi teks untuk mendeteksi bypass (e.g. k0nt0l, a.n.j.i.n.g, k*ntol)
- */
-function normalize(text: string): string {
+// Ganti karakter leetspeak ke huruf normal
+function replaceLeet(text: string): string {
   return text
     .toLowerCase()
-    // Hapus spasi, titik, tanda baca di antara huruf (anti: a.n.j.i.n.g)
-    .replace(/[\s.\-_*|/\\,;:!?]+/g, '')
-    // Ganti angka/simbol yang sering dipakai sebagai huruf (l33tspeak)
     .replace(/0/g, 'o')
     .replace(/1/g, 'i')
     .replace(/3/g, 'e')
@@ -42,22 +24,88 @@ function normalize(text: string): string {
     .replace(/@/g, 'a')
     .replace(/\$/g, 's')
     .replace(/\+/g, 't')
-    // Hapus karakter non-alfanumerik yang tersisa
-    .replace(/[^a-z]/g, '')
+}
+
+// 1. Kata kasar eksplisit / berat:
+// Dicek baik dengan word boundary MAUPUN pada versi tanpa-spasi (compact)
+// untuk mencegah bypass seperti "k0nt0l", "a.n.j.i.n.g", "k 0 n t 0 l"
+// Kata-kata ini tidak punya risiko jadi substring kata sah dalam bahasa Indonesia/Inggris
+const SEVERE_WORDS = [
+  // Seksual & organ genital vulgar
+  'kontol', 'memek', 'pantek', 'itil', 'pepek', 'peler', 'jembut',
+  'ngentot', 'entot', 'tempik',
+  // Umpatan kasar / hewan peyoratif
+  'anjing', 'anjir', 'anj1r', 'bangsat', 'bajingan', 'brengsek',
+  'keparat', 'kampret', 'biadab',
+  // Kotoran
+  'tai', 'taik', 'tahi',
+  // Bahasa daerah kasar
+  'jancok', 'jancuk', 'dancok',
+  // Bahasa Inggris eksplisit
+  'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'cunt',
+  'dick', 'pussy', 'whore', 'slut', 'nigger', 'nigga', 'faggot',
+]
+
+// 2. Kata celaan standar / ambigu / frasa judi:
+// HANYA dicocokkan dengan word boundary (\bkata\b) pada teks bertanda spasi.
+// TIDAK PERNAH dicocokkan tanpa-spasi agar tidak menimbulkan false-positive.
+// Catatan:
+// - Kata umum seperti "gila" dikeluarkan dari daftar karena sering dipakai sebagai seruan positif ("gila keren banget").
+// - Kata "bandar" dan "slot" hanya dicek dalam frasa judi agar tidak memblokir "bandar udara" atau "slot waktu".
+const STANDARD_WORDS = [
+  // Hinaan / celaan personal
+  'babi', 'celeng', 'idiot', 'goblok', 'tolol', 'bodoh', 'bego', 'dungu', 'edan',
+  'monyet', 'bangke', 'retard', 'damn', 'cock', 'kafir', 'setan', 'iblis',
+  // Judi spesifik
+  'togel', 'poker', 'judi',
+  // Frasa promosi judi (mencegah false-positive pada "slot waktu" atau "bandar udara")
+  'slot gacor', 'judi slot', 'situs slot', 'slot online', 'link slot', 'agen slot', 'daftar slot', 'bocoran slot', 'pola slot', 'rtp slot',
+  'bandar judi', 'bandar togel', 'bandar slot', 'bandar bola', 'bandar casino', 'bandar darat', 'bandar online',
+]
+
+/**
+ * Normalisasi teks dengan mempertahankan spasi (mengganti simbol/pemisah menjadi spasi)
+ */
+function normalizeWithSpaces(text: string): string {
+  const leet = replaceLeet(text)
+  return leet.replace(/[^a-z0-9]+/g, ' ').trim()
+}
+
+/**
+ * Normalisasi teks tanpa spasi dan tanpa simbol sama sekali (compact)
+ */
+function normalizeCompact(text: string): string {
+  const leet = replaceLeet(text)
+  return leet.replace(/[^a-z0-9]/g, '')
 }
 
 /**
  * Cek apakah teks mengandung kata terlarang
- * Dicek dalam dua cara: teks asli (normalized) dan tanpa spasi (normalized no-space)
  */
 export function containsBadWord(text: string): boolean {
-  const normalized = normalize(text)
+  if (!text || !text.trim()) return false
 
-  for (const word of BAD_WORDS) {
-    const normalizedWord = normalize(word)
-    if (normalized.includes(normalizedWord)) {
+  const spacedText = normalizeWithSpaces(text)
+
+  // 1. Cek word-boundary matching pada teks dengan spasi
+  const allBoundaryWords = [...SEVERE_WORDS, ...STANDARD_WORDS]
+  for (const word of allBoundaryWords) {
+    const pattern = new RegExp(`\\b${escapeRegex(word)}\\b`, 'i')
+    if (pattern.test(spacedText)) {
       return true
     }
   }
+
+  // 2. Cek anti-bypass (teks tanpa spasi) HANYA untuk SEVERE_WORDS
+  // Menangkap varian seperti "a.n.j.i.n.g", "a n j i n g", "k-o-n-t-o-l"
+  // Tanpa memicu false-positive pada kata ambigu seperti "bandar udara" atau "slot waktu"
+  const compactText = normalizeCompact(text)
+  for (const word of SEVERE_WORDS) {
+    const compactWord = normalizeCompact(word)
+    if (compactText.includes(compactWord)) {
+      return true
+    }
+  }
+
   return false
 }

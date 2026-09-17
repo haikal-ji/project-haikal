@@ -28,18 +28,43 @@ export async function PUT(request: Request) {
     )
   }
 
-  const { name, avatar } = result.data
+  const { name, avatar, bio } = result.data
 
-  const updated = await prisma.user.update({
-    where: { email: user.email },
-    data: { name, avatar: avatar || null },
-  })
+  const updateData: { name: string; avatar?: string | null; bio?: string | null } = {
+    name,
+  }
+  if (avatar !== undefined) {
+    updateData.avatar = avatar || null
+  }
+  if (bio !== undefined) {
+    updateData.bio = bio && bio.trim() ? bio.trim() : null
+  }
 
-  // Invalidate cache di semua halaman artikel & layout agar foto baru langsung muncul
-  revalidatePath('/', 'layout')
-  revalidatePath('/artikel', 'layout')
-  revalidatePath('/profile')
+  try {
+    const updated = await prisma.user.upsert({
+      where: { email: user.email },
+      update: updateData,
+      create: {
+        email: user.email,
+        name,
+        avatar: updateData.avatar ?? null,
+        bio: updateData.bio ?? null,
+      },
+    })
 
-  return NextResponse.json({ user: updated })
+    // Invalidate cache di semua halaman artikel & layout agar foto/bio baru langsung muncul
+    revalidatePath('/', 'layout')
+    revalidatePath('/artikel', 'layout')
+    revalidatePath('/profile')
+    revalidatePath(`/pengguna/${updated.id}`)
+
+    return NextResponse.json({ user: updated })
+  } catch (err) {
+    console.error('Error updating profile:', err)
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Gagal memperbarui profil' },
+      { status: 500 }
+    )
+  }
 }
 

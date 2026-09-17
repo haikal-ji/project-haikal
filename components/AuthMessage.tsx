@@ -1,12 +1,17 @@
 'use client'
 
 import { useState, useSyncExternalStore } from 'react'
+import Link from 'next/link'
 
 export type AuthMessageType = 'success' | 'error' | 'warning'
 
 export interface AuthMessagePayload {
   message: string
   type: AuthMessageType
+  action?: {
+    label: string
+    href: string
+  }
 }
 
 export interface AuthMessageProps {
@@ -82,6 +87,7 @@ export default function AuthMessage({ override }: AuthMessageProps) {
       container: 'bg-emerald-500/10 border-emerald-500/25 text-emerald-800 dark:text-emerald-300',
       iconBadge: 'bg-emerald-500/20 border-emerald-500/30 text-emerald-600 dark:text-emerald-400',
       closeBtn: 'text-emerald-700/60 hover:text-emerald-900 dark:text-emerald-300/60 dark:hover:text-emerald-100 hover:bg-emerald-500/10',
+      actionLink: 'text-emerald-700 hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-200',
       icon: (
         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M20 6L9 17l-5-5" />
@@ -92,6 +98,7 @@ export default function AuthMessage({ override }: AuthMessageProps) {
       container: 'bg-red-500/10 border-red-500/25 text-red-800 dark:text-red-300',
       iconBadge: 'bg-red-500/20 border-red-500/30 text-red-600 dark:text-red-400',
       closeBtn: 'text-red-700/60 hover:text-red-900 dark:text-red-300/60 dark:hover:text-red-100 hover:bg-red-500/10',
+      actionLink: 'text-red-700 hover:text-red-900 dark:text-red-400 dark:hover:text-red-200',
       icon: (
         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M18 6L6 18M6 6l12 12" />
@@ -102,6 +109,7 @@ export default function AuthMessage({ override }: AuthMessageProps) {
       container: 'bg-amber-500/10 border-amber-500/25 text-amber-800 dark:text-amber-300',
       iconBadge: 'bg-amber-500/20 border-amber-500/30 text-amber-700 dark:text-amber-400',
       closeBtn: 'text-amber-700/60 hover:text-amber-900 dark:text-amber-300/60 dark:hover:text-amber-100 hover:bg-amber-500/10',
+      actionLink: 'text-amber-700 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-200',
       icon: (
         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
@@ -120,9 +128,19 @@ export default function AuthMessage({ override }: AuthMessageProps) {
       >
         {theme.icon}
       </div>
-      <p className="flex-1 font-medium break-words pt-0.5">
-        {active.message}
-      </p>
+      <div className="flex-1 min-w-0 pt-0.5">
+        <p className="font-medium break-words">
+          {active.message}
+        </p>
+        {active.action && (
+          <Link
+            href={active.action.href}
+            className={`inline-block mt-1 text-xs font-semibold underline underline-offset-4 transition hover:opacity-80 ${theme.actionLink}`}
+          >
+            {active.action.label}
+          </Link>
+        )}
+      </div>
       <button
         type="button"
         onClick={() => setDismissedKey(currentKey)}

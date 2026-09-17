@@ -51,6 +51,11 @@ export const updateProfileSchema = z.object({
     .min(1, 'Nama tidak boleh kosong')
     .max(100, 'Nama maksimal 100 karakter'),
   avatar: optionalUrl,
+  bio: z
+    .string()
+    .max(200, 'Bio maksimal 160 karakter')
+    .nullish()
+    .transform((val) => (val && val.trim() ? val.trim().slice(0, 160) : null)),
 })
 
 // 4. Articles

@@ -48,7 +48,7 @@ export default function CollectionPage() {
           <DecryptedText
             text="Selected Works"
             animateOn="inViewHover"
-            speed={50}
+            speed={120}
             maxIterations={12}
             sequential
             revealDirection="start"

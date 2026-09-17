@@ -68,7 +68,19 @@ export async function POST(request: Request) {
       user_id: dbUser.id,
       content: content.trim(),
     },
-    include: { user: true },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          avatar: true,
+          badges: {
+            include: { badge: true },
+            orderBy: { awarded_at: 'asc' },
+          },
+        },
+      },
+    },
   })
 
   revalidatePath(`/artikel/${article_id}`)

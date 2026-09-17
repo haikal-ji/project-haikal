@@ -2,6 +2,7 @@
 
 import { useState, type KeyboardEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import Avatar from '@/components/Avatar'
 import CommunityBadge from '@/components/CommunityBadge'
 
@@ -24,7 +25,6 @@ export interface CommentData {
     id: string
     name: string
     avatar: string | null
-    email?: string
     badges?: CommentUserBadge[]
   }
 }
@@ -116,16 +116,26 @@ export default function CommentItem({
     <article className="rounded-2xl sm:rounded-3xl border border-text-secondary/15 bg-thirdary/20 hover:bg-thirdary/35 backdrop-blur-md p-4 sm:p-6 transition-all duration-300 group shadow-xs">
       <div className="flex gap-3 sm:gap-4 items-start">
         <div className="shrink-0 pt-0.5">
-          <Avatar src={comment.user.avatar} name={comment.user.name} />
+          <Link
+            href={`/pengguna/${comment.user.id}`}
+            className="block hover:opacity-85 transition-opacity"
+            title={`Lihat profil ${comment.user.name}`}
+          >
+            <Avatar src={comment.user.avatar} name={comment.user.name} />
+          </Link>
         </div>
 
         <div className="min-w-0 flex-1">
           {/* Header Bar */}
           <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-sm font-bold text-text-primary tracking-tight">
+              <Link
+                href={`/pengguna/${comment.user.id}`}
+                className="text-sm font-bold text-text-primary tracking-tight hover:underline decoration-text-secondary/50 underline-offset-2 transition-all"
+                title={`Lihat profil ${comment.user.name}`}
+              >
                 {comment.user.name}
-              </span>
+              </Link>
 
               {/* Author badge if commenter is the author */}
               {isArticleAuthor && (

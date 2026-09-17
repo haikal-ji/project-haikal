@@ -1,54 +1,42 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import AuthMessage from '@/components/AuthMessage'
+import { resetPasswordAction } from './actions'
+
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="w-full rounded-xl bg-button-hero hover:bg-button-hero-hover text-background dark:text-foreground py-3.5 text-sm font-semibold tracking-wide transition disabled:opacity-50 shadow-md cursor-pointer"
+    >
+      {pending ? 'Menyimpan...' : 'Simpan Password Baru'}
+    </button>
+  )
+}
 
 export default function ResetPasswordPage() {
-  const supabase = createClient()
   const router = useRouter()
+  const [state, formAction] = useActionState(resetPasswordAction, null)
 
-  const [password, setPassword] = useState('')
-  const [confirm, setConfirm] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [done, setDone] = useState(false)
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    setError(null)
-
-    if (password !== confirm) {
-      setError('Password dan konfirmasi tidak cocok.')
-      return
+  useEffect(() => {
+    if (state?.success) {
+      const timer = setTimeout(() => {
+        router.replace('/')
+      }, 2000)
+      return () => clearTimeout(timer)
     }
-    if (password.length < 6) {
-      setError('Password minimal 6 karakter.')
-      return
-    }
+  }, [state?.success, router])
 
-    setLoading(true)
-    const { error } = await supabase.auth.updateUser({ password })
-
-    if (error) {
-      setError(
-        error.message.includes('Auth session missing')
-          ? 'Link reset sudah kedaluwarsa atau tidak valid. Silakan minta link baru.'
-          : error.message
-      )
-      setLoading(false)
-      return
-    }
-
-    setDone(true)
-    setLoading(false)
-    setTimeout(() => router.replace('/'), 2000)
-  }
-
-  if (done) {
+  if (state?.success) {
     return (
       <div className="login-page-shell min-h-screen flex items-center justify-center px-6 py-16 bg-background text-text-primary relative overflow-hidden transition-colors duration-200">
         <div className="login-page-card w-full max-w-md bg-thirdary/60 dark:bg-thirdary/80 border border-text-secondary/15 rounded-2xl p-8 sm:p-10 shadow-2xl backdrop-blur-xl text-center space-y-4">
@@ -84,7 +72,26 @@ export default function ResetPasswordPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <AuthMessage
+          override={
+            state?.error
+              ? {
+                  message: state.error,
+                  type: 'error',
+                  ...(state.error.includes('kedaluwarsa')
+                    ? {
+                        action: {
+                          label: 'Minta link reset baru →',
+                          href: '/forgot-password',
+                        },
+                      }
+                    : {}),
+                }
+              : null
+          }
+        />
+
+        <form action={formAction} className="space-y-4">
           <div>
             <label htmlFor="reset-password" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
               Password Baru
@@ -92,10 +99,10 @@ export default function ResetPasswordPage() {
             <div className="relative">
               <input
                 id="reset-password"
+                name="password"
                 type={showPassword ? 'text' : 'password'}
+                autoComplete="new-password"
                 placeholder="Minimal 6 karakter"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
                 className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
@@ -127,10 +134,10 @@ export default function ResetPasswordPage() {
             <div className="relative">
               <input
                 id="reset-confirm"
+                name="confirm"
                 type={showConfirm ? 'text' : 'password'}
+                autoComplete="new-password"
                 placeholder="Ulangi password baru"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
                 required
                 minLength={6}
                 className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
@@ -156,24 +163,7 @@ export default function ResetPasswordPage() {
             </div>
           </div>
 
-          {error && (
-            <div className="rounded-xl bg-red-500/10 border border-red-500/20 p-3 space-y-2">
-              <p className="text-xs font-medium text-red-500">{error}</p>
-              {error.includes('kedaluwarsa') && (
-                <Link href="/forgot-password" className="inline-block text-xs font-semibold text-red-400 underline underline-offset-4 hover:opacity-80">
-                  Minta link reset baru →
-                </Link>
-              )}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-button-hero hover:bg-button-hero-hover text-background dark:text-foreground py-3.5 text-sm font-semibold tracking-wide transition disabled:opacity-50 shadow-md"
-          >
-            {loading ? 'Menyimpan...' : 'Simpan Password Baru'}
-          </button>
+          <SubmitButton />
         </form>
 
         <p className="mt-8 text-center text-xs text-text-secondary">

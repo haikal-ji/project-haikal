@@ -7,8 +7,18 @@ const adapter = new PrismaPg({
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
+  prismaVersion?: string
 }
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter })
+// Invalidate cached Prisma client in development when schema is updated
+const SCHEMA_VERSION = 'v2-with-bio'
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+export const prisma =
+  globalForPrisma.prisma && globalForPrisma.prismaVersion === SCHEMA_VERSION
+    ? globalForPrisma.prisma
+    : new PrismaClient({ adapter })
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma
+  globalForPrisma.prismaVersion = SCHEMA_VERSION
+}

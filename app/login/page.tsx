@@ -1,24 +1,35 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import AuthMessage from '@/components/AuthMessage'
+import { loginAction } from './actions'
+
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="w-full rounded-xl bg-button-hero hover:bg-button-hero-hover text-background dark:text-foreground py-3.5 text-sm font-semibold tracking-wide transition disabled:opacity-50 shadow-md cursor-pointer"
+    >
+      {pending ? 'Memproses...' : 'Login'}
+    </button>
+  )
+}
 
 export default function LoginPage() {
-  const router = useRouter()
   const supabase = createClient()
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [state, formAction] = useActionState(loginAction, null)
   const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [oauthError, setOauthError] = useState<string | null>(null)
   const [oauthLoading, setOauthLoading] = useState<'github' | 'google' | null>(null)
 
   async function handleGithubLogin() {
-    setError(null)
+    setOauthError(null)
     setOauthLoading('github')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
@@ -27,13 +38,13 @@ export default function LoginPage() {
       },
     })
     if (error) {
-      setError(error.message)
+      setOauthError(error.message)
       setOauthLoading(null)
     }
   }
 
   async function handleGoogleLogin() {
-    setError(null)
+    setOauthError(null)
     setOauthLoading('google')
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
@@ -46,30 +57,12 @@ export default function LoginPage() {
       },
     })
     if (error) {
-      setError(error.message)
+      setOauthError(error.message)
       setOauthLoading(null)
     }
   }
 
-  async function handleManualLogin(e: FormEvent) {
-    e.preventDefault()
-    setError(null)
-    setLoading(true)
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-
-    if (error) {
-      setError(error.message)
-      setLoading(false)
-      return
-    }
-
-    // Sinkronkan user ke tabel User di database
-    await fetch('/api/auth/sync-user', { method: 'POST' })
-
-    router.replace('/')
-    router.refresh()
-  }
+  const errorMessage = state?.error || oauthError
 
   return (
     <div className="login-page-shell min-h-screen flex items-center justify-center px-6 py-16 bg-background text-text-primary relative overflow-hidden transition-colors duration-200">
@@ -91,7 +84,7 @@ export default function LoginPage() {
           <p className="text-sm text-text-secondary mt-1">Masuk ke akun kamu untuk berinteraksi</p>
         </div>
 
-        <AuthMessage override={error ? { message: error, type: 'error' } : null} />
+        <AuthMessage override={oauthError ? { message: oauthError, type: 'error' } : null} />
 
         <div className="space-y-3">
           {/* Tombol Google */}
@@ -146,16 +139,19 @@ export default function LoginPage() {
           <div className="h-px flex-1 bg-text-secondary/15" />
         </div>
 
-        <form onSubmit={handleManualLogin} className="space-y-4">
+        <form action={formAction} className="space-y-4">
+          <AuthMessage override={state?.error ? { message: state.error, type: 'error' } : null} />
+
           <div>
             <label htmlFor="login-email" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">Email</label>
             <input
               id="login-email"
+              key={state?.email ?? 'login-email'}
+              defaultValue={state?.email ?? ''}
+              name="email"
               type="email"
               autoComplete="email"
               placeholder="nama@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
             />
@@ -170,11 +166,10 @@ export default function LoginPage() {
             <div className="relative">
               <input
                 id="login-password"
+                name="password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
               />
@@ -199,13 +194,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-button-hero hover:bg-button-hero-hover text-background dark:text-foreground py-3.5 text-sm font-semibold tracking-wide transition disabled:opacity-50 shadow-md"
-          >
-            {loading ? 'Memproses...' : 'Login'}
-          </button>
+          <SubmitButton />
         </form>
 
         <p className="mt-8 text-center text-xs text-text-secondary">

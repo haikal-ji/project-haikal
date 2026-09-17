@@ -1,29 +1,28 @@
-﻿'use client'
+'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useActionState } from 'react'
+import { useFormStatus } from 'react-dom'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import AuthMessage from '@/components/AuthMessage'
+import { forgotPasswordAction } from './actions'
+
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="w-full rounded-xl bg-button-hero hover:bg-button-hero-hover text-background dark:text-foreground py-3.5 text-sm font-semibold tracking-wide transition disabled:opacity-50 shadow-md cursor-pointer"
+    >
+      {pending ? 'Mengirim...' : 'Kirim link reset'}
+    </button>
+  )
+}
 
 export default function ForgotPasswordPage() {
-  const supabase = createClient()
+  const [state, formAction] = useActionState(forgotPasswordAction, null)
 
-  const [email, setEmail] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    setLoading(true)
-
-    await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
-    })
-
-    setLoading(false)
-    setSubmitted(true)
-  }
-
-  if (submitted) {
+  if (state?.submitted) {
     return (
       <div className="login-page-shell min-h-screen flex items-center justify-center px-6 py-16 bg-background text-text-primary relative overflow-hidden transition-colors duration-200">
         <div className="login-page-card w-full max-w-md bg-thirdary/60 dark:bg-thirdary/80 border border-text-secondary/15 rounded-2xl p-8 sm:p-10 shadow-2xl backdrop-blur-xl text-center space-y-4">
@@ -35,7 +34,7 @@ export default function ForgotPasswordPage() {
           <h1 className="text-2xl font-bold tracking-tight text-text-primary">Cek email kamu</h1>
           <p className="text-sm text-text-secondary leading-relaxed">
             Jika email tersebut terdaftar, link untuk reset password sudah dikirim ke{' '}
-            <span className="font-semibold text-text-primary">{email}</span>.
+            <span className="font-semibold text-text-primary">{state.email}</span>.
             Klik link tersebut untuk membuat password baru.
           </p>
           <Link
@@ -71,28 +70,27 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <AuthMessage override={state?.error ? { message: state.error, type: 'error' } : null} />
+
+        <form action={formAction} className="space-y-4">
           <div>
-            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+            <label htmlFor="forgot-email" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
               Email
             </label>
             <input
+              id="forgot-email"
+              key={state?.email ?? 'forgot-email'}
+              defaultValue={state?.email ?? ''}
+              name="email"
               type="email"
+              autoComplete="email"
               placeholder="nama@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-xl bg-button-hero hover:bg-button-hero-hover text-background dark:text-foreground py-3.5 text-sm font-semibold tracking-wide transition disabled:opacity-50 shadow-md"
-          >
-            {loading ? 'Mengirim...' : 'Kirim link reset'}
-          </button>
+          <SubmitButton />
         </form>
 
         <p className="mt-8 text-center text-xs text-text-secondary">

@@ -17,6 +17,7 @@ model User {
   name       String
   email      String   @unique
   avatar     String?
+  bio        String?
   is_banned  Boolean  @default(false)
   ban_reason String?
   created_at DateTime @default(now())
@@ -58,6 +59,12 @@ model Reaction {
 }
 
 enum ReactionType {
+  KEREN
+  NGAKAK
+  BERGUNA
+  MANTAP
+  KAGET
+  BOSEN
   LIKE
   DISLIKE
 }

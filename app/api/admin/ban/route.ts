@@ -36,6 +36,22 @@ export async function POST(request: Request) {
   const { userId, reason, unban } = result.data
 
   try {
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId },
+    })
+
+    if (!targetUser) {
+      return NextResponse.json({ error: 'User tidak ditemukan' }, { status: 404 })
+    }
+
+    // Lindungi akun owner agar tidak bisa di-ban
+    if (targetUser.email === process.env.OWNER_EMAIL) {
+      return NextResponse.json(
+        { error: 'Akun Owner utama tidak dapat di-ban' },
+        { status: 400 }
+      )
+    }
+
     if (unban) {
       // Unban user
       const updated = await prisma.user.update({

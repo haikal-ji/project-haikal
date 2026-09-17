@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useEffect, type ChangeEvent, type FormEvent, type DragEvent } from 'react'
+import { useState, useEffect, useRef, type ChangeEvent, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
+import CommunityBadge from '@/components/CommunityBadge'
 import { toast } from '@/components/ToastProvider'
 
 type ProfileClientViewProps = {
@@ -13,8 +14,19 @@ type ProfileClientViewProps = {
     name: string
     email: string
     avatar: string | null
+    bio?: string | null
     createdAt: string
     isOwner: boolean
+    badges?: Array<{
+      id: string
+      badge_id: string
+      badge: {
+        id: string
+        name: string
+        emoji: string | null
+        color: string | null
+      }
+    }>
   }
   stats: {
     commentsCount: number
@@ -55,17 +67,168 @@ export default function ProfileClientView({
 
   // Form states (live preview)
   const [name, setName] = useState(user.name)
+  const [bio, setBio] = useState(user.bio || '')
   const [avatarPreview, setAvatarPreview] = useState<string | null>(user.avatar)
-  const [avatarFile, setAvatarFile] = useState<File | null>(null)
-  const [isRemovingAvatar, setIsRemovingAvatar] = useState(false)
 
-  // UI states
+  // Direct Instagram-style Avatar Picker states
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [showAvatarModal, setShowAvatarModal] = useState(false)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+
+  // UI & tab states
   const [activeTab, setActiveTab] = useState<TabType>('identity')
-  const [isDragging, setIsDragging] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [loggingOut, setLoggingOut] = useState(false)
+
+  // Activity list & pagination states
+  const [commentsList, setCommentsList] = useState(recentComments)
+  const [hasMoreComments, setHasMoreComments] = useState(stats.commentsCount > recentComments.length)
+  const [loadingComments, setLoadingComments] = useState(false)
+
+  const [likesList, setLikesList] = useState(likedArticles)
+  const [hasMoreLikes, setHasMoreLikes] = useState(stats.likesCount > likedArticles.length)
+  const [loadingLikes, setLoadingLikes] = useState(false)
+
+  // Direct Instagram-style upload & save function
+  async function uploadAndSaveAvatar(file: File) {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Hanya file gambar yang diperbolehkan (JPG, PNG, WebP).')
+      return
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      toast.error('Ukuran file maksimal 4MB.')
+      return
+    }
+
+    // Optimistic preview instan
+    const localPreview = URL.createObjectURL(file)
+    setAvatarPreview(localPreview)
+    setAvatarUploading(true)
+    setShowAvatarModal(false)
+
+    try {
+      const fileExt = file.name.split('.').pop() || 'jpg'
+      const fileName = `avatar-${user.id}-${Date.now()}.${fileExt}`
+
+      const uploadRes = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, { upsert: true })
+
+      if (uploadRes.error) {
+        throw new Error(
+          `Gagal upload foto profil ke bucket 'avatars'. Pastikan bucket 'avatars' sudah dikonfigurasi dengan benar di Supabase Storage. Detail: ${uploadRes.error.message}`
+        )
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(uploadRes.data?.path || fileName)
+
+      const finalAvatarUrl = publicUrlData.publicUrl
+
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), avatar: finalAvatarUrl, bio: bio.trim() }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Gagal memperbarui foto profil')
+      }
+
+      setAvatarPreview(finalAvatarUrl)
+      toast.success('Foto profil berhasil diubah!')
+      router.refresh()
+    } catch (err: unknown) {
+      setAvatarPreview(user.avatar)
+      const msg = err instanceof Error ? err.message : 'Gagal memperbarui foto profil'
+      toast.error(msg)
+    } finally {
+      setAvatarUploading(false)
+    }
+  }
+
+  // Hapus foto profil langsung
+  async function removeAndSaveAvatar() {
+    setAvatarUploading(true)
+    setShowAvatarModal(false)
+
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), avatar: null, bio: bio.trim() }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Gagal menghapus foto profil')
+      }
+
+      setAvatarPreview(null)
+      toast.success('Foto profil berhasil dihapus!')
+      router.refresh()
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Gagal menghapus foto profil'
+      toast.error(msg)
+    } finally {
+      setAvatarUploading(false)
+    }
+  }
+
+  function handleAvatarCircleClick() {
+    if (avatarUploading) return
+    if (avatarPreview) {
+      setShowAvatarModal(true)
+    } else {
+      fileInputRef.current?.click()
+    }
+  }
+
+  async function handleDirectFileInputChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) {
+      await uploadAndSaveAvatar(file)
+    }
+    e.target.value = ''
+  }
+
+  // Load more comments
+  async function loadMoreComments() {
+    if (loadingComments || !hasMoreComments) return
+    setLoadingComments(true)
+    try {
+      const res = await fetch(`/api/profile/activity?type=comments&skip=${commentsList.length}&take=10`)
+      if (!res.ok) throw new Error('Gagal memuat riwayat komentar')
+      const data = await res.json()
+      setCommentsList((prev) => [...prev, ...data.items])
+      setHasMoreComments(data.hasMore)
+    } catch {
+      toast.error('Gagal memuat riwayat komentar tambahan')
+    } finally {
+      setLoadingComments(false)
+    }
+  }
+
+  // Load more likes
+  async function loadMoreLikes() {
+    if (loadingLikes || !hasMoreLikes) return
+    setLoadingLikes(true)
+    try {
+      const res = await fetch(`/api/profile/activity?type=likes&skip=${likesList.length}&take=10`)
+      if (!res.ok) throw new Error('Gagal memuat artikel disukai')
+      const data = await res.json()
+      setLikesList((prev) => [...prev, ...data.items])
+      setHasMoreLikes(data.hasMore)
+    } catch {
+      toast.error('Gagal memuat artikel disukai tambahan')
+    } finally {
+      setLoadingLikes(false)
+    }
+  }
 
   // Ban status & appeal form
   const [banStatus, setBanStatus] = useState<BanStatus | null>(null)
@@ -80,52 +243,6 @@ export default function ProfileClientView({
       .then((data) => setBanStatus(data))
       .catch(() => {})
   }, [])
-
-  // Handle file selection
-  function handleFile(file: File) {
-    if (!file.type.startsWith('image/')) {
-      setError('Hanya file gambar yang diperbolehkan (JPG, PNG, WebP).')
-      return
-    }
-    if (file.size > 4 * 1024 * 1024) {
-      setError('Ukuran file maksimal 4MB.')
-      return
-    }
-
-    setError(null)
-    setAvatarFile(file)
-    setIsRemovingAvatar(false)
-    setAvatarPreview(URL.createObjectURL(file))
-  }
-
-  function handleAvatarChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (file) handleFile(file)
-  }
-
-  function handleDragOver(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault()
-    setIsDragging(true)
-  }
-
-  function handleDragLeave(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault()
-    setIsDragging(false)
-  }
-
-  function handleDrop(e: DragEvent<HTMLDivElement>) {
-    e.preventDefault()
-    setIsDragging(false)
-    const file = e.dataTransfer.files?.[0]
-    if (file) handleFile(file)
-  }
-
-  function handleRemoveAvatar() {
-    setAvatarFile(null)
-    setAvatarPreview(null)
-    setIsRemovingAvatar(true)
-    setError(null)
-  }
 
   async function handleLogout() {
     try {
@@ -150,27 +267,10 @@ export default function ProfileClientView({
     setLoading(true)
 
     try {
-      let finalAvatarUrl: string | null = user.avatar
-
-      if (isRemovingAvatar) {
-        finalAvatarUrl = null
-      } else if (avatarFile) {
-        const fileExt = avatarFile.name.split('.').pop() || 'jpg'
-        const fileName = `avatar-${user.id}-${Date.now()}.${fileExt}`
-        const { data, error: uploadError } = await supabase.storage
-          .from('thumbnails')
-          .upload(fileName, avatarFile)
-
-        if (uploadError) throw new Error(uploadError.message)
-
-        const { data: publicUrlData } = supabase.storage.from('thumbnails').getPublicUrl(data.path)
-        finalAvatarUrl = publicUrlData.publicUrl
-      }
-
       const res = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, avatar: finalAvatarUrl }),
+        body: JSON.stringify({ name: name.trim(), bio: bio.trim() }),
       })
 
       if (!res.ok) {
@@ -179,9 +279,7 @@ export default function ProfileClientView({
       }
 
       setSuccess(true)
-      setAvatarFile(null)
-      setIsRemovingAvatar(false)
-      toast.success('Profil diperbarui!', 'Perubahan identitas berhasil disimpan ke akunmu.')
+      toast.success('Profil diperbarui!', 'Perubahan nama dan bio berhasil disimpan ke akunmu.')
       router.refresh()
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Terjadi kesalahan sistem'
@@ -206,27 +304,106 @@ export default function ProfileClientView({
         </div>
 
         <div className="profile-card-center">
-          <div className="profile-avatar-frame">
-            {avatarPreview ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={avatarPreview}
-                alt={name}
-                className="profile-card-avatar"
-              />
-            ) : (
-              <div className="profile-card-avatar-fallback font-serif">
-                {initialLetter}
+          {/* Hidden File Input untuk Direct Upload Instagram Style */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleDirectFileInputChange}
+            className="sr-only"
+            aria-hidden="true"
+          />
+
+          <div
+            className="profile-avatar-frame group cursor-pointer select-none"
+            onClick={handleAvatarCircleClick}
+            title={avatarPreview ? 'Klik untuk mengubah atau menghapus foto profil' : 'Klik untuk memilih foto profil'}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                handleAvatarCircleClick()
+              }
+            }}
+          >
+            {/* Foto Profil Utama */}
+            <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-line group-hover:border-foreground/40 transition-all duration-300 shadow-md group-hover:shadow-xl">
+              {avatarPreview ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={avatarPreview}
+                  alt={name}
+                  className="profile-card-avatar !border-0 group-hover:scale-105 transition-transform duration-300"
+                />
+              ) : (
+                <div className="profile-card-avatar-fallback !border-0 font-serif group-hover:scale-105 transition-transform duration-300">
+                  {initialLetter}
+                </div>
+              )}
+
+              {/* Instagram-style Hover Overlay */}
+              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity duration-200 backdrop-blur-[2px]">
+                <svg className="w-6 h-6 mb-1 drop-shadow" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span className="text-[10px] font-semibold tracking-wider uppercase drop-shadow">Ubah Foto</span>
               </div>
-            )}
-            <div className="profile-avatar-status-dot" title="Aktif" />
+
+              {/* Loading Spinner saat proses upload */}
+              {avatarUploading && (
+                <div className="absolute inset-0 bg-black/75 flex flex-col items-center justify-center text-white z-20 backdrop-blur-sm">
+                  <svg className="w-6 h-6 animate-spin text-emerald-400" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span className="text-[9px] font-medium mt-1">Menyimpan...</span>
+                </div>
+              )}
+            </div>
+
+            {/* Camera Badge Khas Instagram di kanan bawah */}
+            <div
+              className="absolute bottom-1 right-1 h-7.5 w-7.5 rounded-full bg-foreground text-background shadow-md border-2 border-background flex items-center justify-center group-hover:scale-110 transition-transform duration-200 z-10"
+              title="Ganti foto profil"
+            >
+              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                <path d="M12 9a3.75 3.75 0 100 7.5 3.75 3.75 0 000-7.5z" />
+                <path fillRule="evenodd" clipRule="evenodd" d="M9.344 3.071a1.5 1.5 0 011.06-.442h3.192c.398 0 .78.159 1.06.442l1.107 1.108a.75.75 0 00.53.221H19A2.25 2.25 0 0121.25 6.65v11.7A2.25 2.25 0 0119 20.6H5A2.25 2.25 0 012.75 18.35V6.65A2.25 2.25 0 015 4.4h2.707a.75.75 0 00.53-.221L9.344 3.07zM12 7.5a5.25 5.25 0 100 10.5 5.25 5.25 0 000-10.5z" />
+              </svg>
+            </div>
           </div>
 
           <h2 className="profile-card-name font-serif">{name || 'Tanpa Nama'}</h2>
-          <p className="profile-card-email" title={user.email}>
-            {user.email}
-          </p>
-          <p className="profile-card-since">Bergabung sejak {user.createdAt}</p>
+
+          {/* Badges Pengguna */}
+          {user.badges && user.badges.length > 0 && (
+            <div className="flex flex-wrap items-center justify-center gap-1.5 mt-2 mb-1.5 max-w-full px-2">
+              {user.badges.map((b) => (
+                <CommunityBadge key={b.id} badge={b.badge} size="xs" />
+              ))}
+            </div>
+          )}
+
+          {/* Bio Singkat */}
+          {bio.trim() && (
+            <p className="mt-3 px-3.5 py-2 text-xs text-text-secondary italic text-center bg-secondary/40 border border-line/60 rounded-xl max-w-xs break-words leading-relaxed">
+              &ldquo;{bio.trim()}&rdquo;
+            </p>
+          )}
+
+          {/* Tautan ke Profil Publik */}
+          <div className="mt-3.5 flex justify-center">
+            <Link
+              href={`/pengguna/${user.id}`}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-foreground transition-colors underline decoration-dotted underline-offset-4"
+              target="_blank"
+            >
+              <span>Lihat Profil Publik</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
 
         {/* Counter Statistik */}
@@ -241,44 +418,6 @@ export default function ProfileClientView({
             <span className="profile-stat-label">Apresiasi</span>
           </div>
         </div>
-
-        {/* Live Preview Komentar */}
-        <div className="profile-preview-box">
-          <div className="profile-preview-box-header">
-            <span className="profile-kicker">Live Preview Komentar</span>
-            <span className="profile-live-indicator">Realtime</span>
-          </div>
-          <div className="profile-comment-sample">
-            <div className="sample-avatar-wrapper">
-              {avatarPreview ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatarPreview} alt={name} className="sample-avatar" />
-              ) : (
-                <div className="sample-avatar sample-avatar-fallback font-serif">
-                  {initialLetter}
-                </div>
-              )}
-            </div>
-            <div className="sample-content">
-              <div className="sample-meta">
-                <span className="sample-author">{name || 'Nama Kamu'}</span>
-                <span className="sample-time">Baru saja</span>
-              </div>
-              <p className="sample-text">
-                Identitas ini yang tampil setiap kali kamu berdiskusi di artikel.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleLogout}
-          disabled={loggingOut}
-          className="profile-logout-button"
-        >
-          {loggingOut ? 'Keluar...' : 'Keluar dari akun'}
-        </button>
       </aside>
 
       {/* Kolom Kanan: Main Tabbed Studio */}
@@ -300,7 +439,7 @@ export default function ProfileClientView({
           >
             <span className="tab-indicator" />
             Komentar Saya
-            <span className="tab-count-pill">{recentComments.length}</span>
+            <span className="tab-count-pill">{stats.commentsCount}</span>
           </button>
           <button
             type="button"
@@ -309,7 +448,7 @@ export default function ProfileClientView({
           >
             <span className="tab-indicator" />
             Artikel Disukai
-            <span className="tab-count-pill">{likedArticles.length}</span>
+            <span className="tab-count-pill">{stats.likesCount}</span>
           </button>
           <button
             type="button"
@@ -328,57 +467,11 @@ export default function ProfileClientView({
               <p className="profile-kicker">Identitas Publik</p>
               <h2 className="profile-tab-title">Personalisasi Karaktermu</h2>
               <p className="profile-tab-desc">
-                Sesuaikan nama dan foto profil agar mudah dikenali oleh sesama pembaca dan penulis artikel.
+                Sesuaikan nama dan bio singkat agar mudah dikenali oleh sesama pembaca dan penulis artikel.
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="profile-form-grid">
-              {/* Avatar Upload Dropzone */}
-              <div className="profile-avatar-section">
-                <label className="profile-field-label">Foto Profil</label>
-                <div
-                  className={`profile-dropzone ${isDragging ? 'is-dragging' : ''}`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                >
-                  <div className="dropzone-preview-area">
-                    {avatarPreview ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={avatarPreview} alt="Preview" className="dropzone-preview-img" />
-                    ) : (
-                      <div className="dropzone-preview-fallback font-serif">
-                        {initialLetter}
-                      </div>
-                    )}
-                  </div>
-                  <div className="dropzone-info">
-                    <p className="dropzone-title">Seret gambar ke sini atau klik tombol</p>
-                    <p className="dropzone-sub">Mendukung format PNG, JPG, atau WebP hingga 4MB</p>
-                    <div className="dropzone-actions">
-                      <label className="profile-browse-btn">
-                        <span>Pilih Foto Baru</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          onChange={handleAvatarChange}
-                          className="sr-only"
-                        />
-                      </label>
-                      {avatarPreview && (
-                        <button
-                          type="button"
-                          onClick={handleRemoveAvatar}
-                          className="profile-remove-avatar-btn"
-                        >
-                          Hapus Foto
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Name Input */}
               <div className="profile-field-group">
                 <div className="profile-field-top">
@@ -399,6 +492,28 @@ export default function ProfileClientView({
                 />
                 <p className="profile-field-hint">
                   Nama ini akan menjadi nama pengirim di setiap diskusi dan komentar artikel.
+                </p>
+              </div>
+
+              {/* Bio Singkat Input */}
+              <div className="profile-field-group">
+                <div className="profile-field-top">
+                  <label htmlFor="user-bio" className="profile-field-label">
+                    Bio Singkat
+                  </label>
+                  <span className="profile-char-count">{bio.length} / 160</span>
+                </div>
+                <textarea
+                  id="user-bio"
+                  value={bio}
+                  maxLength={160}
+                  rows={3}
+                  onChange={(e) => setBio(e.target.value)}
+                  placeholder="Tuliskan sedikit tentang dirimu, minat baca, atau topik yang kamu sukai..."
+                  className="profile-text-input resize-none"
+                />
+                <p className="profile-field-hint">
+                  Bio akan tampil di kartu identitasmu dan pada halaman profil publik yang bisa dilihat pembaca lain.
                 </p>
               </div>
 
@@ -441,7 +556,7 @@ export default function ProfileClientView({
               </p>
             </div>
 
-            {recentComments.length === 0 ? (
+            {commentsList.length === 0 ? (
               <div className="profile-empty-state">
                 <div className="empty-state-glyph font-serif">”</div>
                 <h3 className="empty-state-title">Belum ada komentar</h3>
@@ -453,21 +568,43 @@ export default function ProfileClientView({
                 </Link>
               </div>
             ) : (
-              <div className="profile-comments-feed">
-                {recentComments.map((item) => (
-                  <article key={item.id} className="profile-feed-card">
-                    <div className="feed-card-header">
-                      <span className="feed-article-label">Artikel</span>
-                      <Link href={`/artikel/${item.article.id}`} className="feed-article-link">
-                        {item.article.title}
-                      </Link>
-                      <time className="feed-card-date">{item.createdAt}</time>
-                    </div>
-                    <blockquote className="feed-card-comment">
-                      &ldquo;{item.content}&rdquo;
-                    </blockquote>
-                  </article>
-                ))}
+              <div className="space-y-4">
+                <div className="profile-comments-feed">
+                  {commentsList.map((item) => (
+                    <article key={item.id} className="profile-feed-card">
+                      <div className="feed-card-header">
+                        <span className="feed-article-label">Artikel</span>
+                        <Link href={`/artikel/${item.article.id}`} className="feed-article-link">
+                          {item.article.title}
+                        </Link>
+                        <time className="feed-card-date">{item.createdAt}</time>
+                      </div>
+                      <blockquote className="feed-card-comment">
+                        &ldquo;{item.content}&rdquo;
+                      </blockquote>
+                    </article>
+                  ))}
+                </div>
+
+                {hasMoreComments && (
+                  <div className="pt-4 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={loadMoreComments}
+                      disabled={loadingComments}
+                      className="px-5 py-2.5 rounded-full border border-line bg-secondary hover:bg-line/40 text-xs font-semibold text-text-primary transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      {loadingComments ? (
+                        <>
+                          <span className="w-3.5 h-3.5 border-2 border-text-primary border-t-transparent rounded-full animate-spin" />
+                          <span>Memuat riwayat...</span>
+                        </>
+                      ) : (
+                        <span>Muat lebih banyak komentar</span>
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -484,7 +621,7 @@ export default function ProfileClientView({
               </p>
             </div>
 
-            {likedArticles.length === 0 ? (
+            {likesList.length === 0 ? (
               <div className="profile-empty-state">
                 <div className="empty-state-glyph font-serif">♥</div>
                 <h3 className="empty-state-title">Belum ada artikel disukai</h3>
@@ -496,21 +633,43 @@ export default function ProfileClientView({
                 </Link>
               </div>
             ) : (
-              <div className="profile-likes-grid">
-                {likedArticles.map((article) => (
-                  <Link
-                    key={article.id}
-                    href={`/artikel/${article.id}`}
-                    className="profile-like-card"
-                  >
-                    <div className="like-card-top">
-                      <span className="like-badge">Disukai</span>
-                      <time className="like-date">{article.createdAt}</time>
-                    </div>
-                    <h3 className="like-title">{article.title}</h3>
-                    <span className="like-read-more">Baca selengkapnya</span>
-                  </Link>
-                ))}
+              <div className="space-y-4">
+                <div className="profile-likes-grid">
+                  {likesList.map((article) => (
+                    <Link
+                      key={article.id}
+                      href={`/artikel/${article.id}`}
+                      className="profile-like-card"
+                    >
+                      <div className="like-card-top">
+                        <span className="like-badge">Disukai</span>
+                        <time className="like-date">{article.createdAt}</time>
+                      </div>
+                      <h3 className="like-title">{article.title}</h3>
+                      <span className="like-read-more">Baca selengkapnya</span>
+                    </Link>
+                  ))}
+                </div>
+
+                {hasMoreLikes && (
+                  <div className="pt-4 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={loadMoreLikes}
+                      disabled={loadingLikes}
+                      className="px-5 py-2.5 rounded-full border border-line bg-secondary hover:bg-line/40 text-xs font-semibold text-text-primary transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      {loadingLikes ? (
+                        <>
+                          <span className="w-3.5 h-3.5 border-2 border-text-primary border-t-transparent rounded-full animate-spin" />
+                          <span>Memuat artikel...</span>
+                        </>
+                      ) : (
+                        <span>Muat lebih banyak artikel disukai</span>
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -660,6 +819,57 @@ export default function ProfileClientView({
           </div>
         )}
       </section>
+
+      {/* Modal Aksi Foto Profil Khas Instagram */}
+      {showAvatarModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setShowAvatarModal(false)}
+        >
+          <div
+            className="w-full max-w-sm overflow-hidden rounded-2xl bg-white dark:bg-[#1c1c1e] text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-800 shadow-2xl text-center animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
+              <h3 className="text-base font-bold text-neutral-900 dark:text-white">Ubah Foto Profil</h3>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                Pilih tindakan untuk memperbarui foto akun kamu
+              </p>
+            </div>
+
+            <div className="flex flex-col divide-y divide-neutral-200 dark:divide-neutral-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAvatarModal(false)
+                  fileInputRef.current?.click()
+                }}
+                className="w-full py-3.5 text-sm font-bold text-[#0095F6] hover:bg-neutral-50 dark:hover:bg-white/5 transition cursor-pointer active:scale-98"
+              >
+                Unggah Foto Baru
+              </button>
+
+              {avatarPreview && (
+                <button
+                  type="button"
+                  onClick={removeAndSaveAvatar}
+                  className="w-full py-3.5 text-sm font-bold text-[#ED4956] hover:bg-neutral-50 dark:hover:bg-white/5 transition cursor-pointer active:scale-98"
+                >
+                  Hapus Foto Saat Ini
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={() => setShowAvatarModal(false)}
+                className="w-full py-3.5 text-sm font-medium text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-white/5 transition cursor-pointer active:scale-98"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

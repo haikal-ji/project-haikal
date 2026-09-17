@@ -4,126 +4,168 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ToastProvider'
 
-type ReactionType = 'LIKE' | 'DISLIKE'
+export type ReactionType = 'LIKE' | 'DISLIKE'
 
-export default function ReactionButtons({
-  articleId,
-  initialLikeCount,
-  initialDislikeCount,
-  initialReaction,
-  initialShareCount = 0,
-  isLoggedIn,
-  articleTitle = 'Artikel Haikal',
-}: {
+interface ReactionButtonsProps {
   articleId: string
-  initialLikeCount: number
-  initialDislikeCount: number
-  initialReaction: ReactionType | null
+  initialLikeCount?: number
+  initialDislikeCount?: number
+  initialReaction?: ReactionType | string | null
   initialShareCount?: number
   isLoggedIn: boolean
   articleTitle?: string
-}) {
+}
+
+export default function ReactionButtons({
+  articleId,
+  initialLikeCount = 0,
+  initialDislikeCount = 0,
+  initialReaction = null,
+  initialShareCount = 0,
+  isLoggedIn,
+  articleTitle = 'Artikel Haikal',
+}: ReactionButtonsProps) {
   const router = useRouter()
-  const [likeCount, setLikeCount] = useState(initialLikeCount)
-  const [dislikeCount, setDislikeCount] = useState(initialDislikeCount)
-  const [reaction, setReaction] = useState<ReactionType | null>(initialReaction)
+
+  // Normalize initial reaction
+  const normalizedInitialReaction: ReactionType | null =
+    initialReaction === 'LIKE' ||
+    initialReaction === 'KEREN' ||
+    initialReaction === 'MANTAP' ||
+    initialReaction === 'BERGUNA' ||
+    initialReaction === 'NGAKAK' ||
+    initialReaction === 'KAGET'
+      ? 'LIKE'
+      : initialReaction === 'DISLIKE' || initialReaction === 'BOSEN'
+      ? 'DISLIKE'
+      : null
+
+  const [likeCount, setLikeCount] = useState<number>(initialLikeCount)
+  const [dislikeCount, setDislikeCount] = useState<number>(initialDislikeCount)
+  const [userReaction, setUserReaction] = useState<ReactionType | null>(normalizedInitialReaction)
+  const [loading, setLoading] = useState(false)
+  const [activeAnim, setActiveAnim] = useState<'LIKE' | 'DISLIKE' | null>(null)
+  const [burstKey, setBurstKey] = useState<number>(0)
+
+  // Share state
   const [shareCount, setShareCount] = useState(initialShareCount)
   const [copied, setCopied] = useState(false)
-  const [isBouncing, setIsBouncing] = useState(false)
-  const [isDislikeBouncing, setIsDislikeBouncing] = useState(false)
 
   function requireLogin() {
     router.push(
-      `/login?message=${encodeURIComponent('Kamu harus login dulu untuk memberikan apresiasi')}&type=warning`
+      `/login?message=${encodeURIComponent(
+        'Kamu harus login dulu untuk memberikan reaksi'
+      )}&type=warning`
     )
   }
 
-  // Optimistic zero-delay reaction handler
-  async function react(type: ReactionType) {
+  async function handleReaction(type: ReactionType) {
     if (!isLoggedIn) {
       requireLogin()
       return
     }
 
-    // 1. Snapshot previous state for rollback on error
-    const prevReaction = reaction
+    if (loading) return
+
+    // Trigger refined tactile spring & badge animation
+    setActiveAnim(type)
+    setBurstKey(Date.now())
+    setTimeout(() => {
+      setActiveAnim(null)
+    }, 550)
+
+    // Save previous state for rollback
     const prevLikeCount = likeCount
     const prevDislikeCount = dislikeCount
+    const prevUserReaction = userReaction
 
-    // 2. Compute optimistic updates immediately
-    let nextReaction: ReactionType | null = null
-    let nextLikes = likeCount
-    let nextDislikes = dislikeCount
+    // Optimistic Update
+    let nextLikeCount = likeCount
+    let nextDislikeCount = dislikeCount
+    let nextUserReaction: ReactionType | null = null
 
-    if (type === 'LIKE') {
-      if (reaction === 'LIKE') {
-        // Toggle off
-        nextReaction = null
-        nextLikes = Math.max(0, likeCount - 1)
-      } else if (reaction === 'DISLIKE') {
-        // Switch from dislike to like
-        nextReaction = 'LIKE'
-        nextLikes = likeCount + 1
-        nextDislikes = Math.max(0, dislikeCount - 1)
+    if (userReaction === type) {
+      // Toggle off: klik reaksi yang sama menghapus reaksi
+      nextUserReaction = null
+      if (type === 'LIKE') {
+        nextLikeCount = Math.max(0, nextLikeCount - 1)
       } else {
-        // New like
-        nextReaction = 'LIKE'
-        nextLikes = likeCount + 1
+        nextDislikeCount = Math.max(0, nextDislikeCount - 1)
       }
-      setIsBouncing(true)
-      setTimeout(() => setIsBouncing(false), 400)
+    } else if (userReaction !== null) {
+      // Switch reaksi
+      nextUserReaction = type
+      if (type === 'LIKE') {
+        nextLikeCount = nextLikeCount + 1
+        nextDislikeCount = Math.max(0, nextDislikeCount - 1)
+      } else {
+        nextDislikeCount = nextDislikeCount + 1
+        nextLikeCount = Math.max(0, nextLikeCount - 1)
+      }
     } else {
-      if (reaction === 'DISLIKE') {
-        // Toggle off
-        nextReaction = null
-        nextDislikes = Math.max(0, dislikeCount - 1)
-      } else if (reaction === 'LIKE') {
-        // Switch from like to dislike
-        nextReaction = 'DISLIKE'
-        nextDislikes = dislikeCount + 1
-        nextLikes = Math.max(0, likeCount - 1)
+      // Reaksi baru
+      nextUserReaction = type
+      if (type === 'LIKE') {
+        nextLikeCount = nextLikeCount + 1
       } else {
-        // New dislike
-        nextReaction = 'DISLIKE'
-        nextDislikes = dislikeCount + 1
+        nextDislikeCount = nextDislikeCount + 1
       }
-      setIsDislikeBouncing(true)
-      setTimeout(() => setIsDislikeBouncing(false), 400)
     }
 
-    // Instant UI update (0ms delay!)
-    setReaction(nextReaction)
-    setLikeCount(nextLikes)
-    setDislikeCount(nextDislikes)
+    // Instant UI Update
+    setUserReaction(nextUserReaction)
+    setLikeCount(nextLikeCount)
+    setDislikeCount(nextDislikeCount)
+    setLoading(true)
 
-    // 3. Send request in background
     try {
-      const response = await fetch('/api/reaction', {
+      const res = await fetch('/api/reaction', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ article_id: articleId, type }),
       })
-      const data = await response.json()
-      if (!response.ok) throw new Error(data.error || 'Gagal menyimpan reaksi')
 
-      // Reconcile with official server count
-      setLikeCount(data.likeCount)
-      setDislikeCount(data.dislikeCount)
-      setReaction(data.userReaction)
-    } catch {
-      // Revert to snapshot on network failure
-      setReaction(prevReaction)
+      const data = await res.json()
+      if (!res.ok) {
+        throw new Error(data.error || 'Gagal menyimpan reaksi')
+      }
+
+      if (typeof data.likeCount === 'number') setLikeCount(data.likeCount)
+      if (typeof data.dislikeCount === 'number') setDislikeCount(data.dislikeCount)
+      setUserReaction(data.userReaction)
+    } catch (err: unknown) {
+      // Rollback
+      setUserReaction(prevUserReaction)
       setLikeCount(prevLikeCount)
       setDislikeCount(prevDislikeCount)
-      toast.error('Gagal menyimpan reaksi', 'Silakan periksa koneksi internet kamu')
+
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan sistem'
+      toast.error(msg)
+    } finally {
+      setLoading(false)
     }
   }
 
-  // Track share count optimistically & persist in database
-  async function recordShare() {
-    setShareCount((prev) => prev + 1)
+  // Handle Share with Anti-Spam (Session Deduplication)
+  async function incrementShare(channel: string) {
+    if (typeof window === 'undefined') return
+
+    // Cek apakah user sudah pernah mencatat share untuk artikel ini di sesi saat ini
+    const sessionKey = `shared_${articleId}_${channel}`
+    const alreadyShared = sessionStorage.getItem(sessionKey)
+
+    if (alreadyShared) {
+      // Jangan hit API lagi agar tidak terjadi spam penghitungan di database
+      return
+    }
+
     try {
-      const res = await fetch(`/api/articles/${articleId}/share`, { method: 'POST' })
+      sessionStorage.setItem(sessionKey, 'true')
+      const res = await fetch(`/api/articles/${articleId}/share`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ channel }),
+      })
       if (res.ok) {
         const data = await res.json()
         if (typeof data.shareCount === 'number') {
@@ -131,172 +173,262 @@ export default function ReactionButtons({
         }
       }
     } catch {
-      // Keep optimistic count
+      // Abaikan error background analytics
     }
-  }
-
-  function handleCopy() {
-    if (typeof window === 'undefined') return
-    navigator.clipboard.writeText(window.location.href)
-    setCopied(true)
-    recordShare()
-    toast.success('Tautan disalin ke clipboard')
-    setTimeout(() => setCopied(false), 2000)
   }
 
   function handleShareWhatsApp() {
     if (typeof window === 'undefined') return
-    const text = encodeURIComponent(`Baca artikel menarik "${articleTitle}": ${window.location.href}`)
-    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank')
-    recordShare()
+    const url = encodeURIComponent(window.location.href)
+    const text = encodeURIComponent(`Baca artikel menarik: "${articleTitle}"`)
+    incrementShare('whatsapp')
+    window.open(`https://api.whatsapp.com/send?text=${text}%20${url}`, '_blank', 'noopener,noreferrer')
   }
 
   function handleShareTwitter() {
     if (typeof window === 'undefined') return
-    const text = encodeURIComponent(`"${articleTitle}" oleh Muhammad Haikal`)
     const url = encodeURIComponent(window.location.href)
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank')
-    recordShare()
+    const text = encodeURIComponent(`"${articleTitle}" oleh Haikal`)
+    incrementShare('twitter')
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'noopener,noreferrer')
+  }
+
+  async function handleCopyLink() {
+    if (typeof window === 'undefined') return
+
+    // Jika sedang dalam status 'Tersalin' (cooldown 2.5 detik), cegah spam klik
+    if (copied) return
+
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setCopied(true)
+
+      const sessionKey = `shared_${articleId}_copy`
+      const isFirstCopy = !sessionStorage.getItem(sessionKey)
+
+      if (isFirstCopy) {
+        toast.success('Tautan artikel berhasil disalin!')
+        incrementShare('copy')
+      } else {
+        toast.info('Tautan disalin ke clipboard')
+      }
+
+      // Reset status copied setelah 2.5 detik (cooldown anti-spam)
+      setTimeout(() => setCopied(false), 2500)
+    } catch {
+      toast.error('Gagal menyalin tautan')
+    }
+  }
+
+  async function handleNativeShare() {
+    if (typeof window === 'undefined') return
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: articleTitle,
+          url: window.location.href,
+        })
+        incrementShare('native')
+      } catch {
+        // Pengguna membatalkan dialog share bawaan
+      }
+    } else {
+      handleCopyLink()
+    }
   }
 
   return (
-    <div className="rounded-3xl border border-text-secondary/15 bg-thirdary/30 backdrop-blur-xl p-5 sm:p-6 shadow-sm space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-        {/* Reaction Section */}
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary mb-2.5">
-            Suka dengan artikel ini?
-          </p>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            {/* Love / Like Button */}
+    <div className="rounded-2xl border border-text-secondary/15 bg-background/50 dark:bg-thirdary/30 p-4 sm:p-5 backdrop-blur-md transition-all duration-300 shadow-sm relative">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Segmented Reaction Capsule */}
+        <div className="flex items-center gap-3">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-text-secondary/70 mr-1 hidden sm:inline-block">
+            Tanggapan
+          </span>
+
+          <div className="inline-flex items-center p-1 rounded-xl bg-thirdary/50 dark:bg-black/40 border border-text-secondary/15 shadow-inner">
+            {/* Tombol LIKE 👍 */}
             <button
               type="button"
-              onClick={() => void react('LIKE')}
-              className={`group inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border transition-all duration-200 cursor-pointer select-none active:scale-95 ${
-                reaction === 'LIKE'
-                  ? 'bg-rose-500/15 border-rose-500/40 text-rose-500 shadow-sm shadow-rose-500/10'
-                  : 'bg-background/80 hover:bg-background border-text-secondary/20 hover:border-rose-500/40 text-text-secondary hover:text-rose-500'
-              }`}
-              title="Beri Apresiasi (Suka)"
+              onClick={() => handleReaction('LIKE')}
+              className={`group relative inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all duration-200 cursor-pointer select-none ${
+                userReaction === 'LIKE'
+                  ? 'bg-foreground text-background shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-background/60'
+              } active:scale-95`}
+              title={userReaction === 'LIKE' ? 'Batalkan apresiasi' : 'Beri apresiasi (Suka)'}
+              aria-pressed={userReaction === 'LIKE'}
             >
+              {/* Ambient Glow */}
+              {activeAnim === 'LIKE' && (
+                <span
+                  key={`glow-like-${burstKey}`}
+                  className="anim-reaction-glow absolute inset-0 m-auto rounded-lg bg-foreground/15 pointer-events-none"
+                />
+              )}
+
+              {/* Floating +1 Badge */}
+              {activeAnim === 'LIKE' && (
+                <span
+                  key={`float-like-${burstKey}`}
+                  className="anim-reaction-badge absolute -top-2 left-1/2 pointer-events-none z-30 whitespace-nowrap rounded-full bg-foreground text-background px-2 py-0.5 text-[10px] font-mono font-bold shadow-md"
+                >
+                  +1
+                </span>
+              )}
+
               <svg
-                viewBox="0 0 24 24"
-                className={`w-4 h-4 transition-transform duration-300 ${
-                  isBouncing ? 'scale-135' : 'group-hover:scale-115'
-                } ${reaction === 'LIKE' ? 'fill-current' : 'fill-none stroke-current stroke-2'}`}
-              >
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </svg>
-              <span>Apresiasi</span>
-              <span
-                className={`font-mono text-xs px-2 py-0.5 rounded-full transition-colors ${
-                  reaction === 'LIKE'
-                    ? 'bg-rose-500/20 text-rose-500 font-bold'
-                    : 'bg-text-secondary/10 text-text-secondary'
+                className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
+                  activeAnim === 'LIKE' ? 'anim-reaction-up' : 'group-hover:-translate-y-0.5'
                 }`}
+                viewBox="0 0 24 24"
+                fill={userReaction === 'LIKE' ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth={userReaction === 'LIKE' ? '1.5' : '2'}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
               >
-                {likeCount}
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
+              </svg>
+              <span className="font-mono text-xs font-bold tracking-tight">{likeCount}</span>
+              <span className="text-[11px] opacity-80 hidden md:inline">
+                {userReaction === 'LIKE' ? 'Disukai' : 'Suka'}
               </span>
             </button>
 
-            {/* Subtle Feedback / Dislike Button */}
+            {/* Subtle Divider */}
+            <div className="h-4 w-px bg-text-secondary/15 mx-0.5" />
+
+            {/* Tombol DISLIKE 👎 */}
             <button
               type="button"
-              onClick={() => void react('DISLIKE')}
-              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium border transition-all duration-200 cursor-pointer select-none active:scale-95 ${
-                reaction === 'DISLIKE'
-                  ? 'bg-text-primary text-background border-text-primary shadow-xs'
-                  : 'bg-background/40 hover:bg-background/80 border-text-secondary/15 hover:border-text-secondary/30 text-text-secondary/70 hover:text-text-secondary'
-              }`}
-              title="Beri masukan jika ada yang kurang"
+              onClick={() => handleReaction('DISLIKE')}
+              className={`group relative inline-flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all duration-200 cursor-pointer select-none ${
+                userReaction === 'DISLIKE'
+                  ? 'bg-text-secondary/25 text-text-primary shadow-sm'
+                  : 'text-text-secondary hover:text-text-primary hover:bg-background/60'
+              } active:scale-95`}
+              title={userReaction === 'DISLIKE' ? 'Batalkan' : 'Kurang suka artikel ini'}
+              aria-pressed={userReaction === 'DISLIKE'}
             >
-              <svg
-                viewBox="0 0 24 24"
-                className={`w-3.5 h-3.5 stroke-current fill-none stroke-2 transition-transform duration-300 ${
-                  isDislikeBouncing ? 'scale-125' : ''
-                }`}
-              >
-                <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
-              </svg>
-              <span>Masukan</span>
-              {dislikeCount > 0 && (
-                <span className="font-mono text-[11px] opacity-80">{dislikeCount}</span>
+              {/* Ambient Glow */}
+              {activeAnim === 'DISLIKE' && (
+                <span
+                  key={`glow-dislike-${burstKey}`}
+                  className="anim-reaction-glow absolute inset-0 m-auto rounded-lg bg-text-secondary/20 pointer-events-none"
+                />
               )}
+
+              {/* Floating -1 Badge */}
+              {activeAnim === 'DISLIKE' && (
+                <span
+                  key={`float-dislike-${burstKey}`}
+                  className="anim-reaction-badge absolute -top-2 left-1/2 pointer-events-none z-30 whitespace-nowrap rounded-full bg-text-secondary text-background dark:bg-text-primary dark:text-background px-2 py-0.5 text-[10px] font-mono font-bold shadow-md"
+                >
+                  -1
+                </span>
+              )}
+
+              <svg
+                className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
+                  activeAnim === 'DISLIKE' ? 'anim-reaction-down' : 'group-hover:translate-y-0.5'
+                }`}
+                viewBox="0 0 24 24"
+                fill={userReaction === 'DISLIKE' ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                strokeWidth={userReaction === 'DISLIKE' ? '1.5' : '2'}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3" />
+              </svg>
+              <span className="font-mono text-xs font-bold tracking-tight">{dislikeCount}</span>
             </button>
           </div>
         </div>
 
-        {/* Share Section with Live Share Count */}
-        <div className="sm:text-right border-t sm:border-t-0 border-text-secondary/10 pt-3 sm:pt-0">
-          <div className="flex items-center sm:justify-end gap-2 mb-2.5">
-            <p className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Bagikan Tulisan
-            </p>
-            <span
-              className="inline-flex items-center gap-1 text-[11px] font-medium text-emerald-500 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-mono transition-all"
-              title="Jumlah kali artikel ini dibagikan"
-            >
-              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
-              <span>{shareCount} kali dibagikan</span>
+        {/* Action Bagikan dengan Anti-Spam */}
+        <div className="flex items-center gap-2 border-t sm:border-t-0 pt-3 sm:pt-0 border-text-secondary/10">
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-text-secondary/70 mr-1 hidden xs:inline-block">
+            Bagikan
+          </span>
+
+          {/* WhatsApp */}
+          <button
+            type="button"
+            onClick={handleShareWhatsApp}
+            className="flex items-center justify-center h-9 w-9 rounded-xl border border-text-secondary/15 bg-background/60 hover:bg-[#25D366]/10 hover:border-[#25D366]/40 hover:text-[#25D366] text-text-secondary transition-all duration-200 cursor-pointer active:scale-95"
+            title="Bagikan ke WhatsApp"
+            aria-label="Bagikan ke WhatsApp"
+          >
+            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+            </svg>
+          </button>
+
+          {/* Twitter / X */}
+          <button
+            type="button"
+            onClick={handleShareTwitter}
+            className="flex items-center justify-center h-9 w-9 rounded-xl border border-text-secondary/15 bg-background/60 hover:bg-foreground hover:text-background text-text-secondary transition-all duration-200 cursor-pointer active:scale-95"
+            title="Bagikan ke X (Twitter)"
+            aria-label="Bagikan ke X"
+          >
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </button>
+
+          {/* Copy Link (Dengan Cooldown & Status Tersalin) */}
+          <button
+            type="button"
+            onClick={handleCopyLink}
+            disabled={copied}
+            className={`flex items-center justify-center h-9 px-3 gap-1.5 rounded-xl border text-xs font-semibold transition-all duration-200 ${
+              copied
+                ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default'
+                : 'border-text-secondary/15 bg-background/60 hover:border-text-secondary/35 text-text-secondary hover:text-text-primary cursor-pointer active:scale-95'
+            }`}
+            title={copied ? 'Tautan sudah disalin' : 'Salin tautan artikel'}
+          >
+            {copied ? (
+              <>
+                <svg className="w-4 h-4 animate-in fade-in" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Tersalin</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <span>Salin</span>
+              </>
+            )}
+          </button>
+
+          {/* Web Share (Mobile) */}
+          <button
+            type="button"
+            onClick={handleNativeShare}
+            className="flex items-center justify-center h-9 w-9 rounded-xl border border-text-secondary/15 bg-background/60 hover:bg-foreground hover:text-background text-text-secondary transition-all duration-200 cursor-pointer sm:hidden"
+            title="Bagikan"
+            aria-label="Bagikan"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+          </button>
+
+          {/* Share Counter Pill */}
+          {shareCount > 0 && (
+            <span className="text-[11px] font-mono font-medium text-text-secondary/70 ml-1">
+              · {shareCount} dibagikan
             </span>
-          </div>
-
-          <div className="inline-flex items-center gap-2">
-            {/* Copy Link */}
-            <button
-              type="button"
-              onClick={handleCopy}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 cursor-pointer active:scale-95 ${
-                copied
-                  ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-500'
-                  : 'bg-background/80 hover:bg-background border-text-secondary/20 hover:border-text-primary text-text-secondary hover:text-text-primary'
-              }`}
-              title="Salin tautan artikel"
-            >
-              {copied ? (
-                <>
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>Tersalin!</span>
-                </>
-              ) : (
-                <>
-                  <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 stroke-current fill-none stroke-2">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-                  </svg>
-                  <span>Salin Link</span>
-                </>
-              )}
-            </button>
-
-            {/* WhatsApp */}
-            <button
-              type="button"
-              onClick={handleShareWhatsApp}
-              className="p-2 rounded-full border border-text-secondary/20 bg-background/80 hover:bg-emerald-500/10 hover:border-emerald-500/40 text-text-secondary hover:text-emerald-500 transition-all cursor-pointer active:scale-95"
-              title="Bagikan ke WhatsApp"
-            >
-              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current">
-                <path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.978-.276-.1-.477-.15-.678.15-.201.3-.777.978-.953 1.179-.176.2-.351.226-.652.075-.301-.151-1.272-.469-2.423-1.496-.895-.798-1.5-1.783-1.676-2.084-.176-.301-.019-.464.132-.614.136-.135.301-.351.452-.527.15-.176.2-.301.3-.502.101-.2.05-.376-.025-.526-.075-.151-.678-1.633-.929-2.235-.245-.587-.494-.507-.678-.517-.176-.009-.376-.01-.577-.01-.201 0-.527.075-.803.376s-1.054 1.03-1.054 2.511 1.079 2.912 1.23 3.113c.15.201 2.122 3.24 5.141 4.544.718.31 1.279.496 1.716.635.722.23 1.378.197 1.898.12.579-.086 1.78-.728 2.031-1.431.251-.703.251-1.305.176-1.431-.076-.126-.277-.201-.578-.352zM12 21.84c-1.815 0-3.593-.49-5.147-1.417l-.369-.219-3.826 1.003 1.021-3.73-.24-.382a9.78 9.78 0 0 1-1.503-5.26c0-5.422 4.412-9.835 9.837-9.835 2.628 0 5.099 1.024 6.957 2.883a9.785 9.785 0 0 1 2.88 6.952c0 5.424-4.412 9.84-9.84 9.84zm0-21.84C5.467 0 0 5.467 0 12c0 2.087.545 4.127 1.579 5.922L0 24l6.236-1.636A11.94 11.94 0 0 0 12 24c6.533 0 12-5.467 12-12S18.533 0 12 0z" />
-              </svg>
-            </button>
-
-            {/* Twitter / X */}
-            <button
-              type="button"
-              onClick={handleShareTwitter}
-              className="p-2 rounded-full border border-text-secondary/20 bg-background/80 hover:bg-blue-500/10 hover:border-blue-500/40 text-text-secondary hover:text-blue-400 transition-all cursor-pointer active:scale-95"
-              title="Bagikan ke X"
-            >
-              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-            </button>
-          </div>
+          )}
         </div>
       </div>
     </div>
