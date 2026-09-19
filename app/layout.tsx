@@ -79,6 +79,9 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
+  verification: {
+    google: "aTD5_GM-X3OapH5VwlzrOMt24jq6eh9mEZ9iu_D5EFg",
+  },
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {
