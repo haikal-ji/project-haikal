@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { verifySameOrigin } from '@/lib/csrf'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { articleSchema } from '@/lib/schemas'
+import { sanitizeArticleHtml } from '@/lib/sanitize'
 
 async function requireOwner() {
   const supabase = await createClient()
@@ -53,7 +54,7 @@ export async function POST(request: Request) {
   const article = await prisma.article.create({
     data: {
       title,
-      content,
+      content: sanitizeArticleHtml(content),
       thumbnail: thumbnail || null,
       author_id: owner.id,
     },

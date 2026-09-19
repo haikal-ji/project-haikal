@@ -84,7 +84,7 @@ export default function LoginPage() {
           <p className="text-sm text-text-secondary mt-1">Masuk ke akun kamu untuk berinteraksi</p>
         </div>
 
-        <AuthMessage override={oauthError ? { message: oauthError, type: 'error' } : null} />
+        <AuthMessage override={errorMessage ? { message: errorMessage, type: 'error' } : null} />
 
         <div className="space-y-3">
           {/* Tombol Google */}
@@ -140,8 +140,6 @@ export default function LoginPage() {
         </div>
 
         <form action={formAction} className="space-y-4">
-          <AuthMessage override={state?.error ? { message: state.error, type: 'error' } : null} />
-
           <div>
             <label htmlFor="login-email" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">Email</label>
             <input

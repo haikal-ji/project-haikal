@@ -8,6 +8,7 @@ import type { Metadata } from 'next'
 import ArticleViewTracker from '@/components/ArticleViewTracker'
 import ReactionButtons from '@/components/ReactionButtons'
 import { createClient } from '@/lib/supabase/server'
+import { sanitizeArticleHtml } from '@/lib/sanitize'
 
 export const dynamic = 'force-dynamic'
 
@@ -242,10 +243,10 @@ export default async function ArtikelDetailPage({
         </div>
       )}
 
-      {/* Article Content */}
+      {/* Article Content — konten di-sanitasi untuk mencegah XSS */}
       <div
         className="article-detail-content max-w-none text-base sm:text-lg leading-relaxed text-text-primary space-y-6 my-12"
-        dangerouslySetInnerHTML={{ __html: article.content }}
+        dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content) }}
       />
 
       {/* Reactions Bar */}

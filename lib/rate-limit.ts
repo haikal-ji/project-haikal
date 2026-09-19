@@ -38,12 +38,52 @@ function cleanupStaleEntries(windowMs: number) {
 }
 
 /**
+ * Inti sliding-window — dipakai oleh semua overload di bawah.
+ */
+function hitRateLimit(key: string, opts: { limit: number; windowMs: number }): boolean {
+  const now = Date.now()
+  const windowStart = now - opts.windowMs
+
+  const timestamps = (hitMap.get(key) || []).filter((t) => t > windowStart)
+
+  if (timestamps.length >= opts.limit) {
+    hitMap.set(key, timestamps)
+    cleanupStaleEntries(opts.windowMs)
+    return true // rate limit terlampaui
+  }
+
+  timestamps.push(now)
+  hitMap.set(key, timestamps)
+  cleanupStaleEntries(opts.windowMs)
+  return false // masih aman
+}
+
+/**
+ * Cek rate limit dari IP string secara langsung.
+ * Dipakai di Server Actions (yang tidak punya Request object).
+ *
+ * @param ip        - IP address (dari x-forwarded-for atau 'unknown')
+ * @param routeKey  - Identifier unik route (misal 'POST:/login')
+ * @param opts      - { limit, windowMs }
+ * @returns true jika rate limit terlampaui
+ */
+export function checkRateLimitByIp(
+  ip: string | null | undefined,
+  routeKey: string,
+  opts: { limit: number; windowMs: number }
+): boolean {
+  const safeIp = ip?.split(',')[0].trim() || 'unknown'
+  return hitRateLimit(`${routeKey}:${safeIp}`, opts)
+}
+
+/**
  * Cek apakah request sudah melewati rate limit.
  *
  * @param request - Request object (untuk mengambil IP)
  * @param routeKey - Identifier unik route (misal 'POST:/api/comment')
  * @param opts.limit - Jumlah request maksimal dalam window
  * @param opts.windowMs - Durasi window dalam milidetik
+ * @param opts.identity - (opsional) identitas custom; kalau diisi, IP diabaikan
  * @returns true jika rate limit terlampaui (harus ditolak), false jika masih aman
  */
 export function checkRateLimit(
@@ -85,20 +125,5 @@ export function checkRateLimit(
     key = `${routeKey}:${ip}`
   }
 
-  const now = Date.now()
-  const windowStart = now - opts.windowMs
-
-  // Ambil timestamps yang masih dalam window
-  const timestamps = (hitMap.get(key) || []).filter((t) => t > windowStart)
-
-  if (timestamps.length >= opts.limit) {
-    hitMap.set(key, timestamps)
-    cleanupStaleEntries(opts.windowMs)
-    return true // rate limit terlampaui
-  }
-
-  timestamps.push(now)
-  hitMap.set(key, timestamps)
-  cleanupStaleEntries(opts.windowMs)
-  return false // masih aman
+  return hitRateLimit(key, opts)
 }

@@ -4,6 +4,7 @@ import { syncUserToDb } from '@/lib/auth-sync'
 import { prisma } from '@/lib/prisma'
 import { verifySameOrigin } from '@/lib/csrf'
 import { articleSchema } from '@/lib/schemas'
+import { sanitizeArticleHtml } from '@/lib/sanitize'
 
 async function requireOwner() {
   const supabase = await createClient()
@@ -59,7 +60,7 @@ export async function PUT(
   try {
     const article = await prisma.article.update({
       where: { id },
-      data: { title, content, thumbnail: thumbnail || null },
+      data: { title, content: sanitizeArticleHtml(content), thumbnail: thumbnail || null },
     })
 
     return NextResponse.json({ article })
