@@ -32,7 +32,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://haikal.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://ekall.vercel.app'),
   title: {
     default: "Haikal — Portofolio",
     template: "%s | Haikal",
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://haikal.vercel.app",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://ekall.vercel.app",
     siteName: "Haikal — Portofolio",
     title: "Haikal — Portofolio",
     description: "Web developer & creative technologist yang sedang belajar merancang dan membangun website yang rapi, simpel, dan enak diliat.",

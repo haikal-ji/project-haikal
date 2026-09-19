@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://haikal.vercel.app'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ekall.vercel.app'
 
   let articles: { id: string; created_at: Date }[] = []
 

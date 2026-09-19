@@ -31,7 +31,7 @@ export async function generateMetadata({
   })
   if (!article) return {}
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://haikal.vercel.app'
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ekall.vercel.app'
   const imageUrl = article.thumbnail
     ? (article.thumbnail.startsWith('http') ? article.thumbnail : `${siteUrl}${article.thumbnail}`)
     : `${siteUrl}/og-image.png`
