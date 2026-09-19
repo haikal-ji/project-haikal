@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import CommunityBadge from '@/components/CommunityBadge'
 
 export type PublicProfileUser = {
@@ -115,10 +116,12 @@ export default function PublicProfileView({ user }: { user: PublicProfileUser })
           {/* Avatar frame */}
           <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-line shadow-md shrink-0 bg-secondary flex items-center justify-center">
             {user.avatar ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={user.avatar}
                 alt={user.name}
+                width={112}
+                height={112}
+                priority
                 className="w-full h-full object-cover"
               />
             ) : (

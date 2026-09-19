@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import RichTextEditor from './RichTextEditor'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
@@ -139,11 +140,13 @@ export default function ArticleForm({
           >
             {preview ? (
               <div className="relative w-full h-[190px] group">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={preview}
                   alt="Preview cover artikel"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 400px"
                   className="w-full h-full object-cover rounded-xl"
+                  unoptimized={preview.startsWith('blob:') || preview.startsWith('data:')}
                 />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white text-xs font-medium rounded-xl">
                   <span>Klik untuk ganti cover</span>

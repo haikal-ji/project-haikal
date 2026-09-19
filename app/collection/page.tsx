@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export const metadata: Metadata = {
   title: 'Collection | Haikal',
@@ -62,10 +63,11 @@ export default function CollectionPage() {
         {projects.map((project) => (
           <article key={project.number} className="collection-reference-card">
               <div className="collection-reference-image">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <Image
                 src={project.image}
                 alt={project.name}
+                width={600}
+                height={600}
                 className={project.image.includes('29') ? '!scale-110' : ''}
               />
             </div>

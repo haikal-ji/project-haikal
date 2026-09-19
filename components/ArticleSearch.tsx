@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useMemo, useState } from 'react'
 
 type ArticleItem = {
@@ -47,17 +48,19 @@ export default function ArticleSearch({ articles }: { articles: ArticleItem[] })
             <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xl bg-thirdary/40 mb-4 flex items-center justify-center">
               {article.thumbnail ? (
                 <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={article.thumbnail}
                     alt=""
                     aria-hidden="true"
-                    className="absolute inset-0 h-full w-full object-cover blur-xl opacity-35 scale-110 select-none pointer-events-none"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover blur-xl opacity-35 scale-110 select-none pointer-events-none"
                   />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={article.thumbnail}
                     alt={article.title}
+                    width={400}
+                    height={250}
                     className="relative z-10 h-full w-full object-contain transition-transform duration-500 group-hover:scale-105 select-none"
                   />
                 </>

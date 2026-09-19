@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import Image from 'next/image'
 import BanUserButton from '@/components/BanUserButton'
 import DeleteUserButton from '@/components/DeleteUserButton'
 import AppealActionButtons from '@/components/AppealActionButtons'
@@ -191,10 +192,11 @@ export default async function KomunitasPage() {
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
                         {user.avatar ? (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
+                          <Image
                             src={user.avatar}
                             alt={user.name}
+                            width={32}
+                            height={32}
                             className="w-8 h-8 rounded-full object-cover border border-text-secondary/15"
                           />
                         ) : (

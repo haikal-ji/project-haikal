@@ -36,8 +36,7 @@ export default function SiteHeader({
     await supabase.auth.signOut()
     await fetch('/auth/signout', { method: 'POST', headers: { Accept: 'application/json' } })
     setMobileOpen(false)
-    router.replace('/')
-    router.refresh()
+    window.location.href = '/'
   }
 
   return (

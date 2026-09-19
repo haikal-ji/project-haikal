@@ -1,27 +1,33 @@
-'use client'
+﻿'use client'
 
 import { useState, type FormEvent, type KeyboardEvent } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
 import Avatar from '@/components/Avatar'
 import { toast } from '@/components/ToastProvider'
+import type { CommentData } from '@/components/CommentItem'
 
 interface CommentFormProps {
   articleId: string
   isLoggedIn: boolean
   currentUser?: {
+    id?: string
     name: string
     avatar: string | null
   } | null
+  onOptimisticAdd?: (content: string) => string
+  onOptimisticRollback?: (optimisticId: string) => void
+  onOptimisticReplace?: (optimisticId: string, real: CommentData) => void
 }
 
 export default function CommentForm({
   articleId,
   isLoggedIn,
   currentUser,
+  onOptimisticAdd,
+  onOptimisticRollback,
+  onOptimisticReplace,
 }: CommentFormProps) {
-  const router = useRouter()
   const [content, setContent] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -59,31 +65,41 @@ export default function CommentForm({
 
   async function handleSubmit(e?: FormEvent) {
     if (e) e.preventDefault()
-    if (!content.trim()) return
+    const trimmed = content.trim()
+    if (!trimmed) return
 
     setError(null)
     setLoading(true)
+
+    const optimisticId = onOptimisticAdd?.(trimmed) ?? ''
+    setContent('')
 
     try {
       const res = await fetch('/api/comment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ article_id: articleId, content: content.trim() }),
+        body: JSON.stringify({ article_id: articleId, content: trimmed }),
       })
 
+      const data = await res.json().catch(() => ({}))
+
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
+        if (optimisticId) onOptimisticRollback?.(optimisticId)
+        setContent(trimmed)
         const errorMsg = data.error || 'Gagal mengirim komentar'
         setError(errorMsg)
         toast.error('Gagal mengirim komentar', errorMsg)
         return
       }
 
-      setContent('')
+      if (optimisticId && data.comment) {
+        onOptimisticReplace?.(optimisticId, data.comment)
+      }
       toast.success('Komentar berhasil dikirim')
-      router.refresh()
     } catch (err) {
       console.error(err)
+      if (optimisticId) onOptimisticRollback?.(optimisticId)
+      setContent(trimmed)
       setError('Terjadi kesalahan jaringan')
       toast.error('Koneksi terputus', 'Gagal mengirim komentar ke server.')
     } finally {
@@ -137,7 +153,7 @@ export default function CommentForm({
 
           <div className="flex items-center justify-between gap-3">
             <span className="text-[11px] text-text-secondary/60">
-              {content.length > 0 ? `${content.length} karakter` : 'Dukung diskusi yang santun'}
+              {content.length > 0 ? content.length + ' karakter' : 'Dukung diskusi yang santun'}
             </span>
 
             <button
@@ -146,7 +162,13 @@ export default function CommentForm({
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-text-primary text-background font-semibold text-xs tracking-wider uppercase transition-all duration-200 hover:opacity-90 active:scale-95 disabled:opacity-50 cursor-pointer shadow-xs group"
             >
               {loading ? (
-                <span>Mengirim...</span>
+                <>
+                  <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  <span>Mengirim...</span>
+                </>
               ) : (
                 <>
                   <span>Kirim Tanggapan</span>

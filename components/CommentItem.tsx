@@ -34,6 +34,8 @@ interface CommentItemProps {
   isOwner: boolean
   isAuthor: boolean
   isArticleAuthor?: boolean
+  /** Dipanggil setelah komentar berhasil dihapus — untuk update state parent */
+  onDeleted?: (id: string) => void
 }
 
 export default function CommentItem({
@@ -41,6 +43,7 @@ export default function CommentItem({
   isOwner,
   isAuthor,
   isArticleAuthor = false,
+  onDeleted,
 }: CommentItemProps) {
   const router = useRouter()
   const [content, setContent] = useState(comment.content)
@@ -101,7 +104,7 @@ export default function CommentItem({
         setError(data.error || 'Gagal menghapus komentar')
       } else {
         setIsDeleted(true)
-        router.refresh()
+        onDeleted?.(comment.id)
       }
     } catch (err) {
       console.error(err)

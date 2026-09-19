@@ -62,26 +62,36 @@ export async function POST(request: Request) {
     )
   }
 
-  const comment = await prisma.comment.create({
-    data: {
-      article_id,
-      user_id: dbUser.id,
-      content: content.trim(),
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          avatar: true,
-          badges: {
-            include: { badge: true },
-            orderBy: { awarded_at: 'asc' },
+  // Cek apakah artikel yang dituju masih ada
+  const article = await prisma.article.findUnique({ where: { id: article_id }, select: { id: true } })
+  if (!article) return NextResponse.json({ error: 'Artikel tidak ditemukan' }, { status: 404 })
+
+  let comment
+  try {
+    comment = await prisma.comment.create({
+      data: {
+        article_id,
+        user_id: dbUser.id,
+        content: content.trim(),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            avatar: true,
+            badges: {
+              include: { badge: true },
+              orderBy: { awarded_at: 'asc' },
+            },
           },
         },
       },
-    },
-  })
+    })
+  } catch (err) {
+    console.error('Error creating comment:', err)
+    return NextResponse.json({ error: 'Gagal mengirim komentar' }, { status: 500 })
+  }
 
   revalidatePath(`/artikel/${article_id}`)
 

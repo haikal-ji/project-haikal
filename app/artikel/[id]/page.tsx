@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
-import CommentForm from '@/components/CommentForm'
-import CommentItem from '@/components/CommentItem'
+import Image from 'next/image'
+import CommentSection from '@/components/CommentSection'
 import Avatar from '@/components/Avatar'
 import type { Metadata } from 'next'
 import ArticleViewTracker from '@/components/ArticleViewTracker'
@@ -29,15 +29,36 @@ export async function generateMetadata({
     where: { id },
   })
   if (!article) return {}
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://haikal.vercel.app'
+  const imageUrl = article.thumbnail
+    ? (article.thumbnail.startsWith('http') ? article.thumbnail : `${siteUrl}${article.thumbnail}`)
+    : `${siteUrl}/og-image.png`
+
+  const description = article.content.replace(/<[^>]*>/g, '').slice(0, 155) + '...'
+
   return {
     title: `${article.title} | Haikal Journal`,
-    description: article.content.replace(/<[^>]*>/g, '').slice(0, 155) + '...',
+    description,
     openGraph: {
       title: article.title,
-      description: article.content.replace(/<[^>]*>/g, '').slice(0, 155) + '...',
+      description,
       type: 'article',
       publishedTime: new Date(article.created_at).toISOString(),
-      images: article.thumbnail ? [article.thumbnail] : ['/og-image.png'],
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description,
+      images: [imageUrl],
     },
   }
 }
@@ -200,18 +221,22 @@ export default async function ArtikelDetailPage({
       {article.thumbnail && (
         <div className="relative max-h-[540px] aspect-[16/10] sm:aspect-[16/9] w-full overflow-hidden rounded-3xl border border-text-secondary/15 my-10 bg-thirdary/30 flex items-center justify-center">
           {/* Ambient blurred backdrop */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={article.thumbnail}
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 h-full w-full object-cover blur-2xl opacity-30 scale-110 select-none pointer-events-none"
+            fill
+            sizes="100vw"
+            priority
+            className="object-cover blur-2xl opacity-30 scale-110 select-none pointer-events-none"
           />
           {/* Main crisp uncropped image */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src={article.thumbnail}
             alt={article.title}
+            width={1200}
+            height={675}
+            priority
             className="relative z-10 max-h-[540px] w-full h-full object-contain transition-transform duration-700 hover:scale-[1.01] select-none"
           />
         </div>
@@ -238,63 +263,21 @@ export default async function ArtikelDetailPage({
 
       {/* Comments Section */}
       <section className="mt-16 pt-12 border-t border-text-secondary/15">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-              <span>Ruang Diskusi</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-text-primary">
-              Komentar Komunitas{' '}
-              <span className="text-text-secondary font-normal text-xl">
-                ({article.comments.length})
-              </span>
-            </h2>
-            <p className="text-xs sm:text-sm text-text-secondary mt-1">
-              Bagikan gagasan, tanggapan, atau umpan balik seputar tulisan ini.
-            </p>
-          </div>
+        <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-text-secondary mb-2">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          </svg>
+          <span>Ruang Diskusi</span>
         </div>
 
-        {/* Comment Form */}
-        <div className="mb-10">
-          <CommentForm
-            articleId={article.id}
-            isLoggedIn={Boolean(authUser)}
-            currentUser={currentUser}
-          />
-        </div>
-
-        {/* Comments Stack */}
-        {article.comments.length > 0 ? (
-          <div className="space-y-4">
-            {article.comments.map((comment) => (
-              <CommentItem
-                key={comment.id}
-                comment={comment}
-                isOwner={isOwner}
-                isAuthor={comment.user_id === currentUser?.id}
-                isArticleAuthor={comment.user.id === article.author_id}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-3xl border border-dashed border-text-secondary/20 p-10 sm:p-14 text-center bg-thirdary/10">
-            <div className="w-12 h-12 rounded-2xl bg-thirdary/60 border border-text-secondary/15 flex items-center justify-center text-text-secondary/70 mx-auto mb-3 shadow-xs">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.75">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-              </svg>
-            </div>
-            <h3 className="text-base font-bold text-text-primary tracking-tight">
-              Belum ada komentar
-            </h3>
-            <p className="text-xs sm:text-sm text-text-secondary mt-1 max-w-sm mx-auto">
-              Jadilah orang pertama yang memulai percakapan dan membagikan sudut pandangmu!
-            </p>
-          </div>
-        )}
+        <CommentSection
+          articleId={article.id}
+          initialComments={article.comments}
+          isOwner={isOwner}
+          isLoggedIn={Boolean(authUser)}
+          currentUser={currentUser}
+          authorId={article.author_id}
+        />
       </section>
     </main>
   )

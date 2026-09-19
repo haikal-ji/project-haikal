@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 
 export default function Avatar({
   src,
@@ -22,12 +23,14 @@ export default function Avatar({
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <Image
       src={src}
       alt={name}
+      width={48}
+      height={48}
       className={`comment-avatar ${className}`}
       onError={() => setFailed(true)}
+      unoptimized={src.startsWith('data:') || src.startsWith('blob:')}
     />
   )
 }

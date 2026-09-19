@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { prisma } from '@/lib/prisma'
 import TextType from '@/components/TextType'
 import ScrollVelocity from '@/components/ScrollVelocity'
@@ -10,6 +11,7 @@ import Stack from '@/components/Stack'
 import TiltedCard from '@/components/TiltedCard'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
 import DecryptedText from '@/components/DecryptedText'
+import BlurText from '@/components/BlurText'
 
 export const dynamic = 'force-dynamic'
 
@@ -123,12 +125,14 @@ export default async function HomePage() {
       >
         <BlurReveal delay={0.1} className="flex flex-col gap-2">
           <div>
-            <h1 className="text-text-primary text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-tight">
-              Hi, I&apos;m
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-text-primary via-text-primary/80 to-text-secondary">
-                {' '}Haikal
-              </span>
-            </h1>
+            <BlurText
+              text="Hi, I'm Haikal"
+              delay={70}
+              animateBy="words"
+              direction="top"
+              as="h1"
+              className="text-text-primary text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-tight"
+            />
           </div>
 
           <div className="relative flex items-center min-h-[40px]" aria-label="Bidang yang sedang dipelajari">
@@ -161,10 +165,10 @@ export default async function HomePage() {
               </svg>
             </Link>
             <Link
-              href="#projects"
+              href="#artikel"
               className="cursor-pointer text-sm md:text-base font-bold border-2 border-text-secondary/20 hover:border-text-primary text-text-primary px-8 py-4 rounded-xl flex flex-row items-center justify-center gap-3 hover:-translate-y-1.5 hover:scale-[1.02] hover:bg-thirdary/40 transition-all duration-300 ease-out bg-background/50 backdrop-blur-sm shadow-[0_4px_10px_rgb(0,0,0,0.03)] dark:shadow-[0_4px_10px_rgba(255,255,255,0.02)]"
             >
-              Projects
+              Artikel
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
@@ -213,10 +217,12 @@ export default async function HomePage() {
         <BlurReveal delay={0.25} yOffset={25} className="flex flex-col items-center justify-center relative mt-12 md:mt-0 pb-12 sm:pb-0">
           <div className="absolute inset-0 bg-text-primary/5 rounded-full scale-105 opacity-40 blur-2xl pointer-events-none" />
           <div className="relative z-10 p-2 sm:p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full shadow-2xl">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src="/haikal-hero.jpg"
               alt="Muhammad Haikal"
+              width={380}
+              height={380}
+              priority
               className="w-64 h-64 sm:w-80 sm:h-80 lg:w-[380px] lg:h-[380px] rounded-full object-cover [object-position:center_58%] aspect-square transition-all duration-700 hover:scale-[1.02]"
             />
           </div>
@@ -266,10 +272,24 @@ export default async function HomePage() {
         id="about"
         className="w-full max-w-7xl mx-auto py-24 md:py-32 cursor-default bg-background overflow-hidden border-t border-text-secondary/10"
       >
-        <BlurReveal className="max-w-7xl mx-auto px-6 md:px-12 mb-16 md:mb-24 w-full text-left">
-          <h2 className="text-sm font-bold tracking-[0.2em] text-text-secondary uppercase mb-4">Discover</h2>
-          <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter">About Me</h3>
-        </BlurReveal>
+        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-16 md:mb-24 w-full text-left">
+          <BlurText
+            text="Discover"
+            delay={50}
+            animateBy="letters"
+            direction="top"
+            as="h2"
+            className="text-sm font-bold tracking-[0.2em] text-text-secondary uppercase mb-4"
+          />
+          <BlurText
+            text="About Me"
+            delay={70}
+            animateBy="words"
+            direction="top"
+            as="h3"
+            className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter"
+          />
+        </div>
 
         <BlurReveal delay={0.15} className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 px-6 md:px-12">
           {/* Left: TiltedCard Photo */}
@@ -437,10 +457,24 @@ export default async function HomePage() {
         id="techstack"
         className="w-full max-w-7xl mx-auto py-24 md:py-32 cursor-default bg-background relative border-t border-text-secondary/10 overflow-hidden"
       >
-        <BlurReveal className="max-w-7xl mx-auto px-6 md:px-12 mb-16 md:mb-24 w-full text-left">
-          <h2 className="text-sm font-bold tracking-[0.2em] text-text-secondary uppercase mb-4">Skills &amp; Tools</h2>
-          <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter">My Tech Stack</h3>
-        </BlurReveal>
+        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-16 md:mb-24 w-full text-left">
+          <BlurText
+            text="Skills & Tools"
+            delay={50}
+            animateBy="words"
+            direction="top"
+            as="h2"
+            className="text-sm font-bold tracking-[0.2em] text-text-secondary uppercase mb-4"
+          />
+          <BlurText
+            text="My Tech Stack"
+            delay={70}
+            animateBy="words"
+            direction="top"
+            as="h3"
+            className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter"
+          />
+        </div>
 
         <BlurReveal delay={0.15} className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col gap-16">
           {skillGroups.map((group) => (
@@ -521,10 +555,11 @@ export default async function HomePage() {
                 pauseOnHover={true}
                 cards={projects.map((p, i) => (
                   <div key={i} className="relative w-full h-full overflow-hidden rounded-2xl bg-neutral-900 select-none shadow-xl border border-white/10">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={p.image}
                       alt={p.name}
+                      width={340}
+                      height={480}
                       className="w-full h-full pointer-events-none select-none object-cover object-center transition-transform duration-300"
                     />
                   </div>
@@ -556,9 +591,14 @@ export default async function HomePage() {
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>Journal &amp; Insights</span>
             </div>
-            <h3 className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter">
-              Latest Articles
-            </h3>
+            <BlurText
+              text="Latest Articles"
+              delay={70}
+              animateBy="words"
+              direction="top"
+              as="h3"
+              className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter"
+            />
             <p className="mt-3 text-sm md:text-base text-text-secondary max-w-xl font-medium leading-relaxed">
               Berbagi cerita, sudut pandang, dan catatan perjalanan saya di dunia digital, eksplorasi desain, serta hal-hal baru yang saya pelajari.
             </p>
@@ -586,17 +626,19 @@ export default async function HomePage() {
               <div className="relative aspect-[16/10] lg:aspect-auto lg:w-5/12 overflow-hidden bg-text-secondary/5 border-b lg:border-b-0 lg:border-r border-text-secondary/10 min-h-[260px] lg:min-h-[340px] flex items-center justify-center">
                 {latestArticles[0].thumbnail ? (
                   <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={latestArticles[0].thumbnail}
                       alt=""
                       aria-hidden="true"
-                      className="absolute inset-0 w-full h-full object-cover blur-xl opacity-35 scale-110 select-none pointer-events-none"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 40vw"
+                      className="object-cover blur-xl opacity-35 scale-110 select-none pointer-events-none"
                     />
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={latestArticles[0].thumbnail}
                       alt={latestArticles[0].title}
+                      width={600}
+                      height={400}
                       className="relative z-10 object-contain w-full h-full transition-all duration-700 group-hover:scale-105 select-none"
                     />
                   </>
@@ -680,17 +722,19 @@ export default async function HomePage() {
                   <div className="relative aspect-[16/10] w-full overflow-hidden bg-text-secondary/5 border-b border-text-secondary/10 flex items-center justify-center">
                     {article.thumbnail ? (
                       <>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        <Image
                           src={article.thumbnail}
                           alt=""
                           aria-hidden="true"
-                          className="absolute inset-0 w-full h-full object-cover blur-xl opacity-35 scale-110 select-none pointer-events-none"
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          className="object-cover blur-xl opacity-35 scale-110 select-none pointer-events-none"
                         />
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        <Image
                           src={article.thumbnail}
                           alt={article.title}
+                          width={500}
+                          height={312}
                           className="relative z-10 object-contain w-full h-full transition-all duration-700 group-hover:scale-105 select-none"
                         />
                       </>
@@ -773,7 +817,7 @@ export default async function HomePage() {
 
 
       {/* 8. CONTACT SECTION */}
-      <BlurReveal blurAmount={0}>
+      <BlurReveal blurAmount={12} delay={0.1}>
         <ContactSection />
       </BlurReveal>
     </div>

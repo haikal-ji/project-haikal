@@ -48,20 +48,20 @@ function cleanupStaleEntries(windowMs: number) {
  */
 export function checkRateLimit(
   request: Request,
-  opts: { limit: number; windowMs: number }
+  opts: { limit: number; windowMs: number; identity?: string }
 ): boolean
 export function checkRateLimit(
   request: Request,
   routeKey: string,
-  opts: { limit: number; windowMs: number }
+  opts: { limit: number; windowMs: number; identity?: string }
 ): boolean
 export function checkRateLimit(
   request: Request,
-  arg2: string | { limit: number; windowMs: number },
-  arg3?: { limit: number; windowMs: number }
+  arg2: string | { limit: number; windowMs: number; identity?: string },
+  arg3?: { limit: number; windowMs: number; identity?: string }
 ): boolean {
   let routeKey: string
-  let opts: { limit: number; windowMs: number }
+  let opts: { limit: number; windowMs: number; identity?: string }
 
   if (typeof arg2 === 'string') {
     routeKey = arg2
@@ -76,10 +76,15 @@ export function checkRateLimit(
     opts = arg2
   }
 
-  const forwarded = request.headers.get('x-forwarded-for')
-  const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown'
+  let key: string
+  if (opts.identity) {
+    key = `${routeKey}:${opts.identity}`
+  } else {
+    const forwarded = request.headers.get('x-forwarded-for')
+    const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown'
+    key = `${routeKey}:${ip}`
+  }
 
-  const key = `${routeKey}:${ip}`
   const now = Date.now()
   const windowStart = now - opts.windowMs
 

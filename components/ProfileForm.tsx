@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
 
@@ -74,8 +75,14 @@ export default function ProfileForm({
     <form onSubmit={handleSubmit} className="comment-form">
       <div className="profile-avatar-picker">
         {preview ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={preview} alt="Preview avatar" className="profile-avatar-preview" />
+          <Image
+            src={preview}
+            alt="Preview avatar"
+            width={80}
+            height={80}
+            className="profile-avatar-preview object-cover"
+            unoptimized={preview.startsWith('blob:') || preview.startsWith('data:')}
+          />
         ) : (
           <div className="profile-avatar-preview comment-avatar-fallback">
             {name.charAt(0).toUpperCase() || '?'}

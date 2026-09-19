@@ -16,10 +16,10 @@ interface BlurRevealProps {
 export default function BlurReveal({
   children,
   delay = 0,
-  duration = 0.55,
-  yOffset = 20,
+  duration = 0.65,
+  yOffset = 30,
   xOffset = 0,
-  blurAmount = 8,
+  blurAmount = 12,
   className = '',
 }: BlurRevealProps) {
   return (
@@ -28,21 +28,24 @@ export default function BlurReveal({
         opacity: 0,
         y: yOffset,
         x: xOffset,
-        ...(blurAmount > 0 ? { filter: `blur(${blurAmount}px)` } : {}),
+        filter: blurAmount > 0 ? `blur(${blurAmount}px)` : 'none',
       }}
       whileInView={{
         opacity: 1,
         y: 0,
         x: 0,
-        ...(blurAmount > 0 ? { filter: 'blur(0px)' } : {}),
+        filter: 'blur(0px)',
       }}
-      viewport={{ once: true, margin: '200px 0px 0px 0px', amount: 0 }}
+      viewport={{ once: true, margin: '0px 0px -70px 0px', amount: 0.08 }}
       transition={{
         duration,
         delay,
-        ease: [0.22, 1, 0.36, 1],
+        ease: [0.25, 0.4, 0.25, 1],
       }}
-      className={`reveal-visible ${className}`}
+      style={{
+        willChange: 'transform, filter, opacity',
+      }}
+      className={className}
     >
       {children}
     </motion.div>

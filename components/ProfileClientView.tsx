@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, type ChangeEvent, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
 import CommunityBadge from '@/components/CommunityBadge'
@@ -255,8 +256,7 @@ export default function ProfileClientView({
     } catch {
       // Abaikan jika error jaringan
     } finally {
-      router.replace('/login')
-      router.refresh()
+      window.location.href = '/login'
     }
   }
 
@@ -330,11 +330,14 @@ export default function ProfileClientView({
             {/* Foto Profil Utama */}
             <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-line group-hover:border-foreground/40 transition-all duration-300 shadow-md group-hover:shadow-xl">
               {avatarPreview ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={avatarPreview}
                   alt={name}
-                  className="profile-card-avatar !border-0 group-hover:scale-105 transition-transform duration-300"
+                  width={112}
+                  height={112}
+                  priority
+                  className="profile-card-avatar !border-0 group-hover:scale-105 transition-transform duration-300 object-cover w-full h-full"
+                  unoptimized={avatarPreview.startsWith('blob:') || avatarPreview.startsWith('data:')}
                 />
               ) : (
                 <div className="profile-card-avatar-fallback !border-0 font-serif group-hover:scale-105 transition-transform duration-300">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRef, useEffect, useState, useCallback, CSSProperties, KeyboardEvent, MouseEvent } from 'react';
+import Image from 'next/image';
 import { gsap } from 'gsap';
 
 export interface AccordionGalleryItem {
@@ -274,10 +275,11 @@ const AccordionGallery = ({
                   willChange: 'transform, filter'
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={item.image}
                   alt={item.alt || item.label || ''}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 400px"
                   draggable={false}
                   className={`block h-full w-full select-none ${
                     item.objectFit === 'contain'

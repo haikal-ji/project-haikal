@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { prisma } from '@/lib/prisma'
 import DeleteArticleButton from './DeleteArticleButton'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
@@ -114,10 +115,11 @@ export default async function DashboardPage() {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           {article.thumbnail ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
+                            <Image
                               src={article.thumbnail}
-                              alt=""
+                              alt={article.title || ''}
+                              width={48}
+                              height={48}
                               className="w-12 h-12 rounded-lg object-cover border border-text-secondary/15 shrink-0"
                             />
                           ) : (
