@@ -58,7 +58,8 @@ export default function ArticleForm({
       let thumbnailUrl = thumbnail
 
       if (thumbnailFile) {
-        const fileName = `thumbnail-${Date.now()}-${thumbnailFile.name}`
+        const cleanName = thumbnailFile.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+        const fileName = `thumbnail-${Date.now()}-${cleanName}`
         const { data, error: uploadError } = await supabase.storage
           .from('thumbnails')
           .upload(fileName, thumbnailFile)

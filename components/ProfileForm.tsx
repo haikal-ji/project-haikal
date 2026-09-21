@@ -42,7 +42,8 @@ export default function ProfileForm({
       let avatarUrl = initialAvatar
 
       if (avatarFile) {
-        const fileName = `avatar-${Date.now()}-${avatarFile.name}`
+        const cleanName = avatarFile.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+        const fileName = `avatar-${Date.now()}-${cleanName}`
         const { data, error: uploadError } = await supabase.storage
           .from('thumbnails')
           .upload(fileName, avatarFile)

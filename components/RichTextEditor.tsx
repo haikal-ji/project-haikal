@@ -147,7 +147,8 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
     setUploadingImage(true)
     try {
       const file = await convertHeicToJpeg(rawFile)
-      const fileName = `content-${Date.now()}-${file.name}`
+      const cleanName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_')
+      const fileName = `content-${Date.now()}-${cleanName}`
       const { data, error } = await supabase.storage.from('article-images').upload(fileName, file)
 
       if (error) {
