@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
+import { convertHeicToJpeg } from '@/lib/image-converter'
 
 export default function ProfileForm({
   initialName,
@@ -23,9 +24,10 @@ export default function ProfileForm({
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
-  function handleAvatarChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+  async function handleAvatarChange(e: ChangeEvent<HTMLInputElement>) {
+    const rawFile = e.target.files?.[0]
+    if (!rawFile) return
+    const file = await convertHeicToJpeg(rawFile)
     setAvatarFile(file)
     setPreview(URL.createObjectURL(file))
   }

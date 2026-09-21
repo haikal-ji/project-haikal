@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import RichTextEditor from './RichTextEditor'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
 import { toast } from '@/components/ToastProvider'
+import { convertHeicToJpeg } from '@/lib/image-converter'
 
 type ArticleFormProps = {
   mode: 'create' | 'edit'
@@ -34,9 +35,10 @@ export default function ArticleForm({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  function handleThumbnailChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
+  async function handleThumbnailChange(e: ChangeEvent<HTMLInputElement>) {
+    const rawFile = e.target.files?.[0]
+    if (!rawFile) return
+    const file = await convertHeicToJpeg(rawFile)
     setThumbnailFile(file)
     setPreview(URL.createObjectURL(file))
   }

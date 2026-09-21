@@ -13,6 +13,7 @@ import { TaskItem } from '@tiptap/extension-task-item'
 import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ToastProvider'
+import { convertHeicToJpeg } from '@/lib/image-converter'
 import {
   LuBold,
   LuItalic,
@@ -140,11 +141,12 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
   }, [content])
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !editor) return
+    const rawFile = e.target.files?.[0]
+    if (!rawFile || !editor) return
 
     setUploadingImage(true)
     try {
+      const file = await convertHeicToJpeg(rawFile)
       const fileName = `content-${Date.now()}-${file.name}`
       const { data, error } = await supabase.storage.from('article-images').upload(fileName, file)
 
