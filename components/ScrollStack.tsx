@@ -39,7 +39,7 @@ interface ScrollStackProps {
   onStackComplete?: () => void
 }
 
-// ─── Mobile: 100% GPU-accelerated CSS sticky stacking (eliminates Android scroll lag) ──
+// ─── Mobile: 100% GPU-accelerated CSS sticky stacking (smooth on Android/iOS) ──
 const MobileScrollStack: React.FC<{ children: ReactNode; className?: string; itemDistance?: number }> = ({
   children,
   className = '',
@@ -67,7 +67,7 @@ const MobileScrollStack: React.FC<{ children: ReactNode; className?: string; ite
   )
 }
 
-// ─── Desktop: Full Reachbits JS-driven smooth scroll stack with Lenis ─────────
+// ─── Desktop: Authentic React Bits ScrollStack with jitter-free offset tracking ──
 const DesktopScrollStack: React.FC<ScrollStackProps> = ({
   children,
   className = '',
@@ -122,11 +122,14 @@ const DesktopScrollStack: React.FC<ScrollStackProps> = ({
     }
   }, [useWindowScroll])
 
+  // Subtract previous translateY so cardTop remains purely static and doesn't jitter
   const getElementOffset = useCallback(
-    (element: HTMLElement) => {
+    (element: HTMLElement, index?: number) => {
       if (useWindowScroll) {
         const rect = element.getBoundingClientRect()
-        return rect.top + (window.scrollY || window.pageYOffset || 0)
+        const currentTranslateY =
+          index !== undefined ? (lastTransformsRef.current.get(index)?.translateY || 0) : 0
+        return rect.top + (window.scrollY || window.pageYOffset || 0) - currentTranslateY
       } else {
         return element.offsetTop
       }
@@ -153,7 +156,7 @@ const DesktopScrollStack: React.FC<ScrollStackProps> = ({
     cardsRef.current.forEach((card, i) => {
       if (!card) return
 
-      const cardTop = getElementOffset(card)
+      const cardTop = getElementOffset(card, i)
       const triggerStart = cardTop - stackPositionPx - itemStackDistance * i
       const triggerEnd = cardTop - scaleEndPositionPx
       const pinStart = cardTop - stackPositionPx - itemStackDistance * i
@@ -168,7 +171,7 @@ const DesktopScrollStack: React.FC<ScrollStackProps> = ({
       if (blurAmount) {
         let topCardIndex = 0
         for (let j = 0; j < cardsRef.current.length; j++) {
-          const jCardTop = getElementOffset(cardsRef.current[j])
+          const jCardTop = getElementOffset(cardsRef.current[j], j)
           const jTriggerStart = jCardTop - stackPositionPx - itemStackDistance * j
           if (scrollTop >= jTriggerStart) {
             topCardIndex = j
@@ -200,10 +203,10 @@ const DesktopScrollStack: React.FC<ScrollStackProps> = ({
       const lastTransform = lastTransformsRef.current.get(i)
       const hasChanged =
         !lastTransform ||
-        Math.abs(lastTransform.translateY - newTransform.translateY) > 0.1 ||
-        Math.abs(lastTransform.scale - newTransform.scale) > 0.001 ||
-        Math.abs(lastTransform.rotation - newTransform.rotation) > 0.1 ||
-        Math.abs(lastTransform.blur - newTransform.blur) > 0.1
+        Math.abs(lastTransform.translateY - newTransform.translateY) > 0.05 ||
+        Math.abs(lastTransform.scale - newTransform.scale) > 0.0005 ||
+        Math.abs(lastTransform.rotation - newTransform.rotation) > 0.05 ||
+        Math.abs(lastTransform.blur - newTransform.blur) > 0.05
 
       if (hasChanged) {
         const transform = `translate3d(0, ${newTransform.translateY}px, 0) scale(${newTransform.scale}) rotate(${newTransform.rotation}deg)`
@@ -244,19 +247,22 @@ const DesktopScrollStack: React.FC<ScrollStackProps> = ({
   ])
 
   const handleScroll = useCallback(() => {
-    updateCardTransforms()
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current)
+    }
+    animationFrameRef.current = requestAnimationFrame(updateCardTransforms)
   }, [updateCardTransforms])
 
   const setupLenis = useCallback(() => {
     if (useWindowScroll) {
       const lenis = new Lenis({
-        duration: 1.2,
+        duration: 0.9,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
-        touchMultiplier: 2,
+        touchMultiplier: 1.5,
         infinite: false,
         wheelMultiplier: 1,
-        lerp: 0.1,
+        lerp: 0.12,
         syncTouch: false,
       })
 
@@ -277,14 +283,14 @@ const DesktopScrollStack: React.FC<ScrollStackProps> = ({
       const lenis = new Lenis({
         wrapper: scroller,
         content: scroller.querySelector('.scroll-stack-inner') as HTMLElement,
-        duration: 1.2,
+        duration: 0.9,
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         smoothWheel: true,
-        touchMultiplier: 2,
+        touchMultiplier: 1.5,
         infinite: false,
         gestureOrientation: 'vertical',
         wheelMultiplier: 1,
-        lerp: 0.1,
+        lerp: 0.12,
         syncTouch: false,
       })
 
@@ -328,10 +334,7 @@ const DesktopScrollStack: React.FC<ScrollStackProps> = ({
     setupLenis()
     updateCardTransforms()
 
-    if (useWindowScroll) {
-      window.addEventListener('scroll', handleScroll, { passive: true })
-      window.addEventListener('resize', handleScroll, { passive: true })
-    }
+    window.addEventListener('resize', handleScroll, { passive: true })
 
     return () => {
       if (animationFrameRef.current) {
@@ -340,10 +343,7 @@ const DesktopScrollStack: React.FC<ScrollStackProps> = ({
       if (lenisRef.current) {
         lenisRef.current.destroy()
       }
-      if (useWindowScroll) {
-        window.removeEventListener('scroll', handleScroll)
-        window.removeEventListener('resize', handleScroll)
-      }
+      window.removeEventListener('resize', handleScroll)
       stackCompletedRef.current = false
       cardsRef.current = []
       transformsCache.clear()
@@ -351,16 +351,7 @@ const DesktopScrollStack: React.FC<ScrollStackProps> = ({
     }
   }, [
     itemDistance,
-    itemScale,
-    itemStackDistance,
-    stackPosition,
-    scaleEndPosition,
-    baseScale,
-    scaleDuration,
-    rotationAmount,
-    blurAmount,
     useWindowScroll,
-    onStackComplete,
     setupLenis,
     updateCardTransforms,
     handleScroll,

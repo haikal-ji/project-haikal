@@ -8,6 +8,7 @@ export const dynamic = 'force-dynamic'
 type MetadataUser = {
   name: string
   bio: string | null
+  avatar: string | null
   is_banned: boolean
 } | null
 
@@ -39,18 +40,49 @@ export async function generateMetadata({
   const { id } = await params
   const user = (await (prisma.user as any).findUnique({
     where: { id },
-    select: { name: true, bio: true, is_banned: true },
+    select: { name: true, bio: true, avatar: true, is_banned: true },
   })) as MetadataUser
 
   if (!user || user.is_banned) {
     return {
-      title: 'Pengguna Tidak Ditemukan',
+      title: 'Pengguna Tidak Ditemukan | Haikal Journal',
     }
   }
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ekall.vercel.app'
+  const title = `Profil ${user.name} | Haikal Journal`
+  const description = user.bio
+    ? user.bio.slice(0, 155)
+    : `Lihat profil, komentar, dan aktivitas ${user.name} di Haikal Journal.`
+
+  const imageUrl = user.avatar
+    ? (user.avatar.startsWith('http') ? user.avatar : `${siteUrl}${user.avatar}`)
+    : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=111113&color=ffffff&size=512&bold=true`
+
   return {
-    title: `${user.name} | Profil Pembaca`,
-    description: user.bio ? user.bio.slice(0, 155) : `Lihat aktivitas dan kontribusi ${user.name} di Haikal Journal.`,
+    title,
+    description,
+    openGraph: {
+      title: `Profil ${user.name}`,
+      description,
+      type: 'profile',
+      url: `${siteUrl}/pengguna/${id}`,
+      siteName: 'Haikal Journal',
+      images: [
+        {
+          url: imageUrl,
+          width: 512,
+          height: 512,
+          alt: `Foto profil ${user.name}`,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary',
+      title: `Profil ${user.name}`,
+      description,
+      images: [imageUrl],
+    },
   }
 }
 
