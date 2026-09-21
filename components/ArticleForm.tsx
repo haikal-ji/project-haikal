@@ -114,9 +114,6 @@ export default function ArticleForm({
             aria-label="Judul artikel"
             className="w-full text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight bg-transparent text-text-primary placeholder:text-text-secondary/40 focus:outline-none border-b border-text-secondary/20 focus:border-text-primary pb-3 sm:pb-4 transition-colors"
           />
-          <p className="mt-2.5 text-xs text-text-secondary">
-            Tulis dengan gaya bahasa dan perspektif personalmu. Ide sederhana seringkali jadi tulisan terbaik.
-          </p>
         </div>
 
         {/* Rich Text Editor Card */}
@@ -181,10 +178,6 @@ export default function ArticleForm({
               Hapus cover
             </button>
           )}
-
-          <p className="text-[11px] text-text-secondary leading-relaxed">
-            Gambar cover akan ditampilkan di header artikel, kartu daftar jurnal, dan OpenGraph preview.
-          </p>
         </div>
 
         {/* Panel 2: Publishing Actions */}

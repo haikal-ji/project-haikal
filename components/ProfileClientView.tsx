@@ -391,9 +391,11 @@ export default function ProfileClientView({
 
           {/* Bio Singkat */}
           {bio.trim() && (
-            <p className="mt-3 px-3.5 py-2 text-xs text-text-secondary italic text-center bg-secondary/40 border border-line/60 rounded-xl max-w-xs break-words leading-relaxed">
-              &ldquo;{bio.trim()}&rdquo;
-            </p>
+            <div className="mt-3 flex justify-center w-full">
+              <p className="mx-auto px-3.5 py-2 text-xs text-text-secondary italic text-center bg-secondary/40 border border-line/60 rounded-xl max-w-xs break-words leading-relaxed">
+                &ldquo;{bio.trim()}&rdquo;
+              </p>
+            </div>
           )}
 
           {/* Tautan ke Profil Publik */}
@@ -469,9 +471,6 @@ export default function ProfileClientView({
             <div className="profile-tab-header">
               <p className="profile-kicker">Identitas Publik</p>
               <h2 className="profile-tab-title">Personalisasi Karaktermu</h2>
-              <p className="profile-tab-desc">
-                Sesuaikan nama dan bio singkat agar mudah dikenali oleh sesama pembaca dan penulis artikel.
-              </p>
             </div>
 
             <form onSubmit={handleSubmit} className="profile-form-grid">
@@ -493,9 +492,6 @@ export default function ProfileClientView({
                   required
                   className="profile-text-input"
                 />
-                <p className="profile-field-hint">
-                  Nama ini akan menjadi nama pengirim di setiap diskusi dan komentar artikel.
-                </p>
               </div>
 
               {/* Bio Singkat Input */}
@@ -515,9 +511,6 @@ export default function ProfileClientView({
                   placeholder="Tuliskan sedikit tentang dirimu, minat baca, atau topik yang kamu sukai..."
                   className="profile-text-input resize-none"
                 />
-                <p className="profile-field-hint">
-                  Bio akan tampil di kartu identitasmu dan pada halaman profil publik yang bisa dilihat pembaca lain.
-                </p>
               </div>
 
               {/* Alerts */}
@@ -554,9 +547,6 @@ export default function ProfileClientView({
             <div className="profile-tab-header">
               <p className="profile-kicker">Riwayat Interaksi</p>
               <h2 className="profile-tab-title">Komentar yang Kamu Tulis</h2>
-              <p className="profile-tab-desc">
-                Daftar tanggapan dan sudut pandang yang pernah kamu bagikan di berbagai artikel.
-              </p>
             </div>
 
             {commentsList.length === 0 ? (
@@ -619,9 +609,6 @@ export default function ProfileClientView({
             <div className="profile-tab-header">
               <p className="profile-kicker">Koleksi Apresiasi</p>
               <h2 className="profile-tab-title">Artikel yang Kamu Sukai</h2>
-              <p className="profile-tab-desc">
-                Daftar artikel yang telah kamu beri apresiasi dan mungkin ingin kamu baca kembali.
-              </p>
             </div>
 
             {likesList.length === 0 ? (

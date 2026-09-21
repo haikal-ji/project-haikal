@@ -523,9 +523,6 @@ export default async function HomePage() {
                 encryptedClassName="text-text-secondary/50 font-mono"
               />
             </h3>
-            <p className="mt-3 text-sm md:text-base text-text-secondary max-w-xl font-medium leading-relaxed">
-              Koleksi proyek desain visual dan eksperimen kreatif pilihan saya dalam membangun identitas brand serta materi promosi yang menarik.
-            </p>
           </BlurReveal>
 
           <BlurReveal delay={0.1}>
@@ -599,9 +596,6 @@ export default async function HomePage() {
               as="h3"
               className="text-4xl md:text-5xl lg:text-6xl font-black text-text-primary tracking-tighter"
             />
-            <p className="mt-3 text-sm md:text-base text-text-secondary max-w-xl font-medium leading-relaxed">
-              Berbagi cerita, sudut pandang, dan catatan perjalanan saya di dunia digital, eksplorasi desain, serta hal-hal baru yang saya pelajari.
-            </p>
           </div>
 
           <Link

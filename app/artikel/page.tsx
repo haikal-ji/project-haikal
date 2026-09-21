@@ -31,9 +31,6 @@ export default async function ArtikelListPage() {
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-text-primary">
           Catatan & Tulisan
         </h1>
-        <p className="mt-3 max-w-2xl text-sm sm:text-base text-text-secondary leading-relaxed">
-          Eksplorasi proses pembuatan software, best practices teknologi web modern, serta ide-ide yang ingin saya abadikan.
-        </p>
       </header>
 
       <ArticleSearch articles={searchableArticles} />

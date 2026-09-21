@@ -93,9 +93,6 @@ export default async function KomunitasPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary">
             Manajemen Komunitas
           </h1>
-          <p className="mt-2 text-sm text-text-secondary max-w-xl">
-            Kelola data pengguna terdaftar, pantau aktivitas komentar, dan proses permohonan pembatalan sanksi (unban appeal).
-          </p>
         </div>
 
         {pendingAppeals.length > 0 && (

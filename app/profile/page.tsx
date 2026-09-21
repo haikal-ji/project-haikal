@@ -138,9 +138,6 @@ export default async function ProfilePage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary">
             Profil & Pengaturan
           </h1>
-          <p className="mt-2 text-sm text-text-secondary max-w-xl">
-            Atur bagaimana identitasmu tampil di setiap ruang diskusi dan tinjau jejak interaksi yang telah kamu buat.
-          </p>
         </header>
 
         <ProfileClientView

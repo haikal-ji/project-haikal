@@ -13,9 +13,6 @@ export default function TambahArtikelPage() {
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary">
             Tulis Artikel Baru
           </h1>
-          <p className="mt-2 text-sm text-text-secondary max-w-xl">
-            Tuangkan pemikiran, dokumentasikan insight baru, atau bagikan eksperimen teknis kamu.
-          </p>
         </div>
 
         <div className="flex items-center gap-2 text-xs text-text-secondary bg-thirdary/60 border border-text-secondary/15 px-3.5 py-1.5 rounded-full w-fit">
