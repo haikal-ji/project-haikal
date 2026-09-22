@@ -112,9 +112,11 @@ const PixelTransition: React.FC<PixelTransitionProps> = ({
   };
 
   const handleEnter = (): void => {
+    if (isTouchDevice) return;
     if (!isActive) animatePixels(true);
   };
   const handleLeave = (): void => {
+    if (isTouchDevice) return;
     if (isActive && !once) animatePixels(false);
   };
   const handleClick = (): void => {

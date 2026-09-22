@@ -213,10 +213,46 @@ export default async function HomePage() {
             </div>
           </div>
         </BlurReveal>
-
         {/* RIGHT COLUMN: CIRCLE PHOTO & EXACT RYHAR STACKED FLOATING BADGES */}
         <BlurReveal delay={0.25} yOffset={25} className="flex flex-col items-center justify-center relative mt-12 md:mt-0 pb-12 sm:pb-0">
           <div className="absolute inset-0 bg-text-primary/5 rounded-full scale-105 opacity-40 blur-2xl pointer-events-none" />
+
+          {/* PLAYFUL "Click me!" DOODLE STICKER (TILTED WITH HAND-DRAWN ARROW) */}
+          <div className="absolute -top-7 -right-2 sm:-top-9 sm:-right-4 md:-top-11 md:-right-6 z-30 pointer-events-none select-none rotate-[8deg]">
+            <div className="flex flex-col items-start leading-none drop-shadow-md">
+              <span className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-text-primary dark:text-white ml-2 -rotate-[6deg]">
+                Click
+              </span>
+              <div className="flex items-center gap-1 -mt-1">
+                {/* Hand-drawn style chunky pointer arrow */}
+                <svg
+                  className="w-7 h-7 sm:w-9 sm:h-9 text-text-primary dark:text-white shrink-0 drop-shadow-sm"
+                  viewBox="0 0 48 48"
+                  fill="none"
+                >
+                  <path
+                    d="M38 10 L16 32 L16 18 L8 40 L30 32 L16 32 L38 10 Z"
+                    fill="currentColor"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M11 37 L16 22 M11 37 L26 32"
+                    stroke="rgba(255,255,255,0.9)"
+                    className="dark:stroke-black stroke-white"
+                    strokeWidth="1.5"
+                    strokeDasharray="2 2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-text-primary dark:text-white rotate-[8deg]">
+                  me!
+                </span>
+              </div>
+            </div>
+          </div>
+
           <div className="relative z-10 p-2 sm:p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full shadow-2xl">
             <PixelTransition
               firstContent={
@@ -230,25 +266,13 @@ export default async function HomePage() {
                 />
               }
               secondContent={
-                <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-950 text-white p-6 text-center select-none relative overflow-hidden rounded-full">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08)_0%,transparent_70%)] pointer-events-none" />
-                  <div className="relative z-10 flex flex-col items-center">
-                    <span className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-2">
-                      meow😹
-                    </span>
-                    <p className="text-sm sm:text-base text-neutral-200 font-bold">
-                      Muhammad Haikal
-                    </p>
-                    <p className="text-xs sm:text-sm text-neutral-400 font-medium mt-0.5">
-                      Web &amp; UI Explorer
-                    </p>
-                    <span className="mt-3 inline-flex items-center px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-medium tracking-wide text-neutral-200">
-                      Available to build
-                    </span>
-                  </div>
+                <div className="w-full h-full grid place-items-center bg-[#111] text-white select-none rounded-full">
+                  <p className="font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight select-none">
+                    Meow!
+                  </p>
                 </div>
               }
-              gridSize={10}
+              gridSize={8}
               pixelColor="#ffffff"
               once={false}
               animationStepDuration={0.4}
