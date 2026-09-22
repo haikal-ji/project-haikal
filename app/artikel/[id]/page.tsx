@@ -163,7 +163,6 @@ export default async function ArtikelDetailPage({
       {/* Editorial Header */}
       <header className="mb-8">
         <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary/50 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-4 shadow-2xs">
-          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>Journal &amp; Insights</span>
         </div>
 

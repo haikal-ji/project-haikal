@@ -8,6 +8,7 @@ import ThemeInitializer from "@/components/ThemeInitializer";
 import LoadingScreen from "@/components/LoadingScreen";
 
 import ScrollBlur from "@/components/ScrollBlur";
+import ScrollToTop from "@/components/ScrollToTop";
 import { ToastProvider } from "@/components/ToastProvider";
 import "./globals.css";
 
@@ -97,8 +98,27 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="id"
       suppressHydrationWarning
-      className={`dark ${poppins.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${poppins.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var item = localStorage.getItem('haikal-theme');
+                  var isDark = item === 'dark' || item === null;
+                  if (isDark) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-text-primary font-sans">
         <ToastProvider>
           <ThemeInitializer />
@@ -109,6 +129,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           <SiteHeader isLoggedIn={isLoggedIn} isOwner={isOwner} />
           <main className="flex-1">{children}</main>
           <SiteFooter />
+          <ScrollToTop />
         </ToastProvider>
       </body>
     </html>

@@ -12,6 +12,7 @@ import TiltedCard from '@/components/TiltedCard'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
 import DecryptedText from '@/components/DecryptedText'
 import BlurText from '@/components/BlurText'
+import PixelTransition from '@/components/PixelTransition'
 
 export const dynamic = 'force-dynamic'
 
@@ -217,13 +218,41 @@ export default async function HomePage() {
         <BlurReveal delay={0.25} yOffset={25} className="flex flex-col items-center justify-center relative mt-12 md:mt-0 pb-12 sm:pb-0">
           <div className="absolute inset-0 bg-text-primary/5 rounded-full scale-105 opacity-40 blur-2xl pointer-events-none" />
           <div className="relative z-10 p-2 sm:p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full shadow-2xl">
-            <Image
-              src="/haikal-hero.jpg"
-              alt="Muhammad Haikal"
-              width={380}
-              height={380}
-              priority
-              className="w-64 h-64 sm:w-80 sm:h-80 lg:w-[380px] lg:h-[380px] rounded-full object-cover [object-position:center_58%] aspect-square transition-all duration-700 hover:scale-[1.02]"
+            <PixelTransition
+              firstContent={
+                <Image
+                  src="/haikal-hero.jpg"
+                  alt="Muhammad Haikal"
+                  width={380}
+                  height={380}
+                  priority
+                  className="w-full h-full object-cover [object-position:center_58%] pointer-events-none select-none rounded-full"
+                />
+              }
+              secondContent={
+                <div className="w-full h-full flex flex-col items-center justify-center bg-neutral-950 text-white p-6 text-center select-none relative overflow-hidden rounded-full">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08)_0%,transparent_70%)] pointer-events-none" />
+                  <div className="relative z-10 flex flex-col items-center">
+                    <span className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-2">
+                      meow😹
+                    </span>
+                    <p className="text-sm sm:text-base text-neutral-200 font-bold">
+                      Muhammad Haikal
+                    </p>
+                    <p className="text-xs sm:text-sm text-neutral-400 font-medium mt-0.5">
+                      Web &amp; UI Explorer
+                    </p>
+                    <span className="mt-3 inline-flex items-center px-3 py-1 rounded-full bg-white/10 border border-white/15 text-[11px] font-medium tracking-wide text-neutral-200">
+                      Available to build
+                    </span>
+                  </div>
+                </div>
+              }
+              gridSize={10}
+              pixelColor="#ffffff"
+              once={false}
+              animationStepDuration={0.4}
+              className="w-64 h-64 sm:w-80 sm:h-80 lg:w-[380px] lg:h-[380px] rounded-full border-none cursor-pointer aspect-square"
             />
           </div>
           <div className="absolute -bottom-8 left-2 sm:-bottom-10 sm:-left-4 md:-bottom-12 md:-left-10 z-20 flex flex-col gap-2.5 sm:gap-3 max-w-[calc(100%-1rem)] sm:max-w-none">
@@ -323,7 +352,7 @@ export default async function HomePage() {
                   Who Am I
                 </h4>
                 <p className="text-base text-neutral-600 dark:text-neutral-400 leading-relaxed font-medium">
-                  Saya adalah Muh. Haikal, seorang pelajar yang sedang mempelajari basic pengembangan website dan estetika desain visual. Saat ini saya sedang menjalani PKL dan mempelajari bagaimana sebuah ide dapat bertransformasi menjadi karya digital yang fungsional dan rapi.
+                  Saya Muh Haikal, seorang pelajar yang sedang belajar membuat web sendiri. Lewat proses ini saya belajar banyak hal — mulai dari cara kerja database, membangun fitur, sampai merancang tampilan yang minimalist.
                 </p>
               </div>
               <div className="flex flex-col">
@@ -331,7 +360,7 @@ export default async function HomePage() {
                   My Approach
                 </h4>
                 <p className="text-base text-neutral-600 dark:text-neutral-400 leading-relaxed font-medium">
-                  Saya berkomitmen untuk merancang dan membangun sesuatu dari nol: memahami kebutuhan nyata, menyusun struktur data, merancang tampilan antarmuka, hingga memoles interaksi mikro sampai aplikasi terasa nyaman digunakan.
+                  Saya suka membangun sesuatu dari awal — mulai dari memahami apa yang dibutuhkan, menyusun datanya, merancang tampilannya, sampai memperhatikan detail kecil biar hasilnya nyaman dipakai.
                 </p>
               </div>
             </div>
@@ -585,7 +614,6 @@ export default async function HomePage() {
         <BlurReveal className="max-w-7xl mx-auto px-6 md:px-12 mb-12 md:mb-16 w-full flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary/40 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-4">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>Journal &amp; Insights</span>
             </div>
             <BlurText

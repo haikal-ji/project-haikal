@@ -191,7 +191,6 @@ export default function ArticleForm({
             <div className="flex justify-between items-center py-2 border-b border-text-secondary/10">
               <span>Status</span>
               <span className="inline-flex items-center gap-1.5 font-medium text-text-primary">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Live saat disimpan
               </span>
             </div>

@@ -33,7 +33,6 @@ export default function DashboardNav() {
             HAiKAL<span className="text-text-secondary">.</span>
           </Link>
           <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-thirdary border border-text-secondary/15 text-text-secondary">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
             Workspace
           </span>
         </div>

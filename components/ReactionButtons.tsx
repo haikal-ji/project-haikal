@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from '@/components/ToastProvider'
 
@@ -43,9 +43,26 @@ export default function ReactionButtons({
   const [likeCount, setLikeCount] = useState<number>(initialLikeCount)
   const [dislikeCount, setDislikeCount] = useState<number>(initialDislikeCount)
   const [userReaction, setUserReaction] = useState<ReactionType | null>(normalizedInitialReaction)
-  const [loading, setLoading] = useState(false)
   const [activeAnim, setActiveAnim] = useState<'LIKE' | 'DISLIKE' | null>(null)
   const [burstKey, setBurstKey] = useState<number>(0)
+  const animTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Non-blocking sync queue refs (menghilangkan delay saat klik like/dislike berulang)
+  const targetReactionRef = useRef<ReactionType | null>(normalizedInitialReaction)
+  const serverReactionRef = useRef<ReactionType | null>(normalizedInitialReaction)
+  const isSyncingRef = useRef(false)
+
+  useEffect(() => {
+    targetReactionRef.current = normalizedInitialReaction
+    serverReactionRef.current = normalizedInitialReaction
+    setUserReaction(normalizedInitialReaction)
+  }, [normalizedInitialReaction])
+
+  useEffect(() => {
+    return () => {
+      if (animTimeoutRef.current) clearTimeout(animTimeoutRef.current)
+    }
+  }, [])
 
   // Share state
   const [shareCount, setShareCount] = useState(initialShareCount)
@@ -59,27 +76,87 @@ export default function ReactionButtons({
     )
   }
 
-  async function handleReaction(type: ReactionType) {
+  async function syncWithServer() {
+    if (isSyncingRef.current) return
+    isSyncingRef.current = true
+
+    try {
+      while (targetReactionRef.current !== serverReactionRef.current) {
+        const target = targetReactionRef.current
+        const server = serverReactionRef.current
+
+        let typeToSend: ReactionType | null = null
+
+        if (target === null) {
+          if (server === null) break
+          typeToSend = server
+        } else {
+          typeToSend = target
+        }
+
+        if (!typeToSend) break
+
+        const res = await fetch('/api/reaction', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ article_id: articleId, type: typeToSend }),
+        })
+
+        const data = await res.json()
+        if (!res.ok) {
+          throw new Error(data.error || 'Gagal menyimpan reaksi')
+        }
+
+        serverReactionRef.current = (data.userReaction as ReactionType | null) ?? null
+
+        // Jika target user sudah tercapai dan tidak ada klik baru, sinkronkan data resmi dari server
+        if (targetReactionRef.current === serverReactionRef.current) {
+          if (typeof data.likeCount === 'number') setLikeCount(data.likeCount)
+          if (typeof data.dislikeCount === 'number') setDislikeCount(data.dislikeCount)
+          setUserReaction(serverReactionRef.current)
+        }
+      }
+    } catch (err: unknown) {
+      // Rollback jika terjadi error jaringan
+      setUserReaction(serverReactionRef.current)
+      targetReactionRef.current = serverReactionRef.current
+      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan sistem'
+      toast.error(msg)
+    } finally {
+      isSyncingRef.current = false
+      if (targetReactionRef.current !== serverReactionRef.current) {
+        syncWithServer()
+      }
+    }
+  }
+
+  function handleReaction(type: ReactionType) {
     if (!isLoggedIn) {
       requireLogin()
       return
     }
 
-    if (loading) return
+    // Bersihkan timer animasi sebelumnya jika ada
+    if (animTimeoutRef.current) {
+      clearTimeout(animTimeoutRef.current)
+      animTimeoutRef.current = null
+    }
 
-    // Trigger refined tactile spring & badge animation
-    setActiveAnim(type)
-    setBurstKey(Date.now())
-    setTimeout(() => {
+    const isRemovingReaction = userReaction === type
+
+    // Animasi +1 / -1 hanya muncul saat menambah atau mengganti reaksi, BUKAN saat membatalkan (klik kedua)
+    if (isRemovingReaction) {
       setActiveAnim(null)
-    }, 550)
+    } else {
+      setActiveAnim(type)
+      setBurstKey(Date.now())
+      animTimeoutRef.current = setTimeout(() => {
+        setActiveAnim(null)
+        animTimeoutRef.current = null
+      }, 550)
+    }
 
-    // Save previous state for rollback
-    const prevLikeCount = likeCount
-    const prevDislikeCount = dislikeCount
-    const prevUserReaction = userReaction
-
-    // Optimistic Update
+    // Optimistic Update instan tanpa delay
     let nextLikeCount = likeCount
     let nextDislikeCount = dislikeCount
     let nextUserReaction: ReactionType | null = null
@@ -112,38 +189,14 @@ export default function ReactionButtons({
       }
     }
 
-    // Instant UI Update
+    // Instant UI Update (0ms, langsung responsif)
     setUserReaction(nextUserReaction)
     setLikeCount(nextLikeCount)
     setDislikeCount(nextDislikeCount)
-    setLoading(true)
+    targetReactionRef.current = nextUserReaction
 
-    try {
-      const res = await fetch('/api/reaction', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ article_id: articleId, type }),
-      })
-
-      const data = await res.json()
-      if (!res.ok) {
-        throw new Error(data.error || 'Gagal menyimpan reaksi')
-      }
-
-      if (typeof data.likeCount === 'number') setLikeCount(data.likeCount)
-      if (typeof data.dislikeCount === 'number') setDislikeCount(data.dislikeCount)
-      setUserReaction(data.userReaction)
-    } catch (err: unknown) {
-      // Rollback
-      setUserReaction(prevUserReaction)
-      setLikeCount(prevLikeCount)
-      setDislikeCount(prevDislikeCount)
-
-      const msg = err instanceof Error ? err.message : 'Terjadi kesalahan sistem'
-      toast.error(msg)
-    } finally {
-      setLoading(false)
-    }
+    // Jalankan sinkronisasi background
+    syncWithServer()
   }
 
   // Handle Share with Anti-Spam (Session Deduplication)
@@ -318,16 +371,6 @@ export default function ReactionButtons({
                   key={`glow-dislike-${burstKey}`}
                   className="anim-reaction-glow absolute inset-0 m-auto rounded-lg bg-text-secondary/20 pointer-events-none"
                 />
-              )}
-
-              {/* Floating -1 Badge */}
-              {activeAnim === 'DISLIKE' && (
-                <span
-                  key={`float-dislike-${burstKey}`}
-                  className="anim-reaction-badge absolute -top-2 left-1/2 pointer-events-none z-30 whitespace-nowrap rounded-full bg-text-secondary text-background dark:bg-text-primary dark:text-background px-2 py-0.5 text-[10px] font-mono font-bold shadow-md"
-                >
-                  -1
-                </span>
               )}
 
               <svg

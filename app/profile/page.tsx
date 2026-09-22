@@ -132,7 +132,6 @@ export default async function ProfilePage() {
       <main className="profile-page">
         <header className="profile-page-heading mb-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-3">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
             <span>Studio / Identitas</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-text-primary">

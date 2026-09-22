@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/components/ToastProvider'
 import { convertHeicToJpeg } from '@/lib/image-converter'
+import WarmTooltip, { WarmTooltipGroup } from '@/components/WarmTooltip'
 import {
   LuBold,
   LuItalic,
@@ -218,39 +219,57 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         ? '< 1 menit baca' 
         : `~${Math.ceil(wordCount / 180)} menit baca`
 
-  // Helper button: onMouseDown preventDefault sangat penting agar cursor editor tidak hilang saat klik tombol!
+  // Helper button dengan WarmTooltip khas Windows
   const renderBtn = (
     onClick: () => void,
     isActive: boolean,
     title: string,
     children: React.ReactNode,
     disabled = false
-  ) => (
-    <button
-      type="button"
-      onMouseDown={(e) => {
-        e.preventDefault() // Mencegah hilangnya seleksi teks di editor!
-      }}
-      onClick={onClick}
-      disabled={disabled}
-      title={title}
-      className={`min-w-[34px] h-[34px] px-2 rounded-xl text-xs font-semibold transition-all duration-150 flex items-center justify-center cursor-pointer select-none disabled:opacity-25 disabled:cursor-not-allowed ${
-        isActive
-          ? 'bg-text-primary text-background shadow-xs ring-1 ring-text-primary font-bold'
-          : 'bg-background/80 hover:bg-thirdary text-text-secondary hover:text-text-primary border border-text-secondary/15 active:scale-95'
-      }`}
-    >
-      {children}
-    </button>
-  )
+  ) => {
+    let content: string = title
+    let shortcut: string | undefined = undefined
+    const match = title.match(/^(.*?)\s*\((.*?)\)$/)
+    if (match) {
+      content = match[1].trim()
+      shortcut = match[2].trim()
+    }
+
+    return (
+      <WarmTooltip
+        content={content}
+        shortcut={shortcut}
+        side="top"
+        disabled={disabled}
+      >
+        <button
+          type="button"
+          onMouseDown={(e) => {
+            e.preventDefault() // Mencegah hilangnya seleksi teks di editor!
+          }}
+          onClick={onClick}
+          disabled={disabled}
+          aria-label={title}
+          className={`min-w-[34px] h-[34px] px-2 rounded-xl text-xs font-semibold transition-all duration-150 flex items-center justify-center cursor-pointer select-none disabled:opacity-25 disabled:cursor-not-allowed ${
+            isActive
+              ? 'bg-text-primary text-background shadow-xs ring-1 ring-text-primary font-bold'
+              : 'bg-background/80 hover:bg-thirdary text-text-secondary hover:text-text-primary border border-text-secondary/15 active:scale-95'
+          }`}
+        >
+          {children}
+        </button>
+      </WarmTooltip>
+    )
+  }
 
   return (
     <div className="w-full rounded-2xl border border-text-secondary/20 bg-background/50 overflow-hidden shadow-sm">
       {/* Sticky & Comprehensive Toolbar */}
-      <div
-        className="sticky top-0 z-10 flex flex-wrap items-center gap-1.5 p-3 border-b border-text-secondary/15 bg-background/95 backdrop-blur-md"
-        aria-label="Toolbar editor lengkap"
-      >
+      <WarmTooltipGroup delay={250} warmWindow={350} travel={280} lean={0}>
+        <div
+          className="sticky top-0 z-10 flex flex-wrap items-center gap-1.5 p-3 border-b border-text-secondary/15 bg-background/95 backdrop-blur-md"
+          aria-label="Toolbar editor lengkap"
+        >
         {/* 1. History: Undo / Redo */}
         <div className="flex items-center gap-1">
           {renderBtn(
@@ -442,35 +461,39 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
 
         {/* 8. Media: Upload & URL */}
         <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadingImage}
-            title="Upload gambar dari perangkat"
-            className="h-[34px] px-2.5 rounded-xl text-xs font-semibold border border-text-secondary/15 bg-background/80 hover:bg-thirdary text-text-secondary hover:text-text-primary transition-all duration-150 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-          >
-            <LuImagePlus className="w-4 h-4 text-emerald-500" />
-            <span className="hidden sm:inline">{uploadingImage ? 'Mengupload...' : 'Upload'}</span>
-          </button>
+          <WarmTooltip content="Upload dari perangkat" side="top" disabled={uploadingImage}>
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingImage}
+              aria-label="Upload gambar dari perangkat"
+              className="h-[34px] px-2.5 rounded-xl text-xs font-semibold border border-text-secondary/15 bg-background/80 hover:bg-thirdary text-text-secondary hover:text-text-primary transition-all duration-150 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+            >
+              <LuImagePlus className="w-4 h-4 text-emerald-500" />
+              <span className="hidden sm:inline">{uploadingImage ? 'Mengupload...' : 'Upload'}</span>
+            </button>
+          </WarmTooltip>
 
-          <button
-            type="button"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => {
-              setShowImageUrlBar((prev) => !prev)
-              setShowLinkBar(false)
-            }}
-            title="Sisipkan gambar dari URL"
-            className={`h-[34px] px-2.5 rounded-xl text-xs font-semibold border transition-all duration-150 flex items-center gap-1.5 cursor-pointer ${
-              showImageUrlBar
-                ? 'bg-text-primary text-background border-text-primary shadow-xs'
-                : 'border-text-secondary/15 bg-background/80 hover:bg-thirdary text-text-secondary hover:text-text-primary'
-            }`}
-          >
-            <LuImage className="w-4 h-4" />
-            <span className="hidden sm:inline">URL</span>
-          </button>
+          <WarmTooltip content="Sisipkan gambar dari URL" side="top">
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setShowImageUrlBar((prev) => !prev)
+                setShowLinkBar(false)
+              }}
+              aria-label="Sisipkan gambar dari URL"
+              className={`h-[34px] px-2.5 rounded-xl text-xs font-semibold border transition-all duration-150 flex items-center gap-1.5 cursor-pointer ${
+                showImageUrlBar
+                  ? 'bg-text-primary text-background border-text-primary shadow-xs'
+                  : 'border-text-secondary/15 bg-background/80 hover:bg-thirdary text-text-secondary hover:text-text-primary'
+              }`}
+            >
+              <LuImage className="w-4 h-4" />
+              <span className="hidden sm:inline">URL</span>
+            </button>
+          </WarmTooltip>
 
           <input
             ref={fileInputRef}
@@ -487,10 +510,11 @@ export default function RichTextEditor({ content, onChange }: RichTextEditorProp
         {renderBtn(
           () => editor.chain().focus().unsetAllMarks().clearNodes().run(),
           false,
-          'Bersihkan Semua Format Teks',
+          'Bersihkan Format (Ctrl+\\)',
           <LuRemoveFormatting className="w-4 h-4" />
         )}
       </div>
+    </WarmTooltipGroup>
 
       {/* Inline Interactive Link Bar (No window.prompt popup!) */}
       {showLinkBar && (
