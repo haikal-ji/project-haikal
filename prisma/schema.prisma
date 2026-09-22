@@ -59,12 +59,6 @@ model Reaction {
 }
 
 enum ReactionType {
-  KEREN
-  NGAKAK
-  BERGUNA
-  MANTAP
-  KAGET
-  BOSEN
   LIKE
   DISLIKE
 }

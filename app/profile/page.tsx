@@ -34,7 +34,7 @@ export default async function ProfilePage() {
         take: 20,
       },
       reactions: {
-        where: { type: { in: ['KEREN', 'NGAKAK', 'BERGUNA', 'MANTAP', 'KAGET', 'LIKE'] } },
+        where: { type: 'LIKE' },
         include: {
           article: {
             select: { id: true, title: true, created_at: true },
@@ -91,7 +91,7 @@ export default async function ProfilePage() {
     prisma.reaction.count({
       where: {
         user_id: dbUser.id,
-        type: { in: ['KEREN', 'NGAKAK', 'BERGUNA', 'MANTAP', 'KAGET', 'LIKE'] },
+        type: 'LIKE',
       },
     }),
   ])

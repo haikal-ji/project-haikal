@@ -123,7 +123,7 @@ export default async function PublicProfilePage({
     prisma.reaction.count({
       where: {
         user_id: dbUser.id,
-        type: { in: ['KEREN', 'NGAKAK', 'BERGUNA', 'MANTAP', 'KAGET', 'LIKE'] },
+        type: 'LIKE',
       },
     }),
   ])

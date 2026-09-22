@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import type { ReactionType } from '@prisma/client'
 
-const LIKED_TYPES: ReactionType[] = ['KEREN', 'NGAKAK', 'BERGUNA', 'MANTAP', 'KAGET', 'LIKE']
+const LIKED_TYPES: ReactionType[] = ['LIKE']
 
 export async function GET(request: Request) {
   const supabase = await createClient()

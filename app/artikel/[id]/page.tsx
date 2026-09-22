@@ -113,7 +113,7 @@ export default async function ArtikelDetailPage({
   let dislikeCount = 0
 
   for (const r of article.reactions) {
-    if (r.type === 'DISLIKE' || r.type === 'BOSEN') {
+    if (r.type === 'DISLIKE') {
       dislikeCount++
     } else {
       likeCount++
@@ -134,9 +134,9 @@ export default async function ArtikelDetailPage({
     : null
 
   const currentReaction: 'LIKE' | 'DISLIKE' | null =
-    rawReaction === 'DISLIKE' || rawReaction === 'BOSEN'
+    rawReaction === 'DISLIKE'
       ? 'DISLIKE'
-      : rawReaction
+      : rawReaction === 'LIKE'
       ? 'LIKE'
       : null
 

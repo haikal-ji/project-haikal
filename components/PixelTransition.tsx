@@ -132,6 +132,7 @@ const PixelTransition: React.FC<PixelTransitionProps> = ({
         overflow-hidden
         cursor-pointer
         select-none
+        [touch-action:manipulation]
         [isolation:isolate]
         [mask-image:-webkit-radial-gradient(white,black)]
         ${className || 'bg-[#222] text-white rounded-[15px] border-2 border-white w-[300px] max-w-full'}
@@ -143,8 +144,8 @@ const PixelTransition: React.FC<PixelTransitionProps> = ({
       onFocus={handleEnter}
       onBlur={handleLeave}
       tabIndex={0}
-      role="region"
-      aria-label="Interactive pixel transition image"
+      role="button"
+      aria-label="Pixel transition image"
     >
       <div style={{ paddingTop: aspectRatio }} />
 

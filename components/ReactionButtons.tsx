@@ -46,6 +46,7 @@ export default function ReactionButtons({
   const [activeAnim, setActiveAnim] = useState<'LIKE' | 'DISLIKE' | null>(null)
   const [burstKey, setBurstKey] = useState<number>(0)
   const animTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // Non-blocking sync queue refs (menghilangkan delay saat klik like/dislike berulang)
   const targetReactionRef = useRef<ReactionType | null>(normalizedInitialReaction)
@@ -61,6 +62,7 @@ export default function ReactionButtons({
   useEffect(() => {
     return () => {
       if (animTimeoutRef.current) clearTimeout(animTimeoutRef.current)
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
     }
   }, [])
 
@@ -195,8 +197,15 @@ export default function ReactionButtons({
     setDislikeCount(nextDislikeCount)
     targetReactionRef.current = nextUserReaction
 
-    // Jalankan sinkronisasi background
-    syncWithServer()
+    // Debounce sinkronisasi ke server (400ms) untuk mencegah spam klik & rate limiting 429
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      debounceTimerRef.current = null
+      syncWithServer()
+    }, 400)
   }
 
   // Handle Share with Anti-Spam (Session Deduplication)
