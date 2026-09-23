@@ -17,19 +17,14 @@ export const dynamic = "force-dynamic";
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-});
-
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
-  subsets: ["latin"],
-  style: ["normal", "italic"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -98,7 +93,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="id"
       suppressHydrationWarning
-      className={`${poppins.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${poppins.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
         <script

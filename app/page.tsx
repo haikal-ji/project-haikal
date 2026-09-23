@@ -127,16 +127,11 @@ export default async function HomePage() {
         id="home"
         className="w-full max-w-7xl mx-auto cursor-default grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-center px-6 md:px-12 pt-28 pb-20 md:pt-36 md:pb-28 overflow-hidden"
       >
-        <BlurReveal delay={0.1} className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2">
           <div>
-            <BlurText
-              text="Hi, I'm Haikal"
-              delay={70}
-              animateBy="words"
-              direction="top"
-              as="h1"
-              className="text-text-primary text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-tight"
-            />
+            <h1 className="text-text-primary text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-tight">
+              Hi, I&apos;m Haikal
+            </h1>
           </div>
 
           <div className="relative flex items-center min-h-[40px]" aria-label="Bidang yang sedang dipelajari">
@@ -215,9 +210,9 @@ export default async function HomePage() {
               </a>
             </div>
           </div>
-        </BlurReveal>
+        </div>
         {/* RIGHT COLUMN: CIRCLE PHOTO & EXACT RYHAR STACKED FLOATING BADGES */}
-        <BlurReveal delay={0.25} yOffset={25} className="flex flex-col items-center justify-center relative mt-12 md:mt-0 pb-12 sm:pb-0">
+        <div className="flex flex-col items-center justify-center relative mt-12 md:mt-0 pb-12 sm:pb-0">
           <div className="absolute inset-0 bg-text-primary/5 rounded-full scale-105 opacity-40 blur-2xl pointer-events-none" />
 
           {/* PLAYFUL "Click me!" DOODLE STICKER (TILTED WITH HAND-DRAWN ARROW) */}
@@ -321,7 +316,7 @@ export default async function HomePage() {
               </span>
             </div>
           </div>
-        </BlurReveal>
+        </div>
       </section>
 
       {/* 2. ABOUT ME SECTION */}
