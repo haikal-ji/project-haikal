@@ -157,6 +157,14 @@ export default function SiteFooter() {
             GITHUB
           </a>
           <a
+            href="https://www.linkedin.com/in/haikal-ji-9b3311422"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-text-secondary hover:text-text-primary transition-colors duration-200"
+          >
+            LINKEDIN
+          </a>
+          <a
             href="mailto:mlbbus0208@gmail.com"
             className="text-text-secondary hover:text-text-primary transition-colors duration-200"
           >

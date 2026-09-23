@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { verifySameOrigin } from '@/lib/csrf'
 import { articleSchema } from '@/lib/schemas'
 import { sanitizeArticleHtml } from '@/lib/sanitize'
+import { deleteThumbnailFromStorage } from '@/lib/storage-helpers'
 
 async function requireOwner() {
   const supabase = await createClient()
@@ -57,11 +58,28 @@ export async function PUT(
 
   const { title, content, thumbnail } = result.data
 
+  // 1. Ambil data artikel yang ada sekarang untuk mendapatkan thumbnail lama
+  const existingArticle = await prisma.article.findUnique({
+    where: { id },
+    select: { thumbnail: true },
+  })
+
+  if (!existingArticle) {
+    return NextResponse.json({ error: 'Artikel tidak ditemukan' }, { status: 404 })
+  }
+
+  const newThumbnail = thumbnail || null
+
   try {
     const article = await prisma.article.update({
       where: { id },
-      data: { title, content: sanitizeArticleHtml(content), thumbnail: thumbnail || null },
+      data: { title, content: sanitizeArticleHtml(content), thumbnail: newThumbnail },
     })
+
+    // 2. Jika thumbnail lama ada dan berbeda dari thumbnail baru, hapus file lama dari Supabase Storage
+    if (existingArticle.thumbnail && existingArticle.thumbnail !== newThumbnail) {
+      await deleteThumbnailFromStorage(existingArticle.thumbnail)
+    }
 
     return NextResponse.json({ article })
   } catch (error: any) {
@@ -114,29 +132,10 @@ export async function DELETE(
   }
 
   // Hapus thumbnail dari Supabase Storage setelah transaksi DB berhasil.
-  // Dibungkus try/catch terpisah: kalau storage gagal, artikel tetap dianggap
-  // terhapus (jangan rollback) — cukup log peringatan saja.
+  // Dibungkus try/catch terpisah di dalam helper: kalau storage gagal, artikel
+  // tetap dianggap terhapus (jangan rollback) — cukup log peringatan saja.
   if (existingArticle.thumbnail) {
-    try {
-      const thumbnailUrl = existingArticle.thumbnail
-      // Ekstrak nama file dari URL Supabase Storage
-      // Format URL: https://<project>.supabase.co/storage/v1/object/public/thumbnails/<filename>
-      const BUCKET = 'thumbnails'
-      const bucketMarker = `/object/public/${BUCKET}/`
-      const markerIndex = thumbnailUrl.indexOf(bucketMarker)
-
-      if (markerIndex !== -1) {
-        const fileName = thumbnailUrl.slice(markerIndex + bucketMarker.length)
-        const supabase = await createClient()
-        const { error: storageError } = await supabase.storage.from(BUCKET).remove([fileName])
-
-        if (storageError) {
-          console.warn(`Artikel ${id} dihapus, tapi thumbnail gagal dihapus dari Storage:`, storageError.message)
-        }
-      }
-    } catch (storageErr) {
-      console.warn(`Artikel ${id} dihapus, tapi thumbnail gagal dihapus dari Storage (unexpected):`, storageErr)
-    }
+    await deleteThumbnailFromStorage(existingArticle.thumbnail)
   }
 
   return NextResponse.json({ success: true })

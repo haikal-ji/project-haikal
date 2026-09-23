@@ -53,7 +53,7 @@ export default function ContactSection({
     },
     {
       name: 'WhatsApp',
-      handle: '082396640918',
+      handle: 'Chat via WhatsApp',
       href: 'https://wa.me/6282396640918?text=Halo%20Haikal',
       hoverBorder: 'hover:border-[#25D366]',
       hoverBg: 'hover:bg-[#25D366]/5',
@@ -68,7 +68,7 @@ export default function ContactSection({
     {
       name: 'LinkedIn',
       handle: 'Muhammad Haikal',
-      href: 'https://linkedin.com',
+      href: 'https://www.linkedin.com/in/haikal-ji-9b3311422',
       hoverBorder: 'hover:border-[#0077b5]',
       hoverBg: 'hover:bg-[#0077b5]/5',
       iconHoverColor: 'group-hover:text-[#0077b5]',
