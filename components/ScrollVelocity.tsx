@@ -51,10 +51,23 @@ const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffec
 function useElementWidth<T extends HTMLElement>(ref: React.RefObject<T | null>): number {
   const [width, setWidth] = useState(0);
 
-  useIsomorphicLayoutEffect(() => {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    if (typeof ResizeObserver !== 'undefined') {
+      const observer = new ResizeObserver((entries) => {
+        if (entries[0]) {
+          setWidth(entries[0].contentRect.width);
+        }
+      });
+      observer.observe(el);
+      return () => observer.disconnect();
+    }
+
     function updateWidth() {
-      if (ref.current) {
-        setWidth(ref.current.offsetWidth);
+      if (el) {
+        setWidth(el.offsetWidth);
       }
     }
     updateWidth();

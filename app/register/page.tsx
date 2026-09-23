@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useActionState } from 'react'
+import { useState, useActionState, Suspense } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import AuthMessage from '@/components/AuthMessage'
 import { registerAction } from './actions'
@@ -19,7 +20,11 @@ function SubmitButton() {
   )
 }
 
-export default function RegisterPage() {
+function RegisterForm() {
+  const searchParams = useSearchParams()
+  const rawNext = searchParams.get('next') || searchParams.get('redirectTo') || '/'
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/'
+
   const [state, formAction] = useActionState(registerAction, null)
   const [showPassword, setShowPassword] = useState(false)
 
@@ -36,7 +41,10 @@ export default function RegisterPage() {
             <span className="font-semibold text-text-primary">{state.email}</span>. Klik link tersebut untuk
             mengaktifkan akun.
           </p>
-          <Link href="/login" className="inline-block text-sm font-semibold text-text-primary underline underline-offset-4 hover:opacity-80">
+          <Link
+            href={next && next !== '/' ? `/login?next=${encodeURIComponent(next)}` : '/login'}
+            className="inline-block text-sm font-semibold text-text-primary underline underline-offset-4 hover:opacity-80"
+          >
             Kembali ke Login
           </Link>
         </div>
@@ -49,10 +57,10 @@ export default function RegisterPage() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-text-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
       <Link
-        href="/"
+        href={next && next !== '/' ? next : '/'}
         className="absolute top-8 left-6 md:left-10 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-text-primary transition z-20"
       >
-        <span>←</span> Kembali ke beranda
+        <span>←</span> {next && next !== '/' ? 'Kembali' : 'Kembali ke beranda'}
       </Link>
 
       <div className="login-page-card w-full max-w-md bg-thirdary/60 dark:bg-thirdary/80 border border-text-secondary/15 rounded-2xl p-8 sm:p-10 shadow-2xl backdrop-blur-xl relative z-10">
@@ -67,6 +75,8 @@ export default function RegisterPage() {
         <AuthMessage override={state?.error ? { message: state.error, type: 'error' } : null} />
 
         <form action={formAction} className="space-y-4">
+          <input type="hidden" name="next" value={next} />
+
           <div>
             <label htmlFor="register-name" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">Nama Lengkap</label>
             <input
@@ -134,11 +144,22 @@ export default function RegisterPage() {
 
         <p className="mt-8 text-center text-xs text-text-secondary">
           Sudah punya akun?{' '}
-          <Link href="/login" className="font-semibold text-text-primary underline underline-offset-4 hover:opacity-80">
+          <Link
+            href={next && next !== '/' ? `/login?next=${encodeURIComponent(next)}` : '/login'}
+            className="font-semibold text-text-primary underline underline-offset-4 hover:opacity-80"
+          >
             Login
           </Link>
         </p>
       </div>
     </div>
+  )
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background text-text-secondary text-sm">Memuat...</div>}>
+      <RegisterForm />
+    </Suspense>
   )
 }

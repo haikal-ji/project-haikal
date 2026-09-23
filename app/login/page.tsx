@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useActionState } from 'react'
+import { useState, useActionState, Suspense } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import AuthMessage from '@/components/AuthMessage'
@@ -20,8 +21,11 @@ function SubmitButton() {
   )
 }
 
-export default function LoginPage() {
+function LoginForm() {
   const supabase = createClient()
+  const searchParams = useSearchParams()
+  const rawNext = searchParams.get('next') || searchParams.get('redirectTo') || '/'
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/'
 
   const [state, formAction] = useActionState(loginAction, null)
   const [showPassword, setShowPassword] = useState(false)
@@ -31,10 +35,14 @@ export default function LoginPage() {
   async function handleGithubLogin() {
     setOauthError(null)
     setOauthLoading('github')
+    const callbackUrl = new URL('/auth/callback', window.location.origin)
+    if (next && next !== '/') {
+      callbackUrl.searchParams.set('next', next)
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: callbackUrl.toString(),
       },
     })
     if (error) {
@@ -46,10 +54,14 @@ export default function LoginPage() {
   async function handleGoogleLogin() {
     setOauthError(null)
     setOauthLoading('google')
+    const callbackUrl = new URL('/auth/callback', window.location.origin)
+    if (next && next !== '/') {
+      callbackUrl.searchParams.set('next', next)
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: callbackUrl.toString(),
         queryParams: {
           access_type: 'offline',
           prompt: 'select_account consent',
@@ -69,10 +81,10 @@ export default function LoginPage() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-text-primary/5 rounded-full blur-[120px] pointer-events-none" />
 
       <Link
-        href="/"
+        href={next && next !== '/' ? next : '/'}
         className="absolute top-8 left-6 md:left-10 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-text-secondary hover:text-text-primary transition z-20"
       >
-        <span>←</span> Kembali ke beranda
+        <span>←</span> {next && next !== '/' ? 'Kembali' : 'Kembali ke beranda'}
       </Link>
 
       <div className="login-page-card w-full max-w-md bg-thirdary/60 dark:bg-thirdary/80 border border-text-secondary/15 rounded-2xl p-8 sm:p-10 shadow-2xl backdrop-blur-xl relative z-10">
@@ -140,6 +152,8 @@ export default function LoginPage() {
         </div>
 
         <form action={formAction} className="space-y-4">
+          <input type="hidden" name="next" value={next} />
+
           <div>
             <label htmlFor="login-email" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">Email</label>
             <input
@@ -197,11 +211,22 @@ export default function LoginPage() {
 
         <p className="mt-8 text-center text-xs text-text-secondary">
           Belum punya akun?{' '}
-          <Link href="/register" className="font-semibold text-text-primary underline underline-offset-4 hover:opacity-80">
+          <Link
+            href={next && next !== '/' ? `/register?next=${encodeURIComponent(next)}` : '/register'}
+            className="font-semibold text-text-primary underline underline-offset-4 hover:opacity-80"
+          >
             Daftar sekarang
           </Link>
         </p>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background text-text-secondary text-sm">Memuat...</div>}>
+      <LoginForm />
+    </Suspense>
   )
 }

@@ -20,8 +20,8 @@ const techLogos: LogoItem[] = [
   {
     title: 'NEXT.JS',
     node: (
-      <span className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
-        <SiNextdotjs className="w-5 h-5 text-current" />
+      <span className="inline-flex items-center gap-2 text-neutral-700 dark:text-neutral-200 hover:text-text-primary transition-colors duration-200">
+        <SiNextdotjs aria-hidden="true" className="w-5 h-5 text-current" />
         <span className="text-xs font-semibold tracking-wider uppercase">Next.js</span>
       </span>
     ),
@@ -29,8 +29,8 @@ const techLogos: LogoItem[] = [
   {
     title: 'REACT',
     node: (
-      <span className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
-        <SiReact className="w-5 h-5 text-current" />
+      <span className="inline-flex items-center gap-2 text-neutral-700 dark:text-neutral-200 hover:text-text-primary transition-colors duration-200">
+        <SiReact aria-hidden="true" className="w-5 h-5 text-current" />
         <span className="text-xs font-semibold tracking-wider uppercase">React</span>
       </span>
     ),
@@ -38,8 +38,8 @@ const techLogos: LogoItem[] = [
   {
     title: 'TYPESCRIPT',
     node: (
-      <span className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
-        <SiTypescript className="w-5 h-5 text-current" />
+      <span className="inline-flex items-center gap-2 text-neutral-700 dark:text-neutral-200 hover:text-text-primary transition-colors duration-200">
+        <SiTypescript aria-hidden="true" className="w-5 h-5 text-current" />
         <span className="text-xs font-semibold tracking-wider uppercase">TypeScript</span>
       </span>
     ),
@@ -47,8 +47,8 @@ const techLogos: LogoItem[] = [
   {
     title: 'TAILWIND CSS',
     node: (
-      <span className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
-        <SiTailwindcss className="w-5 h-5 text-current" />
+      <span className="inline-flex items-center gap-2 text-neutral-700 dark:text-neutral-200 hover:text-text-primary transition-colors duration-200">
+        <SiTailwindcss aria-hidden="true" className="w-5 h-5 text-current" />
         <span className="text-xs font-semibold tracking-wider uppercase">Tailwind CSS</span>
       </span>
     ),
@@ -56,8 +56,8 @@ const techLogos: LogoItem[] = [
   {
     title: 'PRISMA ORM',
     node: (
-      <span className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
-        <SiPrisma className="w-5 h-5 text-current" />
+      <span className="inline-flex items-center gap-2 text-neutral-700 dark:text-neutral-200 hover:text-text-primary transition-colors duration-200">
+        <SiPrisma aria-hidden="true" className="w-5 h-5 text-current" />
         <span className="text-xs font-semibold tracking-wider uppercase">Prisma ORM</span>
       </span>
     ),
@@ -65,8 +65,8 @@ const techLogos: LogoItem[] = [
   {
     title: 'SUPABASE',
     node: (
-      <span className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
-        <SiSupabase className="w-5 h-5 text-current" />
+      <span className="inline-flex items-center gap-2 text-neutral-700 dark:text-neutral-200 hover:text-text-primary transition-colors duration-200">
+        <SiSupabase aria-hidden="true" className="w-5 h-5 text-current" />
         <span className="text-xs font-semibold tracking-wider uppercase">Supabase</span>
       </span>
     ),
@@ -74,8 +74,8 @@ const techLogos: LogoItem[] = [
   {
     title: 'POSTGRESQL',
     node: (
-      <span className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
-        <SiPostgresql className="w-5 h-5 text-current" />
+      <span className="inline-flex items-center gap-2 text-neutral-700 dark:text-neutral-200 hover:text-text-primary transition-colors duration-200">
+        <SiPostgresql aria-hidden="true" className="w-5 h-5 text-current" />
         <span className="text-xs font-semibold tracking-wider uppercase">PostgreSQL</span>
       </span>
     ),
@@ -83,8 +83,8 @@ const techLogos: LogoItem[] = [
   {
     title: 'FIGMA',
     node: (
-      <span className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
-        <SiFigma className="w-5 h-5 text-current" />
+      <span className="inline-flex items-center gap-2 text-neutral-700 dark:text-neutral-200 hover:text-text-primary transition-colors duration-200">
+        <SiFigma aria-hidden="true" className="w-5 h-5 text-current" />
         <span className="text-xs font-semibold tracking-wider uppercase">Figma</span>
       </span>
     ),
@@ -92,8 +92,8 @@ const techLogos: LogoItem[] = [
   {
     title: 'DOCKER',
     node: (
-      <span className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
-        <SiDocker className="w-5 h-5 text-current" />
+      <span className="inline-flex items-center gap-2 text-neutral-700 dark:text-neutral-200 hover:text-text-primary transition-colors duration-200">
+        <SiDocker aria-hidden="true" className="w-5 h-5 text-current" />
         <span className="text-xs font-semibold tracking-wider uppercase">Docker</span>
       </span>
     ),
@@ -101,8 +101,8 @@ const techLogos: LogoItem[] = [
   {
     title: 'GIT',
     node: (
-      <span className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
-        <SiGit className="w-5 h-5 text-current" />
+      <span className="inline-flex items-center gap-2 text-neutral-700 dark:text-neutral-200 hover:text-text-primary transition-colors duration-200">
+        <SiGit aria-hidden="true" className="w-5 h-5 text-current" />
         <span className="text-xs font-semibold tracking-wider uppercase">Git</span>
       </span>
     ),
@@ -110,8 +110,8 @@ const techLogos: LogoItem[] = [
   {
     title: 'VERCEL',
     node: (
-      <span className="inline-flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors duration-200">
-        <SiVercel className="w-5 h-5 text-current" />
+      <span className="inline-flex items-center gap-2 text-neutral-700 dark:text-neutral-200 hover:text-text-primary transition-colors duration-200">
+        <SiVercel aria-hidden="true" className="w-5 h-5 text-current" />
         <span className="text-xs font-semibold tracking-wider uppercase">Vercel</span>
       </span>
     ),
@@ -126,7 +126,7 @@ export default function SiteFooter() {
   return (
     <footer className="border-t border-text-secondary/10 bg-background text-text-primary transition-colors duration-200">
       {/* 1. Animated Logo Loop Divider between page and footer */}
-      <div className="border-b border-text-secondary/10 py-5 overflow-hidden opacity-60 hover:opacity-100 transition-opacity duration-300">
+      <div className="border-b border-text-secondary/10 py-5 overflow-hidden">
         <LogoLoop
           logos={techLogos}
           speed={65}
@@ -142,9 +142,9 @@ export default function SiteFooter() {
 
       {/* 2. Main Footer Content (RyHar layout with GMAIL) */}
       <div className="mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 max-w-7xl px-6 py-8 md:px-12">
-        <div className="flex flex-col gap-1 text-center sm:text-left text-xs sm:text-sm text-text-secondary">
+        <div className="flex flex-col gap-1 text-center sm:text-left text-xs sm:text-sm text-text-secondary font-medium">
           <p>© {new Date().getFullYear()} Haikal. All rights reserved.</p>
-          <p className="text-xs text-text-secondary/70">Built with Next.js &amp; Tailwind CSS</p>
+          <p className="text-xs text-text-secondary">Built with Next.js &amp; Tailwind CSS</p>
         </div>
 
         <div className="flex items-center gap-6 sm:gap-8 text-xs font-bold uppercase tracking-widest">

@@ -18,7 +18,7 @@ export default async function ProfilePage() {
   } = await supabase.auth.getUser()
 
   if (!user || !user.email) {
-    redirect('/login')
+    redirect('/login?next=/profile')
   }
 
   let dbUser = await prisma.user.findUnique({

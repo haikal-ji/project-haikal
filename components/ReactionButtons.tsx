@@ -71,10 +71,14 @@ export default function ReactionButtons({
   const [copied, setCopied] = useState(false)
 
   function requireLogin() {
+    const currentPath =
+      typeof window !== 'undefined'
+        ? `${window.location.pathname}${window.location.search}`
+        : `/artikel/${articleId}`
     router.push(
       `/login?message=${encodeURIComponent(
         'Kamu harus login dulu untuk memberikan reaksi'
-      )}&type=warning`
+      )}&type=warning&next=${encodeURIComponent(currentPath)}`
     )
   }
 

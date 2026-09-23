@@ -50,7 +50,10 @@ export async function loginAction(
     }
   }
 
+  const rawNext = (formData.get('next') as string)?.trim() || '/'
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/'
+
   await syncUserToDb(supabase)
 
-  redirect('/')
+  redirect(next)
 }

@@ -36,7 +36,14 @@ export default function SiteHeader({
     await supabase.auth.signOut()
     await fetch('/auth/signout', { method: 'POST', headers: { Accept: 'application/json' } })
     setMobileOpen(false)
-    window.location.href = '/'
+
+    // Jika sedang di halaman yang memerlukan login, alihkan ke beranda
+    if (pathname.startsWith('/profile') || pathname.startsWith('/dashboard')) {
+      window.location.href = '/'
+    } else {
+      // Di halaman artikel / publik, tetap di halaman saat ini agar konteks bacaan tidak hilang
+      window.location.reload()
+    }
   }
 
   return (
@@ -269,7 +276,7 @@ function NavbarWithScrollspy({
                   </button>
                 ) : (
                   <Link
-                    href="/login"
+                    href={pathname && pathname !== '/' ? `/login?next=${encodeURIComponent(pathname)}` : '/login'}
                     onClick={() => setMobileOpen(false)}
                     className="px-3 py-2 rounded-xl text-sm font-medium text-text-secondary hover:text-text-primary hover:bg-thirdary transition-colors"
                   >

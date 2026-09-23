@@ -1,18 +1,21 @@
+import dynamicImport from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
 import { prisma } from '@/lib/prisma'
 import TextType from '@/components/TextType'
-import ScrollVelocity from '@/components/ScrollVelocity'
 import TechIcon from '@/components/TechIcon'
-import ContactSection from '@/components/ContactSection'
 import ScrollStack, { ScrollStackItem } from '@/components/ScrollStack'
 import BlurReveal from '@/components/BlurReveal'
-import Stack from '@/components/Stack'
-import TiltedCard from '@/components/TiltedCard'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
 import DecryptedText from '@/components/DecryptedText'
 import BlurText from '@/components/BlurText'
 import PixelTransition from '@/components/PixelTransition'
+
+// Below-the-fold heavy components (lazy-loaded via next/dynamic to cut ~100 KiB initial JS)
+const ScrollVelocity = dynamicImport(() => import('@/components/ScrollVelocity'), { ssr: true })
+const ContactSection = dynamicImport(() => import('@/components/ContactSection'), { ssr: true })
+const Stack = dynamicImport(() => import('@/components/Stack'), { ssr: true })
+const TiltedCard = dynamicImport(() => import('@/components/TiltedCard'), { ssr: true })
 
 export const dynamic = 'force-dynamic'
 
@@ -262,6 +265,7 @@ export default async function HomePage() {
                   width={380}
                   height={380}
                   priority
+                  sizes="(max-width: 640px) 256px, (max-width: 1024px) 320px, 380px"
                   className="w-full h-full object-cover [object-position:center_58%] pointer-events-none select-none rounded-full"
                 />
               }
@@ -429,11 +433,11 @@ export default async function HomePage() {
         </BlurReveal>
 
         {/* 3. SCROLL VELOCITY BANNER */}
-        <div className="mt-24 md:mt-32 pb-6 border-t border-neutral-200 dark:border-neutral-800/80 pt-10 overflow-hidden">
+        <div aria-hidden="true" className="mt-24 md:mt-32 pb-6 border-t border-neutral-200 dark:border-neutral-800/80 pt-10 overflow-hidden">
           <ScrollVelocity
             texts={["Hello I'm Haikal", "RPL Student"]}
             velocity={70}
-            className="shrink font-black tracking-tighter text-neutral-400 dark:text-neutral-500 opacity-60 select-none hover:opacity-100 transition-opacity"
+            className="shrink font-black tracking-tighter text-neutral-600 dark:text-neutral-300 select-none hover:text-text-primary transition-colors"
             numCopies={6}
             damping={50}
             stiffness={400}

@@ -49,12 +49,23 @@ export async function registerAction(
     }
   }
 
+  const rawNext = (formData.get('next') as string)?.trim() || '/'
+  const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/'
+
+  const forwardedHost = headersList.get('x-forwarded-host') || headersList.get('host')
+  const proto = headersList.get('x-forwarded-proto') || 'https'
+  const origin = forwardedHost ? `${proto}://${forwardedHost}` : ''
+  const emailRedirectTo = origin
+    ? `${origin}/auth/callback${next !== '/' ? `?next=${encodeURIComponent(next)}` : ''}`
+    : undefined
+
   const supabase = await createClient()
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
       data: { full_name: name || email },
+      emailRedirectTo,
     },
   })
 
@@ -69,7 +80,7 @@ export async function registerAction(
   // Jika Supabase mengembalikan session (Confirm email nonaktif di dashboard)
   if (data.session) {
     await syncUserToDb(supabase)
-    redirect('/')
+    redirect(next)
   }
 
   // Jika Confirm email masih aktif di Supabase

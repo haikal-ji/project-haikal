@@ -145,12 +145,12 @@ export default function ContactSection({
               title="Buka lokasi di Google Maps"
             >
               <p className="text-sm font-bold text-text-primary flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-rose-500 shrink-0 group-hover/badge:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg aria-hidden="true" className="w-4 h-4 text-rose-500 shrink-0 group-hover/badge:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
                 <span>Desa Lambai</span>
-                <svg className="w-3.5 h-3.5 text-text-secondary group-hover/badge:text-text-primary transition-transform group-hover/badge:translate-x-0.5 group-hover/badge:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <svg aria-hidden="true" className="w-3.5 h-3.5 text-text-secondary group-hover/badge:text-text-primary transition-transform group-hover/badge:translate-x-0.5 group-hover/badge:-translate-y-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </p>
@@ -169,14 +169,14 @@ export default function ContactSection({
               >
                 {isMapInteractive ? (
                   <>
-                    <svg className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <svg aria-hidden="true" className="w-3.5 h-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     <span>Kunci Peta</span>
                   </>
                 ) : (
                   <>
-                    <svg className="w-3.5 h-3.5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                    <svg aria-hidden="true" className="w-3.5 h-3.5 text-text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4" />
                     </svg>
                     <span>Interaksi Peta</span>
@@ -191,7 +191,7 @@ export default function ContactSection({
                 className="pointer-events-auto inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-text-primary text-background text-xs font-bold shadow-lg hover:opacity-90 transition-all duration-300"
               >
                 <span>Buka Maps</span>
-                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </a>
@@ -215,16 +215,19 @@ export default function ContactSection({
               <a
                 key={item.name}
                 href={item.href}
+                aria-label={`${item.name}: ${item.handle}`}
                 target={item.href.startsWith('mailto:') ? undefined : '_blank'}
                 rel={item.href.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
                 className={`group bg-background border border-text-secondary/20 rounded-2xl p-4 sm:p-5 lg:p-6 flex items-center justify-center sm:justify-between transition-all duration-300 shadow-sm hover:shadow-md aspect-square sm:aspect-auto ${item.hoverBorder} ${item.hoverBg}`}
               >
                 <div className="flex items-center gap-4">
                   <div
+                    aria-hidden="true"
                     className={`w-12 h-12 rounded-full bg-text-secondary/10 flex items-center justify-center text-text-primary group-hover:scale-110 transition-all duration-300 ${item.iconHoverColor}`}
                   >
                     {item.icon}
                   </div>
+                  {/* Teks terlihat di layar desktop/tablet */}
                   <div className="hidden sm:block text-left">
                     <h4 className="text-base sm:text-lg font-bold text-text-primary">
                       {item.name}
@@ -233,9 +236,14 @@ export default function ContactSection({
                       {item.handle}
                     </p>
                   </div>
+                  {/* Teks khusus screen-reader di layar mobile (agar tautan memiliki discernible name) */}
+                  <span className="sr-only sm:hidden">
+                    {item.name} ({item.handle})
+                  </span>
                 </div>
 
                 <svg
+                  aria-hidden="true"
                   className={`hidden sm:block w-5 h-5 text-text-secondary group-hover:text-text-primary group-hover:translate-x-1 transition-all ${
                     item.arrowHoverColor || ''
                   }`}

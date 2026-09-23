@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, type FormEvent, type KeyboardEvent } from 'react'
 import Link from 'next/link'
@@ -52,7 +52,9 @@ export default function CommentForm({
             </div>
           </div>
           <Link
-            href="/login"
+            href={`/login?message=${encodeURIComponent(
+              'Kamu harus login dulu untuk meninggalkan komentar'
+            )}&type=info&next=${encodeURIComponent(`/artikel/${articleId}`)}`}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-text-primary hover:opacity-90 text-background text-xs font-bold uppercase tracking-wider transition-all duration-200 shadow-sm hover:shadow-md shrink-0 active:scale-95 group"
           >
             <span>Masuk untuk Berkomentar</span>
