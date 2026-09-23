@@ -172,7 +172,7 @@ export const ScrollVelocity: React.FC<ScrollVelocityProps> = ({
   }
 
   return (
-    <section className="flex flex-col gap-2 md:gap-4">
+    <section className="flex flex-col gap-2 md:gap-4" aria-hidden="true">
       {texts.map((text, index) => (
         <VelocityText
           key={index}

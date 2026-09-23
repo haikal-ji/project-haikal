@@ -432,7 +432,7 @@ export default async function HomePage() {
           <ScrollVelocity
             texts={["Hello I'm Haikal", "RPL Student"]}
             velocity={70}
-            className="shrink font-black tracking-tighter text-neutral-600 dark:text-neutral-300 select-none hover:text-text-primary transition-colors"
+            className="shrink font-black tracking-tighter text-neutral-400 dark:text-neutral-500 opacity-60 select-none hover:opacity-100 transition-opacity"
             numCopies={6}
             damping={50}
             stiffness={400}
