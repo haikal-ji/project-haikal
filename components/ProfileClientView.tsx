@@ -402,11 +402,12 @@ export default function ProfileClientView({
           <div className="mt-3.5 flex justify-center">
             <Link
               href={`/pengguna/${user.id}`}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-foreground transition-colors underline decoration-dotted underline-offset-4"
-              target="_blank"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-foreground transition-colors underline decoration-dotted underline-offset-4 group"
             >
               <span>Lihat Profil Publik</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <svg className="w-3 h-3 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
             </Link>
           </div>
         </div>
