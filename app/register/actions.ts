@@ -49,6 +49,14 @@ export async function registerAction(
     }
   }
 
+  if (password.length > 72) {
+    return {
+      error: 'Password maksimal 72 karakter.',
+      name,
+      email,
+    }
+  }
+
   const rawNext = (formData.get('next') as string)?.trim() || '/'
   const next = rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/'
 

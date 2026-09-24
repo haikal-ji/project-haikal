@@ -27,6 +27,10 @@ export async function resetPasswordAction(
     return { error: 'Password minimal 6 karakter.' }
   }
 
+  if (password.length > 72) {
+    return { error: 'Password maksimal 72 karakter.' }
+  }
+
   const supabase = await createClient()
   const { error } = await supabase.auth.updateUser({ password })
 

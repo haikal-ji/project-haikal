@@ -116,6 +116,7 @@ function RegisterForm() {
                 placeholder="Minimal 6 karakter"
                 required
                 minLength={6}
+                maxLength={72}
                 className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
               />
               <button
