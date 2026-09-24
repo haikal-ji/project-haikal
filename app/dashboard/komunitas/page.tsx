@@ -79,7 +79,8 @@ export default async function KomunitasPage() {
         color: true,
       },
     }),
-  ])) as [UserItem[], AppealItem[], BadgeItem[]]
+    new Promise((resolve) => setTimeout(resolve, 350)),
+  ])) as [UserItem[], AppealItem[], BadgeItem[], unknown]
 
   return (
     <div className="space-y-10 animate-fade-in">
@@ -162,7 +163,7 @@ export default async function KomunitasPage() {
 
         <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[760px] text-left text-sm">
               <thead className="border-b border-text-secondary/10 bg-thirdary/70 text-[11px] font-bold uppercase tracking-wider text-text-secondary">
                 <tr>
                   <th scope="col" className="px-5 py-3.5 w-14">No.</th>

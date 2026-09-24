@@ -1,8 +1,10 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { prisma } from '@/lib/prisma'
 import DeleteArticleButton from './DeleteArticleButton'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
+import DashboardOverviewSkeleton from './DashboardOverviewSkeleton'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +16,15 @@ const todayLabel = new Intl.DateTimeFormat('id-ID', {
   timeZone: 'Asia/Jakarta',
 }).format(new Date())
 
-export default async function DashboardPage() {
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<DashboardOverviewSkeleton />}>
+      <DashboardContent />
+    </Suspense>
+  )
+}
+
+async function DashboardContent() {
   const [articles] = await Promise.all([
     prisma.article.findMany({
       orderBy: { created_at: 'desc' },

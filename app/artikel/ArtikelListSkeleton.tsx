@@ -1,4 +1,4 @@
-export default function ArtikelLoading() {
+export default function ArtikelListSkeleton() {
   return (
     <main className="min-h-screen bg-background text-text-primary px-6 pt-24 sm:pt-28 pb-16 md:px-12 md:pt-32 md:pb-20 max-w-7xl mx-auto transition-colors duration-200 animate-pulse">
       {/* Header Skeleton */}

@@ -20,7 +20,7 @@ export default function KomunitasLoading() {
 
         <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[760px] text-left text-sm">
               <thead className="border-b border-text-secondary/10 bg-thirdary/70 text-[11px] font-bold uppercase tracking-wider text-text-secondary">
                 <tr>
                   <th scope="col" className="px-5 py-3.5 w-14">No.</th>

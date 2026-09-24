@@ -1,6 +1,8 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import ArticleSearch from '@/components/ArticleSearch'
+import ArtikelListSkeleton from './ArtikelListSkeleton'
 
 export const metadata: Metadata = {
   title: 'Artikel | Haikal',
@@ -9,7 +11,15 @@ export const metadata: Metadata = {
 
 export const dynamic = 'force-dynamic'
 
-export default async function ArtikelListPage() {
+export default function ArtikelPage() {
+  return (
+    <Suspense fallback={<ArtikelListSkeleton />}>
+      <ArtikelContent />
+    </Suspense>
+  )
+}
+
+async function ArtikelContent() {
   const articles = await prisma.article.findMany({
     orderBy: { created_at: 'asc' },
   })

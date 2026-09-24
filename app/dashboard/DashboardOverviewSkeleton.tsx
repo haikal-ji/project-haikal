@@ -1,4 +1,4 @@
-export default function DashboardLoading() {
+export default function DashboardOverviewSkeleton() {
   return (
     <div className="space-y-10 animate-pulse">
       {/* Top Header Skeleton */}
