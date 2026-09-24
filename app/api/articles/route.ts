@@ -49,14 +49,13 @@ export async function POST(request: Request) {
     )
   }
 
-  const { title, content, thumbnail, category } = result.data
+  const { title, content, thumbnail } = result.data
 
   const article = await prisma.article.create({
     data: {
       title,
       content: sanitizeArticleHtml(content),
       thumbnail: thumbnail || null,
-      category: category || 'Tech',
       author_id: owner.id,
     },
   })

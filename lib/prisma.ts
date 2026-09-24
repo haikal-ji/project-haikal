@@ -11,7 +11,7 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 // Invalidate cached Prisma client in development when schema is updated
-const SCHEMA_VERSION = 'v3-with-category'
+const SCHEMA_VERSION = 'v2-with-bio'
 
 export const prisma =
   globalForPrisma.prisma && globalForPrisma.prismaVersion === SCHEMA_VERSION

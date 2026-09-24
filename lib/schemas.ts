@@ -71,12 +71,6 @@ export const articleSchema = z.object({
     .min(1, 'Konten wajib diisi')
     .max(50000, 'Konten maksimal 50000 karakter'),
   thumbnail: optionalUrl,
-  category: z
-    .string()
-    .trim()
-    .max(50, 'Kategori maksimal 50 karakter')
-    .optional()
-    .default('Tech'),
 })
 
 // 5. Badges

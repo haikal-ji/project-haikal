@@ -41,7 +41,6 @@ export default async function EditArtikelPage({
         initialTitle={article.title}
         initialContent={article.content}
         initialThumbnail={article.thumbnail}
-        initialCategory={article.category}
       />
     </div>
   )

@@ -163,7 +163,7 @@ export default async function ArtikelDetailPage({
       {/* Editorial Header */}
       <header className="mb-8">
         <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary/50 px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-4 shadow-2xs">
-          <span>{article.category || 'Tech'}</span>
+          <span>Journal &amp; Insights</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-text-primary leading-[1.12]">
