@@ -32,28 +32,63 @@ export async function generateMetadata({
   if (!article) return {}
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ekall.vercel.app'
-  const imageUrl = article.thumbnail
-    ? (article.thumbnail.startsWith('http') ? article.thumbnail : `${siteUrl}${article.thumbnail}`)
-    : `${siteUrl}/og-image.png`
+  const hasThumbnail = Boolean(article.thumbnail && article.thumbnail.trim().length > 0)
+  const defaultOgImage = `${siteUrl}/og-image.png`
+  const defaultOwnerAvatar = `${siteUrl}/haikal-hero.jpg`
 
-  const description = article.content.replace(/<[^>]*>/g, '').slice(0, 155) + '...'
+  const imageUrl = hasThumbnail
+    ? (article.thumbnail!.startsWith('http') ? article.thumbnail! : `${siteUrl}${article.thumbnail}`)
+    : defaultOgImage
 
-  return {
-    title: `${article.title} | Haikal Journal`,
-    description,
-    openGraph: {
-      title: article.title,
-      description,
-      type: 'article',
-      publishedTime: new Date(article.created_at).toISOString(),
-      images: [
+  // Clean description stripped of HTML tags, sanitized and truncated to 155 chars
+  const rawDescription = article.content
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const description = rawDescription.length > 155
+    ? rawDescription.slice(0, 152) + '...'
+    : rawDescription || 'Baca artikel lengkap di Haikal Journal.'
+
+  const ogImages = hasThumbnail
+    ? [
         {
           url: imageUrl,
           width: 1200,
           height: 630,
           alt: article.title,
         },
-      ],
+      ]
+    : [
+        {
+          url: defaultOgImage,
+          width: 1200,
+          height: 630,
+          alt: `${article.title} - Haikal Journal`,
+        },
+        {
+          url: defaultOwnerAvatar,
+          width: 800,
+          height: 800,
+          alt: 'Foto Profil Muh. Haikal',
+        },
+      ]
+
+  return {
+    title: `${article.title} | Haikal Journal`,
+    description,
+    alternates: {
+      canonical: `${siteUrl}/artikel/${article.id}`,
+    },
+    openGraph: {
+      title: article.title,
+      description,
+      url: `${siteUrl}/artikel/${article.id}`,
+      siteName: 'Haikal Journal',
+      locale: 'id_ID',
+      type: 'article',
+      publishedTime: new Date(article.created_at).toISOString(),
+      authors: ['Muh. Haikal'],
+      images: ogImages,
     },
     twitter: {
       card: 'summary_large_image',

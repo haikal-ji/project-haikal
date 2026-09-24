@@ -36,9 +36,10 @@ export const metadata: Metadata = {
   description: "Web developer & creative technologist yang sedang belajar merancang dan membangun website yang rapi, simpel, dan enak diliat.",
   icons: {
     icon: [
+      { url: '/favicon.ico', sizes: 'any' },
       { url: '/haikal-circle.png?v=3', type: 'image/png' },
     ],
-    shortcut: '/haikal-circle.png?v=3',
+    shortcut: '/favicon.ico',
     apple: '/haikal-circle.png?v=3',
   },
   keywords: ["portofolio", "web developer", "next.js", "haikal", "desain", "UI/UX"],
@@ -57,6 +58,12 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         alt: "Haikal — Portofolio",
+      },
+      {
+        url: "/haikal-hero.jpg",
+        width: 800,
+        height: 800,
+        alt: "Muh. Haikal",
       },
     ],
   },

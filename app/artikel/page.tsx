@@ -4,9 +4,42 @@ import { prisma } from '@/lib/prisma'
 import ArticleSearch from '@/components/ArticleSearch'
 import ArtikelListSkeleton from './ArtikelListSkeleton'
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://ekall.vercel.app'
+
 export const metadata: Metadata = {
-  title: 'Artikel | Haikal',
+  title: 'Artikel & Tulisan | Haikal',
   description: 'Catatan tentang proses, hal-hal yang sedang dipelajari, dan beberapa ide yang ingin disimpan.',
+  alternates: {
+    canonical: `${siteUrl}/artikel`,
+  },
+  openGraph: {
+    title: 'Artikel & Tulisan | Haikal Journal',
+    description: 'Catatan tentang proses, hal-hal yang sedang dipelajari, dan beberapa ide yang ingin disimpan.',
+    url: `${siteUrl}/artikel`,
+    siteName: 'Haikal Journal',
+    locale: 'id_ID',
+    type: 'website',
+    images: [
+      {
+        url: `${siteUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Haikal Journal — Catatan & Tulisan',
+      },
+      {
+        url: `${siteUrl}/haikal-hero.jpg`,
+        width: 800,
+        height: 800,
+        alt: 'Muh. Haikal',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Artikel & Tulisan | Haikal Journal',
+    description: 'Catatan tentang proses, hal-hal yang sedang dipelajari, dan beberapa ide yang ingin disimpan.',
+    images: [`${siteUrl}/og-image.png`],
+  },
 }
 
 export const dynamic = 'force-dynamic'
