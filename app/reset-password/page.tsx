@@ -26,6 +26,8 @@ export default function ResetPasswordPage() {
 
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
 
   useEffect(() => {
     if (state?.success) {
@@ -93,20 +95,33 @@ export default function ResetPasswordPage() {
 
         <form action={formAction} className="space-y-4">
           <div>
-            <label htmlFor="reset-password" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Password Baru
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label htmlFor="reset-password" className="block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                Password Baru
+              </label>
+              {password.length > 0 && (
+                <span className={`text-[11px] font-mono transition-colors ${password.length >= 72 ? 'text-amber-500 font-bold' : 'text-text-secondary/60'}`}>
+                  {password.length}/72
+                </span>
+              )}
+            </div>
             <div className="relative">
               <input
                 id="reset-password"
                 name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="new-password"
-                placeholder="Minimal 6 karakter"
+                placeholder="6 – 72 karakter"
                 required
                 minLength={6}
                 maxLength={72}
-                className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
+                className={`w-full rounded-xl border bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none transition ${
+                  password.length >= 72
+                    ? 'border-amber-500/50 focus:border-amber-500 focus:ring-1 focus:ring-amber-500'
+                    : 'border-text-secondary/20 focus:border-text-primary focus:ring-1 focus:ring-text-primary'
+                }`}
               />
               <button
                 type="button"
@@ -127,22 +142,41 @@ export default function ResetPasswordPage() {
                 )}
               </button>
             </div>
+            {password.length >= 72 && (
+              <p className="mt-1.5 text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1.5 animate-fade-in font-medium">
+                <span>⚠️</span>
+                <span>Batas maksimal 72 karakter tercapai.</span>
+              </p>
+            )}
           </div>
           <div>
-            <label htmlFor="reset-confirm" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">
-              Konfirmasi Password
-            </label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label htmlFor="reset-confirm" className="block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                Konfirmasi Password
+              </label>
+              {confirm.length > 0 && (
+                <span className={`text-[11px] font-mono transition-colors ${confirm.length >= 72 ? 'text-amber-500 font-bold' : 'text-text-secondary/60'}`}>
+                  {confirm.length}/72
+                </span>
+              )}
+            </div>
             <div className="relative">
               <input
                 id="reset-confirm"
                 name="confirm"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
                 type={showConfirm ? 'text' : 'password'}
                 autoComplete="new-password"
-                placeholder="Ulangi password baru"
+                placeholder="6 – 72 karakter"
                 required
                 minLength={6}
                 maxLength={72}
-                className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
+                className={`w-full rounded-xl border bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none transition ${
+                  confirm.length >= 72
+                    ? 'border-amber-500/50 focus:border-amber-500 focus:ring-1 focus:ring-amber-500'
+                    : 'border-text-secondary/20 focus:border-text-primary focus:ring-1 focus:ring-text-primary'
+                }`}
               />
               <button
                 type="button"
@@ -163,6 +197,12 @@ export default function ResetPasswordPage() {
                 )}
               </button>
             </div>
+            {confirm.length >= 72 && (
+              <p className="mt-1.5 text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1.5 animate-fade-in font-medium">
+                <span>⚠️</span>
+                <span>Batas maksimal 72 karakter tercapai.</span>
+              </p>
+            )}
           </div>
 
           <SubmitButton />

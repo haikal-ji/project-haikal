@@ -27,6 +27,7 @@ function RegisterForm() {
 
   const [state, formAction] = useActionState(registerAction, null)
   const [showPassword, setShowPassword] = useState(false)
+  const [password, setPassword] = useState('')
 
   if (state?.requiresConfirmation) {
     return (
@@ -106,18 +107,33 @@ function RegisterForm() {
             />
           </div>
           <div>
-            <label htmlFor="register-password" className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-text-secondary">Password</label>
+            <div className="flex items-center justify-between mb-1.5">
+              <label htmlFor="register-password" className="block text-xs font-semibold uppercase tracking-wider text-text-secondary">
+                Password
+              </label>
+              {password.length > 0 && (
+                <span className={`text-[11px] font-mono transition-colors ${password.length >= 72 ? 'text-amber-500 font-bold' : 'text-text-secondary/60'}`}>
+                  {password.length}/72
+                </span>
+              )}
+            </div>
             <div className="relative">
               <input
                 id="register-password"
                 name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="new-password"
-                placeholder="Minimal 6 karakter"
+                placeholder="6 – 72 karakter"
                 required
                 minLength={6}
                 maxLength={72}
-                className="w-full rounded-xl border border-text-secondary/20 bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
+                className={`w-full rounded-xl border bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none transition ${
+                  password.length >= 72
+                    ? 'border-amber-500/50 focus:border-amber-500 focus:ring-1 focus:ring-amber-500'
+                    : 'border-text-secondary/20 focus:border-text-primary focus:ring-1 focus:ring-text-primary'
+                }`}
               />
               <button
                 type="button"
@@ -138,6 +154,12 @@ function RegisterForm() {
                 )}
               </button>
             </div>
+            {password.length >= 72 && (
+              <p className="mt-1.5 text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1.5 animate-fade-in font-medium">
+                <span>⚠️</span>
+                <span>Batas maksimal 72 karakter tercapai.</span>
+              </p>
+            )}
           </div>
 
           <SubmitButton />
