@@ -4,8 +4,8 @@ export default function ProfileLoading() {
       <main className="profile-page animate-pulse">
         {/* Page Header */}
         <header className="profile-page-heading mb-8">
-          <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-3">
-            <span>Studio / Identitas</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary px-3.5 py-1 text-xs mb-3">
+            <div className="w-24 h-3.5 rounded bg-thirdary/80" />
           </div>
           <div className="h-10 sm:h-12 w-64 sm:w-80 rounded-2xl bg-thirdary/80" />
         </header>
@@ -51,12 +51,12 @@ export default function ProfileLoading() {
             <div className="profile-stats-strip">
               <div className="profile-stat-item">
                 <div className="w-8 h-6 rounded bg-thirdary/80 mx-auto mb-1" />
-                <span className="profile-stat-label">Komentar</span>
+                <div className="w-12 h-3 rounded bg-thirdary/50 mx-auto" />
               </div>
               <div className="profile-stat-divider" />
               <div className="profile-stat-item">
                 <div className="w-8 h-6 rounded bg-thirdary/80 mx-auto mb-1" />
-                <span className="profile-stat-label">Apresiasi</span>
+                <div className="w-12 h-3 rounded bg-thirdary/50 mx-auto" />
               </div>
             </div>
           </aside>

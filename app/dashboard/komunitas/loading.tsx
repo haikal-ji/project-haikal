@@ -23,13 +23,27 @@ export default function KomunitasLoading() {
             <table className="w-full min-w-[760px] text-left text-sm">
               <thead className="border-b border-text-secondary/10 bg-thirdary/70 text-[11px] font-bold uppercase tracking-wider text-text-secondary">
                 <tr>
-                  <th scope="col" className="px-5 py-3.5 w-14">No.</th>
-                  <th scope="col" className="px-5 py-3.5">Pengguna</th>
-                  <th scope="col" className="px-5 py-3.5">Email</th>
-                  <th scope="col" className="px-5 py-3.5">Komentar</th>
-                  <th scope="col" className="px-5 py-3.5">Status</th>
-                  <th scope="col" className="px-5 py-3.5">Badge Komunitas</th>
-                  <th scope="col" className="px-5 py-3.5 text-right">Moderasi</th>
+                  <th scope="col" className="px-5 py-3.5 w-14">
+                    <div className="w-5 h-3 rounded bg-thirdary/80" />
+                  </th>
+                  <th scope="col" className="px-5 py-3.5">
+                    <div className="w-16 h-3 rounded bg-thirdary/80" />
+                  </th>
+                  <th scope="col" className="px-5 py-3.5">
+                    <div className="w-14 h-3 rounded bg-thirdary/80" />
+                  </th>
+                  <th scope="col" className="px-5 py-3.5">
+                    <div className="w-16 h-3 rounded bg-thirdary/80" />
+                  </th>
+                  <th scope="col" className="px-5 py-3.5">
+                    <div className="w-12 h-3 rounded bg-thirdary/80" />
+                  </th>
+                  <th scope="col" className="px-5 py-3.5">
+                    <div className="w-24 h-3 rounded bg-thirdary/80" />
+                  </th>
+                  <th scope="col" className="px-5 py-3.5 text-right">
+                    <div className="w-14 h-3 rounded bg-thirdary/80 ml-auto" />
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-text-secondary/10">

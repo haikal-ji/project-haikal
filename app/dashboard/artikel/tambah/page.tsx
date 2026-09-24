@@ -1,9 +1,19 @@
+import { Suspense } from 'react'
 import ArticleForm from '@/components/ArticleForm'
+import TambahArtikelLoading from './loading'
 
 export const dynamic = 'force-dynamic'
 
-export default async function TambahArtikelPage() {
-  // Jeda natural 350ms agar skeleton loading muncul mulus dan tidak flickering
+export default function TambahArtikelPage() {
+  return (
+    <Suspense fallback={<TambahArtikelLoading />}>
+      <TambahArtikelContent />
+    </Suspense>
+  )
+}
+
+async function TambahArtikelContent() {
+  // Jeda natural 350ms agar full frame skeleton loading muncul mulus
   await new Promise((resolve) => setTimeout(resolve, 350))
 
   return (

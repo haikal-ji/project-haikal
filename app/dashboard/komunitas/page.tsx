@@ -1,9 +1,11 @@
+import { Suspense } from 'react'
 import { prisma } from '@/lib/prisma'
 import Image from 'next/image'
 import BanUserButton from '@/components/BanUserButton'
 import DeleteUserButton from '@/components/DeleteUserButton'
 import AppealActionButtons from '@/components/AppealActionButtons'
 import UserBadgeManager, { type BadgeItem, type UserBadgeItem } from '@/components/UserBadgeManager'
+import KomunitasLoading from './loading'
 
 interface AppealItem {
   id: string
@@ -33,7 +35,15 @@ interface UserItem {
 
 export const dynamic = 'force-dynamic'
 
-export default async function KomunitasPage() {
+export default function KomunitasPage() {
+  return (
+    <Suspense fallback={<KomunitasLoading />}>
+      <KomunitasContent />
+    </Suspense>
+  )
+}
+
+async function KomunitasContent() {
   const [users, pendingAppeals, allBadges] = (await Promise.all([
     prisma.user.findMany({
       orderBy: { created_at: 'desc' },

@@ -40,11 +40,21 @@ export default function DashboardOverviewSkeleton() {
             <table className="w-full min-w-[640px] text-left text-sm">
               <thead className="border-b border-text-secondary/10 bg-thirdary/70 text-[11px] font-bold uppercase tracking-wider text-text-secondary">
                 <tr>
-                  <th scope="col" className="px-5 py-3.5 w-14">No.</th>
-                  <th scope="col" className="px-5 py-3.5">Artikel</th>
-                  <th scope="col" className="px-5 py-3.5">Tanggal</th>
-                  <th scope="col" className="px-5 py-3.5">Status</th>
-                  <th scope="col" className="px-5 py-3.5 text-right">Aksi</th>
+                  <th scope="col" className="px-5 py-3.5 w-14">
+                    <div className="w-5 h-3 rounded bg-thirdary/80" />
+                  </th>
+                  <th scope="col" className="px-5 py-3.5">
+                    <div className="w-16 h-3 rounded bg-thirdary/80" />
+                  </th>
+                  <th scope="col" className="px-5 py-3.5">
+                    <div className="w-16 h-3 rounded bg-thirdary/80" />
+                  </th>
+                  <th scope="col" className="px-5 py-3.5">
+                    <div className="w-12 h-3 rounded bg-thirdary/80" />
+                  </th>
+                  <th scope="col" className="px-5 py-3.5 text-right">
+                    <div className="w-10 h-3 rounded bg-thirdary/80 ml-auto" />
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-text-secondary/10">

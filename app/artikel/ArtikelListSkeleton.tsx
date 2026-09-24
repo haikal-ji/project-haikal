@@ -3,8 +3,8 @@ export default function ArtikelListSkeleton() {
     <main className="min-h-screen bg-background text-text-primary px-6 pt-24 sm:pt-28 pb-16 md:px-12 md:pt-32 md:pb-20 max-w-7xl mx-auto transition-colors duration-200 animate-pulse">
       {/* Header Skeleton */}
       <header className="mb-12">
-        <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-text-secondary mb-4">
-          <span>Journal / Articles</span>
+        <div className="inline-flex items-center gap-2 rounded-full border border-text-secondary/20 bg-thirdary px-3.5 py-1 text-xs mb-4">
+          <div className="w-24 h-3.5 rounded bg-thirdary/80" />
         </div>
         <div className="h-10 sm:h-12 w-60 sm:w-80 rounded-2xl bg-thirdary/80" />
       </header>

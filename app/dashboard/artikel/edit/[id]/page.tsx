@@ -1,10 +1,24 @@
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import ArticleForm from '@/components/ArticleForm'
+import EditArtikelLoading from './loading'
 
 export const dynamic = 'force-dynamic'
 
-export default async function EditArtikelPage({
+export default function EditArtikelPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  return (
+    <Suspense fallback={<EditArtikelLoading />}>
+      <EditArtikelContent params={params} />
+    </Suspense>
+  )
+}
+
+async function EditArtikelContent({
   params,
 }: {
   params: Promise<{ id: string }>
