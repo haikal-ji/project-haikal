@@ -100,7 +100,13 @@ export default function ResetPasswordPage() {
                 Password Baru
               </label>
               {password.length > 0 && (
-                <span className={`text-[11px] font-mono transition-colors ${password.length >= 72 ? 'text-amber-500 font-bold' : 'text-text-secondary/60'}`}>
+                <span className={`text-[11px] font-mono transition-colors ${
+                  password.length >= 72
+                    ? 'text-amber-500 font-bold'
+                    : password.length < 6
+                    ? 'text-amber-500'
+                    : 'text-text-secondary/60'
+                }`}>
                   {password.length}/72
                 </span>
               )}
@@ -118,7 +124,7 @@ export default function ResetPasswordPage() {
                 minLength={6}
                 maxLength={72}
                 className={`w-full rounded-xl border bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none transition ${
-                  password.length >= 72
+                  password.length >= 72 || (password.length > 0 && password.length < 6)
                     ? 'border-amber-500/50 focus:border-amber-500 focus:ring-1 focus:ring-amber-500'
                     : 'border-text-secondary/20 focus:border-text-primary focus:ring-1 focus:ring-text-primary'
                 }`}
@@ -142,6 +148,14 @@ export default function ResetPasswordPage() {
                 )}
               </button>
             </div>
+            {password.length > 0 && password.length < 6 && (
+              <p className="mt-1.5 text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1.5 animate-fade-in font-medium">
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span>Minimal 6 karakter</span>
+              </p>
+            )}
             {password.length >= 72 && (
               <p className="mt-1.5 text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1.5 animate-fade-in font-medium">
                 <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -157,7 +171,13 @@ export default function ResetPasswordPage() {
                 Konfirmasi Password
               </label>
               {confirm.length > 0 && (
-                <span className={`text-[11px] font-mono transition-colors ${confirm.length >= 72 ? 'text-amber-500 font-bold' : 'text-text-secondary/60'}`}>
+                <span className={`text-[11px] font-mono transition-colors ${
+                  confirm.length >= 72
+                    ? 'text-amber-500 font-bold'
+                    : confirm.length < 6
+                    ? 'text-amber-500'
+                    : 'text-text-secondary/60'
+                }`}>
                   {confirm.length}/72
                 </span>
               )}
@@ -175,7 +195,7 @@ export default function ResetPasswordPage() {
                 minLength={6}
                 maxLength={72}
                 className={`w-full rounded-xl border bg-background px-4 py-3 pr-11 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none transition ${
-                  confirm.length >= 72
+                  confirm.length >= 72 || (confirm.length > 0 && confirm.length < 6)
                     ? 'border-amber-500/50 focus:border-amber-500 focus:ring-1 focus:ring-amber-500'
                     : 'border-text-secondary/20 focus:border-text-primary focus:ring-1 focus:ring-text-primary'
                 }`}
@@ -199,6 +219,14 @@ export default function ResetPasswordPage() {
                 )}
               </button>
             </div>
+            {confirm.length > 0 && confirm.length < 6 && (
+              <p className="mt-1.5 text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1.5 animate-fade-in font-medium">
+                <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <span>Minimal 6 karakter</span>
+              </p>
+            )}
             {confirm.length >= 72 && (
               <p className="mt-1.5 text-xs text-amber-500 dark:text-amber-400 flex items-center gap-1.5 animate-fade-in font-medium">
                 <svg className="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
