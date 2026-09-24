@@ -10,7 +10,10 @@ export default async function EditArtikelPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const article = await prisma.article.findUnique({ where: { id } })
+  const [article] = await Promise.all([
+    prisma.article.findUnique({ where: { id } }),
+    new Promise((resolve) => setTimeout(resolve, 350)),
+  ])
 
   if (!article) notFound()
 

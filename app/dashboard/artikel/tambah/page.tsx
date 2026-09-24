@@ -1,6 +1,11 @@
 import ArticleForm from '@/components/ArticleForm'
 
-export default function TambahArtikelPage() {
+export const dynamic = 'force-dynamic'
+
+export default async function TambahArtikelPage() {
+  // Jeda natural 350ms agar skeleton loading muncul mulus dan tidak flickering
+  await new Promise((resolve) => setTimeout(resolve, 350))
+
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Top Header */}
