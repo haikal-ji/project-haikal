@@ -26,7 +26,10 @@ export default function ArtikelLoading() {
             <div className="aspect-[16/10] w-full rounded-xl bg-thirdary/60 border border-text-secondary/10" />
 
             {/* Date / meta skeleton */}
-            <div className="w-28 h-3.5 rounded-full bg-thirdary/70" />
+            <div className="flex items-center justify-between text-xs mb-2">
+              <div className="w-8 h-3.5 rounded bg-thirdary/70" />
+              <div className="w-24 h-3.5 rounded bg-thirdary/60" />
+            </div>
 
             {/* Title skeleton */}
             <div className="space-y-2 pt-1">
@@ -34,13 +37,10 @@ export default function ArtikelLoading() {
               <div className="w-4/5 h-5 rounded-lg bg-thirdary/60" />
             </div>
 
-            {/* Author / footer skeleton */}
-            <div className="pt-4 mt-auto border-t border-text-secondary/10 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-thirdary/70" />
-                <div className="w-24 h-3 rounded bg-thirdary/60" />
-              </div>
-              <div className="w-16 h-3 rounded bg-thirdary/50" />
+            {/* Card footer skeleton matching "Baca selengkapnya →" */}
+            <div className="pt-4 mt-auto flex items-center justify-between">
+              <div className="w-28 h-3.5 rounded bg-thirdary/60" />
+              <div className="w-4 h-3.5 rounded bg-thirdary/50" />
             </div>
           </div>
         ))}
