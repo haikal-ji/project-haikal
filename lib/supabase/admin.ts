@@ -11,6 +11,10 @@ export function createAdminClient() {
     throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL')
   }
 
+  if (!serviceRoleKey) {
+    console.warn('[Supabase Admin] SUPABASE_SERVICE_ROLE_KEY tidak ditemukan di environment variables! Operasi hapus storage akan diblokir oleh RLS jika menggunakan Anon Key.')
+  }
+
   // Gunakan SUPABASE_SERVICE_ROLE_KEY jika tersedia, fallback ke ANON_KEY
   const key = serviceRoleKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
