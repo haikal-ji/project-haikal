@@ -15,6 +15,7 @@ type ArticleFormProps = {
   initialTitle?: string
   initialContent?: string
   initialThumbnail?: string | null
+  initialCategory?: string
 }
 
 export default function ArticleForm({
@@ -23,6 +24,7 @@ export default function ArticleForm({
   initialTitle = '',
   initialContent = '',
   initialThumbnail = null,
+  initialCategory = 'Tech',
 }: ArticleFormProps) {
   const router = useRouter()
   const supabase = createClient()
@@ -32,6 +34,7 @@ export default function ArticleForm({
   const [thumbnail, setThumbnail] = useState<string | null>(initialThumbnail)
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(initialThumbnail)
+  const [category, setCategory] = useState(initialCategory || 'Tech')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -76,7 +79,12 @@ export default function ArticleForm({
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, content, thumbnail: thumbnailUrl }),
+        body: JSON.stringify({
+          title,
+          content,
+          thumbnail: thumbnailUrl,
+          category: category.trim() || 'Tech',
+        }),
       })
 
       if (!res.ok) {
@@ -180,10 +188,51 @@ export default function ArticleForm({
           )}
         </div>
 
-        {/* Panel 2: Publishing Actions */}
+        {/* Panel 2: Kategori / Tag */}
         <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md p-5 sm:p-6 shadow-xs space-y-4">
           <div className="flex items-center gap-2">
             <span className="text-[11px] font-mono text-text-secondary">02</span>
+            <h2 className="text-xs font-bold uppercase tracking-wider text-text-primary">Kategori Artikel</h2>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex flex-wrap gap-2">
+              {['Tech', 'Design', 'Tutorial', 'Personal', 'PKL'].map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setCategory(cat)}
+                  className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-all ${
+                    category.toLowerCase() === cat.toLowerCase()
+                      ? 'bg-text-primary text-background shadow-xs'
+                      : 'bg-background/80 hover:bg-background text-text-secondary hover:text-text-primary border border-text-secondary/20'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            <div className="relative">
+              <input
+                type="text"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                placeholder="Atau ketik kategori kustom..."
+                maxLength={40}
+                className="w-full text-xs rounded-xl border border-text-secondary/20 bg-background px-3.5 py-2.5 text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary transition"
+              />
+            </div>
+            <p className="text-[11px] text-text-secondary leading-tight">
+              Pilih kategori rekomendasi atau ketik sendiri agar memudahkan pembaca memfilter artikel.
+            </p>
+          </div>
+        </div>
+
+        {/* Panel 3: Publishing Actions */}
+        <div className="rounded-2xl border border-text-secondary/15 bg-thirdary/40 backdrop-blur-md p-5 sm:p-6 shadow-xs space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono text-text-secondary">03</span>
             <h2 className="text-xs font-bold uppercase tracking-wider text-text-primary">Publikasi</h2>
           </div>
 

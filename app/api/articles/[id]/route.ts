@@ -56,7 +56,7 @@ export async function PUT(
     )
   }
 
-  const { title, content, thumbnail } = result.data
+  const { title, content, thumbnail, category } = result.data
 
   // 1. Ambil data artikel yang ada sekarang untuk mendapatkan thumbnail lama
   const existingArticle = await prisma.article.findUnique({
@@ -73,7 +73,12 @@ export async function PUT(
   try {
     const article = await prisma.article.update({
       where: { id },
-      data: { title, content: sanitizeArticleHtml(content), thumbnail: newThumbnail },
+      data: {
+        title,
+        content: sanitizeArticleHtml(content),
+        thumbnail: newThumbnail,
+        ...(category ? { category } : {}),
+      },
     })
 
     // 2. Jika thumbnail lama ada dan berbeda dari thumbnail baru, hapus file lama dari Supabase Storage

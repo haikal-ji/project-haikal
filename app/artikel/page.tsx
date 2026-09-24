@@ -11,13 +11,14 @@ export const dynamic = 'force-dynamic'
 
 export default async function ArtikelListPage() {
   const articles = await prisma.article.findMany({
-    orderBy: { created_at: 'asc' },
+    orderBy: { created_at: 'desc' },
   })
 
   const searchableArticles = articles.map((article) => ({
     id: article.id,
     title: article.title,
     thumbnail: article.thumbnail,
+    category: article.category || 'Tech',
     created_at: article.created_at.toISOString(),
   }))
 
