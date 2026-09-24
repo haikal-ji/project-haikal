@@ -15,9 +15,12 @@ const todayLabel = new Intl.DateTimeFormat('id-ID', {
 }).format(new Date())
 
 export default async function DashboardPage() {
-  const articles = await prisma.article.findMany({
-    orderBy: { created_at: 'desc' },
-  })
+  const [articles] = await Promise.all([
+    prisma.article.findMany({
+      orderBy: { created_at: 'desc' },
+    }),
+    new Promise((resolve) => setTimeout(resolve, 350)),
+  ])
 
   return (
     <div className="space-y-10 animate-fade-in">
