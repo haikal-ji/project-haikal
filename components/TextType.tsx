@@ -1,7 +1,6 @@
 'use client';
 
 import { type ElementType, useEffect, useRef, useState, createElement, useMemo, useCallback } from 'react';
-import { gsap } from 'gsap';
 
 interface TextTypeProps {
   className?: string;
@@ -45,15 +44,14 @@ const TextType = ({
   reverseMode = false,
   ...props
 }: TextTypeProps & React.HTMLAttributes<HTMLElement>) => {
-  const [displayedText, setDisplayedText] = useState('');
-  const [currentCharIndex, setCurrentCharIndex] = useState(0);
+  const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
+  const [displayedText, setDisplayedText] = useState(textArray[0] || '');
+  const [currentCharIndex, setCurrentCharIndex] = useState(textArray[0]?.length || 0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(!startOnVisible);
-  const cursorRef = useRef<HTMLSpanElement>(null);
   const containerRef = useRef<HTMLElement>(null);
-
-  const textArray = useMemo(() => (Array.isArray(text) ? text : [text]), [text]);
+  const isStarted = useRef(false);
 
   const getRandomSpeed = useCallback(() => {
     if (!variableSpeed) return typingSpeed;
@@ -85,22 +83,17 @@ const TextType = ({
   }, [startOnVisible]);
 
   useEffect(() => {
-    if (showCursor && cursorRef.current) {
-      gsap.set(cursorRef.current, { opacity: 1 });
-      gsap.to(cursorRef.current, {
-        opacity: 0,
-        duration: cursorBlinkDuration,
-        repeat: -1,
-        yoyo: true,
-        ease: 'power2.inOut'
-      });
-    }
-  }, [showCursor, cursorBlinkDuration]);
-
-  useEffect(() => {
     if (!isVisible) return;
 
     let timeout: ReturnType<typeof setTimeout>;
+
+    if (!isStarted.current) {
+      isStarted.current = true;
+      timeout = setTimeout(() => {
+        setIsDeleting(true);
+      }, pauseDuration);
+      return () => clearTimeout(timeout);
+    }
 
     const currentText = textArray[currentTextIndex];
     const processedText = reverseMode ? currentText.split('').reverse().join('') : currentText;
@@ -132,10 +125,9 @@ const TextType = ({
               setDisplayedText(prev => prev + processedText[currentCharIndex]);
               setCurrentCharIndex(prev => prev + 1);
             },
-            variableSpeed ? getRandomSpeed() : typingSpeed
+            getRandomSpeed()
           );
-        } else if (textArray.length >= 1) {
-          if (!loop && currentTextIndex === textArray.length - 1) return;
+        } else {
           timeout = setTimeout(() => {
             setIsDeleting(true);
           }, pauseDuration);
@@ -143,28 +135,22 @@ const TextType = ({
       }
     };
 
-    if (currentCharIndex === 0 && !isDeleting && displayedText === '') {
-      timeout = setTimeout(executeTypingAnimation, initialDelay);
-    } else {
-      executeTypingAnimation();
-    }
+    executeTypingAnimation();
 
     return () => clearTimeout(timeout);
   }, [
     currentCharIndex,
+    currentTextIndex,
     displayedText,
     isDeleting,
-    typingSpeed,
-    deletingSpeed,
-    pauseDuration,
-    textArray,
-    currentTextIndex,
-    loop,
-    initialDelay,
     isVisible,
+    loop,
+    pauseDuration,
     reverseMode,
-    variableSpeed,
-    onSentenceComplete
+    textArray,
+    onSentenceComplete,
+    getRandomSpeed,
+    deletingSpeed
   ]);
 
   const shouldHideCursor =
@@ -182,8 +168,8 @@ const TextType = ({
     </span>,
     showCursor && (
       <span
-        ref={cursorRef}
-        className={`ml-1 inline-block opacity-100 ${shouldHideCursor ? 'hidden' : ''} ${cursorClassName}`}
+        className={`ml-1 inline-block animate-pulse ${shouldHideCursor ? 'hidden' : ''} ${cursorClassName}`}
+        aria-hidden="true"
       >
         {cursorCharacter}
       </span>
