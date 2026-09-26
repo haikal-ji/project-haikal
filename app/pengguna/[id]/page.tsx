@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import PublicProfileView, { type PublicProfileUser } from '@/components/PublicProfileView'
+import '@/app/profile/profile.css'
 
 export const dynamic = 'force-dynamic'
 

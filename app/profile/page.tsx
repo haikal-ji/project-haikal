@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/prisma'
 import ProfileClientView from '@/components/ProfileClientView'
 import type { Metadata } from 'next'
+import './profile.css'
 
 export const dynamic = 'force-dynamic'
 

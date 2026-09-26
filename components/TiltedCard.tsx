@@ -132,7 +132,9 @@ export default function TiltedCard({
             width={typeof imageWidth === 'number' ? imageWidth : parseInt(String(imageWidth)) || 300}
             height={typeof imageHeight === 'number' ? imageHeight : parseInt(String(imageHeight)) || 300}
             className="w-full h-full object-cover rounded-[15px]"
-            priority
+            loading="lazy"
+            quality={75}
+            sizes="(max-width: 1024px) 1px, 440px"
           />
         </div>
 
