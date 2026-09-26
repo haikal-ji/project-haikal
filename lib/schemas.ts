@@ -53,7 +53,7 @@ export const updateProfileSchema = z.object({
   avatar: optionalUrl,
   bio: z
     .string()
-    .max(200, 'Bio maksimal 160 karakter')
+    .max(160, 'Bio maksimal 160 karakter')
     .nullish()
     .transform((val) => (val && val.trim() ? val.trim().slice(0, 160) : null)),
 })

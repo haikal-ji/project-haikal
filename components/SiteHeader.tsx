@@ -20,7 +20,13 @@ export default function SiteHeader({
   const [activeSection, setActiveSection] = useState('home')
 
   // Sembunyikan navbar di halaman auth dan dashboard
-  if (pathname === '/login' || pathname === '/register' || pathname.startsWith('/dashboard')) {
+  if (
+    pathname === '/login' ||
+    pathname === '/register' ||
+    pathname === '/forgot-password' ||
+    pathname === '/reset-password' ||
+    pathname.startsWith('/dashboard')
+  ) {
     return null
   }
 

@@ -254,10 +254,16 @@ export default function CommentItem({
                 rows={3}
                 autoFocus
                 disabled={loading}
+                maxLength={1000}
                 placeholder="Tulis koreksi komentarmu..."
                 className="w-full rounded-xl border border-text-secondary/20 bg-background p-3 text-sm text-text-primary placeholder:text-text-secondary/50 focus:outline-none focus:border-text-primary focus:ring-1 focus:ring-text-primary transition"
               />
-              <div className="flex items-center justify-end">
+              <div className="flex items-center justify-between">
+                <span className={`text-[11px] font-mono ${
+                  editContent.length >= 1000 ? 'text-amber-500 font-bold' : 'text-text-secondary/50'
+                }`}>
+                  {editContent.length}/1000
+                </span>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"

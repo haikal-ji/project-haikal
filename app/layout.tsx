@@ -27,6 +27,13 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://ekall.vercel.app'),
   title: {
@@ -100,7 +107,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="id"
       suppressHydrationWarning
-      className={`${poppins.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${poppins.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
       <head>
         <script

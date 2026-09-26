@@ -4,7 +4,7 @@
  * Membaca header Origin (standar browser pada setiap mutating request).
  * Jika Origin kosong (beberapa browser lama / privacy proxy), fallback ke Referer.
  * Membandingkan hostname-nya dengan NEXT_PUBLIC_SITE_URL (production) atau
- * Host header (development).
+ * Host / x-forwarded-host header (development / behind proxy).
  *
  * @returns true jika origin cocok, false jika tidak cocok atau kedua header kosong.
  */
@@ -12,33 +12,36 @@ export function verifySameOrigin(request: Request): boolean {
   const origin = request.headers.get('origin')
   const referer = request.headers.get('referer')
 
-  // Ambil URL sumber request
-  const sourceUrl = origin || referer
-  if (!sourceUrl) return false
+  // Browser di sandboxed iframe / privacy mode kadang kirim string literal "null"
+  const rawSource = origin || referer
+  if (!rawSource || rawSource === 'null') return false
 
   let sourceHostname: string
   try {
-    sourceHostname = new URL(sourceUrl).hostname
+    sourceHostname = new URL(rawSource).hostname
   } catch {
     return false
   }
 
-  // Tentukan hostname yang diharapkan
+  // Production: bandingkan dengan NEXT_PUBLIC_SITE_URL
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
-  if (siteUrl) {
+  if (siteUrl && siteUrl !== 'null') {
     try {
       const expectedHostname = new URL(siteUrl).hostname
       return sourceHostname === expectedHostname
     } catch {
-      // NEXT_PUBLIC_SITE_URL malformed, fallback ke Host header
+      // NEXT_PUBLIC_SITE_URL malformed, lanjut ke fallback
     }
   }
 
-  // Fallback untuk development: bandingkan dengan Host header
-  const host = request.headers.get('host')
-  if (!host) return false
+  // Fallback development / behind reverse proxy:
+  // x-forwarded-host lebih akurat saat di balik proxy (Vercel, Nginx, dll.)
+  const forwardedHost = request.headers.get('x-forwarded-host')
+  const hostHeader = request.headers.get('host')
+  const rawHost = forwardedHost || hostHeader
+  if (!rawHost) return false
 
-  // Host bisa berisi port (localhost:3000), ambil hostname saja
-  const expectedHostname = host.split(':')[0]
+  // Hilangkan port jika ada (localhost:3000 → localhost)
+  const expectedHostname = rawHost.split(':')[0]
   return sourceHostname === expectedHostname
 }
