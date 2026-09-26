@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   images: {
     formats: ['image/avif', 'image/webp'],
+    imageSizes: [128, 256, 320, 384],
+    deviceSizes: [512, 640, 750, 828, 1080, 1200],
     remotePatterns: [
       {
         protocol: "https",
@@ -44,6 +46,16 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "*.supabase.co",
       },
+    ],
+  },
+  experimental: {
+    optimizePackageImports: [
+      'react-icons',
+      'motion',
+      'gsap',
+      '@tiptap/react',
+      '@tiptap/starter-kit',
+      'lenis',
     ],
   },
   async headers() {

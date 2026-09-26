@@ -2,16 +2,19 @@ import dynamicImport from 'next/dynamic'
 import Link from 'next/link'
 import Image from 'next/image'
 import { prisma } from '@/lib/prisma'
-import TextType from '@/components/TextType'
 import TechIcon from '@/components/TechIcon'
-import ScrollStack, { ScrollStackItem } from '@/components/ScrollStack'
-import BlurReveal from '@/components/BlurReveal'
 import ArrowUpRight from '@/components/ui/ArrowUpRight'
-import DecryptedText from '@/components/DecryptedText'
-import BlurText from '@/components/BlurText'
-import PixelTransition from '@/components/PixelTransition'
+import { ScrollStackItem } from '@/components/ScrollStack'
+import HeroAvatar from '@/components/HeroAvatar'
 
-// Below-the-fold heavy components (lazy-loaded via next/dynamic to cut ~100 KiB initial JS)
+// Lazy-loaded interactive and animation components to eliminate ~136 KiB initial unused JS
+const TextType = dynamicImport(() => import('@/components/TextType'))
+const ScrollStack = dynamicImport(() => import('@/components/ScrollStack'))
+const BlurReveal = dynamicImport(() => import('@/components/BlurReveal'))
+const BlurText = dynamicImport(() => import('@/components/BlurText'))
+const DecryptedText = dynamicImport(() => import('@/components/DecryptedText'))
+
+// Below-the-fold heavy components
 const ScrollVelocity = dynamicImport(() => import('@/components/ScrollVelocity'), { ssr: true })
 const ContactSection = dynamicImport(() => import('@/components/ContactSection'), { ssr: true })
 const Stack = dynamicImport(() => import('@/components/Stack'), { ssr: true })
@@ -252,31 +255,7 @@ export default async function HomePage() {
           </div>
 
           <div className="relative z-10 p-2 sm:p-3 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-full shadow-2xl">
-            <PixelTransition
-              firstContent={
-                <Image
-                  src="/haikal-hero.jpg"
-                  alt="Muhammad Haikal"
-                  width={380}
-                  height={380}
-                  priority
-                  sizes="(max-width: 640px) 256px, (max-width: 1024px) 320px, 380px"
-                  className="w-full h-full object-cover [object-position:center_58%] pointer-events-none select-none rounded-full"
-                />
-              }
-              secondContent={
-                <div className="w-full h-full grid place-items-center bg-[#111] text-white select-none rounded-full">
-                  <p className="font-black text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight select-none">
-                    Meow!
-                  </p>
-                </div>
-              }
-              gridSize={8}
-              pixelColor="#ffffff"
-              once={false}
-              animationStepDuration={0.4}
-              className="w-64 h-64 sm:w-80 sm:h-80 lg:w-[380px] lg:h-[380px] rounded-full border-none cursor-pointer aspect-square"
-            />
+            <HeroAvatar />
           </div>
           <div className="absolute -bottom-8 left-2 sm:-bottom-10 sm:-left-4 md:-bottom-12 md:-left-10 z-20 flex flex-col gap-2.5 sm:gap-3 max-w-[calc(100%-1rem)] sm:max-w-none">
             <div className="floating flex items-center gap-2.5 sm:gap-3 bg-background/95 dark:bg-[#111111]/95 backdrop-blur-md border border-text-secondary/15 p-2.5 pr-4 sm:p-3 sm:pr-5 rounded-2xl shadow-xl hover:-translate-y-1 transition-transform duration-300">
