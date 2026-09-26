@@ -13,7 +13,7 @@ export default function ScrollBlur() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed top-0 left-0 right-0 z-40 h-24 sm:h-28 md:h-36 select-none overflow-hidden"
+      className="pointer-events-none fixed top-0 left-0 right-0 z-40 h-24 sm:h-28 md:h-36 select-none overflow-hidden hidden sm:block"
     >
       {/* Progressive Blur Layer 1 (Subtle base) */}
       <div
