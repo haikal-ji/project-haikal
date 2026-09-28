@@ -1,23 +1,51 @@
 /**
- * Rate limiter sederhana berbasis sliding window in-memory (tanpa dependency eksternal).
- *
- * CATATAN PENTING:
- * Solusi in-memory ini TIDAK akan konsisten di lingkungan serverless multi-instance
- * (seperti Vercel), karena setiap instance punya Map-nya sendiri. Untuk produksi
- * yang lebih serius, sebaiknya gunakan:
- * - Upstash Redis (@upstash/ratelimit)
- * - Proteksi di level CDN (Cloudflare Rate Limiting, Vercel WAF)
- *
- * Untuk project personal / traffic rendah ini, solusi in-memory sudah cukup memadai
- * sebagai lapisan pertahanan dasar.
+ * Rate limiter dengan dua backend:
+ * - Upstash Redis: dipakai kalau UPSTASH_REDIS_REST_URL dan UPSTASH_REDIS_REST_TOKEN
+ *   tersedia di environment. Konsisten di seluruh instance serverless.
+ * - In-memory sliding window: fallback otomatis saat env var belum diset
+ *   (lokal / development). Tidak konsisten di multi-instance serverless.
  */
 
-// Map<key, timestamp[]> — menyimpan timestamp request per IP+route
+import { Ratelimit } from '@upstash/ratelimit'
+import { Redis } from '@upstash/redis'
+
+// ---------------------------------------------------------------------------
+// Upstash backend — lazy singleton
+// ---------------------------------------------------------------------------
+
+let _upstashInstance: Ratelimit | null = null
+let _upstashChecked = false
+
+function getUpstashLimiter(opts: { limit: number; windowMs: number }): Ratelimit | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+
+  if (!url || !token) return null
+
+  // Buat instance baru per-call karena limit/windowMs bisa beda per route.
+  // Upstash SDK ringan — tidak masalah buat beberapa instance dengan prefix berbeda.
+  const redis = new Redis({ url, token })
+  const windowSec = Math.max(1, Math.ceil(opts.windowMs / 1000))
+  const windowStr = `${windowSec} s` as Parameters<typeof Ratelimit.slidingWindow>[1]
+
+  return new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(opts.limit, windowStr),
+    analytics: false,
+    prefix: 'rl',
+  })
+}
+
+// Supress unused-var warning pada module-level singleton vars
+void _upstashInstance
+void _upstashChecked
+
+// ---------------------------------------------------------------------------
+// In-memory fallback (sliding window)
+// ---------------------------------------------------------------------------
+
 const hitMap = new Map<string, number[]>()
-
-// Bersihkan entry lama setiap 5 menit supaya Map tidak membengkak
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000
-
 let lastCleanup = Date.now()
 
 function cleanupStaleEntries(windowMs: number) {
@@ -37,10 +65,7 @@ function cleanupStaleEntries(windowMs: number) {
   }
 }
 
-/**
- * Inti sliding-window — dipakai oleh semua overload di bawah.
- */
-function hitRateLimit(key: string, opts: { limit: number; windowMs: number }): boolean {
+function hitRateLimitInMemory(key: string, opts: { limit: number; windowMs: number }): boolean {
   const now = Date.now()
   const windowStart = now - opts.windowMs
 
@@ -49,23 +74,46 @@ function hitRateLimit(key: string, opts: { limit: number; windowMs: number }): b
   if (timestamps.length >= opts.limit) {
     hitMap.set(key, timestamps)
     cleanupStaleEntries(opts.windowMs)
-    return true // rate limit terlampaui
+    return true
   }
 
   timestamps.push(now)
   hitMap.set(key, timestamps)
   cleanupStaleEntries(opts.windowMs)
-  return false // masih aman
+  return false
 }
+
+// ---------------------------------------------------------------------------
+// Core dispatcher — Upstash kalau tersedia, in-memory kalau tidak
+// ---------------------------------------------------------------------------
+
+async function hitRateLimit(key: string, opts: { limit: number; windowMs: number }): Promise<boolean> {
+  const url = process.env.UPSTASH_REDIS_REST_URL
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN
+
+  if (url && token) {
+    try {
+      const limiter = getUpstashLimiter(opts)
+      if (limiter) {
+        const { success } = await limiter.limit(key)
+        return !success
+      }
+    } catch {
+      // Upstash unreachable — fallback ke in-memory agar tidak block traffic
+    }
+  }
+
+  return hitRateLimitInMemory(key, opts)
+}
+
+// ---------------------------------------------------------------------------
+// Public API
+// ---------------------------------------------------------------------------
 
 /**
  * Cek rate limit dari IP string secara langsung.
  * Dipakai di Server Actions (yang tidak punya Request object).
- *
- * @param ip        - IP address (dari x-forwarded-for atau 'unknown')
- * @param routeKey  - Identifier unik route (misal 'POST:/login')
- * @param opts      - { limit, windowMs }
- * @returns true jika rate limit terlampaui
+ * Sinkron — selalu pakai in-memory.
  */
 export function checkRateLimitByIp(
   ip: string | null | undefined,
@@ -73,50 +121,38 @@ export function checkRateLimitByIp(
   opts: { limit: number; windowMs: number }
 ): boolean {
   const safeIp = ip?.split(',')[0].trim() || 'unknown'
+  return hitRateLimitInMemory(`${routeKey}:${safeIp}`, opts)
+}
+
+/**
+ * Versi async dari checkRateLimitByIp — pakai Upstash kalau tersedia.
+ */
+export async function checkRateLimitByIpAsync(
+  ip: string | null | undefined,
+  routeKey: string,
+  opts: { limit: number; windowMs: number }
+): Promise<boolean> {
+  const safeIp = ip?.split(',')[0].trim() || 'unknown'
   return hitRateLimit(`${routeKey}:${safeIp}`, opts)
 }
 
 /**
- * Cek apakah request sudah melewati rate limit.
+ * Cek apakah request sudah melewati rate limit. Async, kompatibel dengan Upstash.
  *
- * @param request - Request object (untuk mengambil IP)
+ * @param request  - Request object (untuk mengambil IP dari header)
  * @param routeKey - Identifier unik route (misal 'POST:/api/comment')
- * @param opts.limit - Jumlah request maksimal dalam window
- * @param opts.windowMs - Durasi window dalam milidetik
- * @param opts.identity - (opsional) identitas custom; kalau diisi, IP diabaikan
- * @returns true jika rate limit terlampaui (harus ditolak), false jika masih aman
+ * @param opts.limit     - Jumlah request maksimal dalam window
+ * @param opts.windowMs  - Durasi window dalam milidetik
+ * @param opts.identity  - (opsional) identitas custom; kalau diisi, IP diabaikan
+ * @returns Promise<true> jika rate limit terlampaui (harus ditolak)
  */
-export function checkRateLimit(
-  request: Request,
-  opts: { limit: number; windowMs: number; identity?: string }
-): boolean
-export function checkRateLimit(
+export async function checkRateLimit(
   request: Request,
   routeKey: string,
   opts: { limit: number; windowMs: number; identity?: string }
-): boolean
-export function checkRateLimit(
-  request: Request,
-  arg2: string | { limit: number; windowMs: number; identity?: string },
-  arg3?: { limit: number; windowMs: number; identity?: string }
-): boolean {
-  let routeKey: string
-  let opts: { limit: number; windowMs: number; identity?: string }
-
-  if (typeof arg2 === 'string') {
-    routeKey = arg2
-    opts = arg3!
-  } else {
-    try {
-      const url = new URL(request.url)
-      routeKey = `${request.method}:${url.pathname}`
-    } catch {
-      routeKey = `${request.method}:unknown`
-    }
-    opts = arg2
-  }
-
+): Promise<boolean> {
   let key: string
+
   if (opts.identity) {
     key = `${routeKey}:${opts.identity}`
   } else {

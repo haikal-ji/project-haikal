@@ -20,7 +20,7 @@ export async function POST(
   const identity = authUser ? `user:${authUser.id}` : `ip:${ip}`
 
   if (
-    checkRateLimit(request, `POST:/api/articles/view:${id}`, {
+    await checkRateLimit(request, `POST:/api/articles/view:${id}`, {
       limit: 20,
       windowMs: 60_000,
       identity,

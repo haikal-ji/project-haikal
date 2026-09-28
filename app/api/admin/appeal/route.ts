@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
   }
 
-  if (checkRateLimit(request, 'POST:/api/admin/appeal', { limit: 3, windowMs: 60_000 })) {
+  if (await checkRateLimit(request, 'POST:/api/admin/appeal', { limit: 3, windowMs: 60_000 })) {
     return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 })
   }
 

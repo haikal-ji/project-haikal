@@ -340,7 +340,7 @@ export default function ProfileClientView({
                   unoptimized={avatarPreview.startsWith('blob:') || avatarPreview.startsWith('data:')}
                 />
               ) : (
-                <div className="profile-card-avatar-fallback !border-0 font-serif group-hover:scale-105 transition-transform duration-300">
+                <div className="profile-card-avatar-fallback !border-0 font-sans font-bold group-hover:scale-105 transition-transform duration-300">
                   {initialLetter}
                 </div>
               )}
@@ -378,7 +378,7 @@ export default function ProfileClientView({
             </div>
           </div>
 
-          <h2 className="profile-card-name font-serif">{name || 'Tanpa Nama'}</h2>
+          <h2 className="profile-card-name font-sans font-bold">{name || 'Tanpa Nama'}</h2>
 
           {/* Badges Pengguna */}
           {user.badges && user.badges.length > 0 && (
@@ -415,12 +415,12 @@ export default function ProfileClientView({
         {/* Counter Statistik */}
         <div className="profile-stats-strip">
           <div className="profile-stat-item">
-            <span className="profile-stat-number font-serif">{stats.commentsCount}</span>
+            <span className="profile-stat-number font-sans font-bold">{stats.commentsCount}</span>
             <span className="profile-stat-label">Komentar</span>
           </div>
           <div className="profile-stat-divider" />
           <div className="profile-stat-item">
-            <span className="profile-stat-number font-serif">{stats.likesCount}</span>
+            <span className="profile-stat-number font-sans font-bold">{stats.likesCount}</span>
             <span className="profile-stat-label">Apresiasi</span>
           </div>
         </div>

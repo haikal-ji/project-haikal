@@ -184,7 +184,8 @@ html.dark .neon { box-shadow: 0 4px 20px -5px rgba(255, 255, 255, 0.02); }
 }
 
 * { box-sizing: border-box; }
-::selection { background: color-mix(in srgb, var(--foreground) 18%, transparent); color: var(--foreground); }
+::selection { background: var(--foreground); color: var(--background); }
+::-moz-selection { background: var(--foreground); color: var(--background); }
 a, button { transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease, opacity 180ms ease, transform 140ms ease; }
 .custom-cursor { position: fixed; z-index: 110; top: 0; left: 0; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--color-clay); box-shadow: 0 0 0 5px color-mix(in srgb, var(--color-clay) 15%, transparent); pointer-events: none; opacity: 0; transition: width 180ms ease, height 180ms ease, opacity 180ms ease; }
 .custom-cursor-enabled .custom-cursor { opacity: 1; }

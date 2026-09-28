@@ -12,7 +12,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Origin tidak valid' }, { status: 403 })
   }
 
-  if (checkRateLimit(request, 'POST:/api/comment', { limit: 10, windowMs: 60_000 })) {
+  // Rate limit per-IP: blokade awal sebelum auth (mencegah login farming)
+  if (await checkRateLimit(request, 'POST:/api/comment:ip', { limit: 20, windowMs: 60_000 })) {
     return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 })
   }
 
@@ -39,6 +40,11 @@ export async function POST(request: Request) {
       },
       { status: 403 }
     )
+  }
+
+  // Rate limit per-user-id: mencegah spam dari satu akun via banyak IP/proxy
+  if (await checkRateLimit(request, 'POST:/api/comment:user', { limit: 5, windowMs: 60_000, identity: dbUser.id })) {
+    return NextResponse.json({ error: 'Terlalu banyak komentar, tunggu sebentar sebelum mencoba lagi' }, { status: 429 })
   }
 
   const body = await request.json().catch(() => null)
@@ -97,4 +103,3 @@ export async function POST(request: Request) {
 
   return NextResponse.json({ comment })
 }
-

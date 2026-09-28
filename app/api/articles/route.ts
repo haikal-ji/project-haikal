@@ -19,7 +19,7 @@ async function requireOwner() {
 }
 
 export async function GET(request: Request) {
-  if (checkRateLimit(request, 'GET:/api/articles', { limit: 30, windowMs: 60_000 })) {
+  if (await checkRateLimit(request, 'GET:/api/articles', { limit: 30, windowMs: 60_000 })) {
     return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 })
   }
 

@@ -11,7 +11,7 @@ function isOwner(email: string | undefined | null) {
 
 // GET: Mengambil semua badge yang tersedia
 export async function GET(request: Request) {
-  if (checkRateLimit(request, 'GET:/api/badges', { limit: 30, windowMs: 60_000 })) {
+  if (await checkRateLimit(request, 'GET:/api/badges', { limit: 30, windowMs: 60_000 })) {
     return NextResponse.json({ error: 'Terlalu banyak permintaan, coba lagi nanti' }, { status: 429 })
   }
 

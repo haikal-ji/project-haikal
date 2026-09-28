@@ -25,7 +25,7 @@ export async function POST(
   const identity = authUser ? `user:${authUser.id}` : `ip:${ip}`
 
   if (
-    checkRateLimit(request, `POST:/api/articles/share:${id}`, {
+    await checkRateLimit(request, `POST:/api/articles/share:${id}`, {
       limit: 10,
       windowMs: 60_000,
       identity,
