@@ -150,11 +150,11 @@ export default function ReactionButtons({
 
     const isRemovingReaction = userReaction === type
 
-    // Animasi +1 / -1 hanya muncul saat menambah atau mengganti reaksi, BUKAN saat membatalkan (klik kedua)
-    if (isRemovingReaction) {
+    // Animasi tactile spring & floating badge hanya aktif untuk tombol LIKE
+    if (isRemovingReaction || type === 'DISLIKE') {
       setActiveAnim(null)
     } else {
-      setActiveAnim(type)
+      setActiveAnim('LIKE')
       setBurstKey(Date.now())
       animTimeoutRef.current = setTimeout(() => {
         setActiveAnim(null)
@@ -366,7 +366,7 @@ export default function ReactionButtons({
             {/* Subtle Divider */}
             <div className="h-4 w-px bg-text-secondary/15 mx-0.5" />
 
-            {/* Tombol DISLIKE 👎 */}
+            {/* Tombol DISLIKE 👎 (tanpa animasi) */}
             <button
               type="button"
               onClick={() => handleReaction('DISLIKE')}
@@ -378,18 +378,8 @@ export default function ReactionButtons({
               title={userReaction === 'DISLIKE' ? 'Batalkan' : 'Kurang suka artikel ini'}
               aria-pressed={userReaction === 'DISLIKE'}
             >
-              {/* Ambient Glow */}
-              {activeAnim === 'DISLIKE' && (
-                <span
-                  key={`glow-dislike-${burstKey}`}
-                  className="anim-reaction-glow absolute inset-0 m-auto rounded-lg bg-text-secondary/20 pointer-events-none"
-                />
-              )}
-
               <svg
-                className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
-                  activeAnim === 'DISLIKE' ? 'anim-reaction-down' : 'group-hover:translate-y-0.5'
-                }`}
+                className="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:translate-y-0.5"
                 viewBox="0 0 24 24"
                 fill={userReaction === 'DISLIKE' ? 'currentColor' : 'none'}
                 stroke="currentColor"

@@ -56,30 +56,37 @@ export async function generateMetadata({
     ? user.bio.slice(0, 155)
     : `Lihat profil, komentar, dan aktivitas ${user.name} di Haikal Journal.`
 
+  // Gunakan foto avatar asli jika ada, atau fallback ke og-image.png resmi
+  // WhatsApp crawler menolak URL gambar dinamis yang memiliki query string (seperti ui-avatars.com)
+  const defaultOgImage = `${siteUrl}/og-image.png`
   const imageUrl = user.avatar
     ? (user.avatar.startsWith('http') ? user.avatar : `${siteUrl}${user.avatar}`)
-    : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=111113&color=ffffff&size=512&bold=true`
+    : defaultOgImage
 
   return {
     title,
     description,
+    alternates: {
+      canonical: `${siteUrl}/pengguna/${id}`,
+    },
     openGraph: {
       title: `Profil ${user.name}`,
       description,
-      type: 'profile',
+      type: 'website',
       url: `${siteUrl}/pengguna/${id}`,
       siteName: 'Haikal Journal',
+      locale: 'id_ID',
       images: [
         {
           url: imageUrl,
-          width: 512,
-          height: 512,
+          width: user.avatar ? 800 : 1200,
+          height: user.avatar ? 800 : 630,
           alt: `Foto profil ${user.name}`,
         },
       ],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title: `Profil ${user.name}`,
       description,
       images: [imageUrl],
