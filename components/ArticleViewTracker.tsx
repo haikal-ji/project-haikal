@@ -17,10 +17,37 @@ export default function ArticleViewTracker({
     trackedArticle.current = articleId
 
     void fetch(`/api/articles/${articleId}/view`, { method: 'POST' })
-      .then((response) => response.ok ? response.json() : null)
+      .then((response) => (response.ok ? response.json() : null))
       .then((data: { viewCount?: number } | null) => {
-        if (typeof data?.viewCount === 'number') setViewCount(data.viewCount)
+        if (typeof data?.viewCount === 'number') {
+          setViewCount(data.viewCount)
+          // Siarkan ke tab lain yang sedang terbuka agar ikut ter-update otomatis
+          if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+            try {
+              const channel = new BroadcastChannel(`article-view-${articleId}`)
+              channel.postMessage({ viewCount: data.viewCount })
+              channel.close()
+            } catch {}
+          }
+        }
       })
+  }, [articleId])
+
+  // Dengarkan siaran dari tab lain secara real-time
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('BroadcastChannel' in window)) return
+
+    try {
+      const channel = new BroadcastChannel(`article-view-${articleId}`)
+      channel.onmessage = (event: MessageEvent<{ viewCount?: number }>) => {
+        if (typeof event.data?.viewCount === 'number') {
+          setViewCount(event.data.viewCount)
+        }
+      }
+      return () => {
+        channel.close()
+      }
+    } catch {}
   }, [articleId])
 
   return (
