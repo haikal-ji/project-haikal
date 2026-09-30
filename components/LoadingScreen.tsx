@@ -3,33 +3,17 @@
 import { useEffect, useState } from 'react'
 
 export default function LoadingScreen() {
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(true)
   const [fading, setFading] = useState(false)
 
   useEffect(() => {
-    // Di mobile / layar kecil atau kunjungan berulang, jangan blokir layar agar LCP tetap hijau (< 2 detik)
-    if (typeof window === 'undefined') return
-
-    const isMobile = window.innerWidth < 768
-    const alreadySeen = sessionStorage.getItem('haikal_loaded')
-
-    if (isMobile || alreadySeen) {
-      return
-    }
-
-    try {
-      sessionStorage.setItem('haikal_loaded', '1')
-    } catch {}
-
-    setVisible(true)
-
     const timer = setTimeout(() => {
       setFading(true)
-    }, 400)
+    }, 600)
 
     const removeTimer = setTimeout(() => {
       setVisible(false)
-    }, 750)
+    }, 1000)
 
     return () => {
       clearTimeout(timer)
@@ -43,7 +27,7 @@ export default function LoadingScreen() {
     <div
       aria-hidden="true"
       onAnimationEnd={() => setVisible(false)}
-      className={`fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center overflow-hidden transition-opacity duration-300 ease-out pointer-events-none ${
+      className={`fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center overflow-hidden transition-opacity duration-400 ease-out pointer-events-none ${
         fading ? 'opacity-0' : 'opacity-100'
       }`}
     >
@@ -69,7 +53,7 @@ export default function LoadingScreen() {
         <div
           className="absolute inset-y-0 left-0 w-full bg-text-primary rounded-full animate-loading-bar"
           style={{
-            animation: 'loadingProgress 0.75s cubic-bezier(0.65, 0, 0.35, 1) forwards',
+            animation: 'loadingProgress 1s cubic-bezier(0.65, 0, 0.35, 1) forwards',
           }}
         />
       </div>
