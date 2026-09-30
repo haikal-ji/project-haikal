@@ -26,34 +26,49 @@ export default function ArticleSearch({ articles }: { articles: ArticleItem[] })
           <input
             id="article-search"
             type="text"
+            inputMode="search"
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
+            maxLength={50}
+            onChange={(event) => setQuery(event.target.value.slice(0, 50))}
             placeholder="Cari artikel berdasarkan judul..."
-            className="w-full rounded-xl border border-text-secondary/20 bg-thirdary px-4 py-2.5 pr-9 text-sm text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:border-text-primary transition"
+            aria-label="Cari artikel berdasarkan judul"
+            autoComplete="off"
+            className="w-full rounded-xl border border-text-secondary/20 bg-thirdary pl-4 pr-24 py-2.5 text-sm text-text-primary placeholder:text-text-secondary/60 focus:outline-none focus:border-text-primary transition [&::-webkit-search-cancel-button]:hidden"
           />
-          {query && (
-            <button
-              type="button"
-              onClick={() => setQuery('')}
-              aria-label="Hapus pencarian"
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary transition"
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+            <span
+              className={`text-xs font-mono select-none transition-colors ${
+                query.length >= 50
+                  ? 'text-amber-500 font-bold'
+                  : 'text-text-secondary/70'
+              }`}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="w-4 h-4"
-                aria-hidden="true"
+              {query.length}/50
+            </span>
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                aria-label="Hapus pencarian"
+                className="text-text-secondary hover:text-text-primary transition p-0.5 rounded focus:outline-none focus-visible:ring-1 focus-visible:ring-text-primary"
               >
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-          )}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="w-4 h-4"
+                  aria-hidden="true"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            )}
+          </div>
         </div>
         <span className="text-xs font-semibold uppercase tracking-wider text-text-secondary">
           {filteredArticles.length} artikel ditemukan
@@ -120,7 +135,9 @@ export default function ArticleSearch({ articles }: { articles: ArticleItem[] })
         ))}
         {filteredArticles.length === 0 && (
           <div className="col-span-full py-16 text-center text-text-secondary">
-            <p className="text-sm">Tidak ada artikel yang sesuai dengan kata kunci &quot;{query}&quot;.</p>
+            <p className="text-sm max-w-md mx-auto">
+              Tidak ada artikel yang sesuai dengan kata kunci &quot;<span className="text-text-primary font-medium break-all">{query}</span>&quot;.
+            </p>
           </div>
         )}
       </div>
